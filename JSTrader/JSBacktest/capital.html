@@ -1,0 +1,77 @@
+<!DOCTYPE HTML>
+<HTML>
+
+<head>
+    <meta charset="utf-8">
+    <title>净值曲线</title>
+    <script src="qrc:///JS/qwebchannel.js"></script>
+    <script src="qrc:///JS/echarts.min.js"></script>
+</head>
+
+<body>
+    <script>
+        function output(message) {
+            var output = document.getElementById("output");
+            output.innerHTML = output.innerHTML = message + "\n";
+        }
+
+        function setdata(message) {
+            //先解析JSON
+            var json = JSON.parse(message);
+            var myChart = echarts.init(document.getElementById('result'));
+            option = {
+                title: {
+                    text: '回测净值曲线'
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['净值']
+                },
+
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: json.X
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value} ￥'
+                    }
+                },
+                dataZoom: [{ // 这个dataZoom组件，默认控制x轴。
+                    type: 'slider', // 这个 dataZoom 组件是 slider 型 dataZoom 组件
+                    start: 0, // 左边在 10% 的位置。
+                    end: 100 // 右边在 60% 的位置。
+                }],
+                series: [{
+                    name: '净值',
+                    type: 'line',
+                    data: json.Y
+                }]
+            }
+            myChart.setOption(option);
+        }
+
+        window.onload = function() {
+            output("窗口已经加载\n");
+            new QWebChannel(qt.webChannelTransport, function(channel) {
+                var transferobject = channel.objects.transferobject;
+                transferobject.sendCapital.connect(
+                    function(message) {
+                        alert("回测完成");
+                        setdata(message);
+
+                    });
+                transferobject.finished(true);
+            });
+        }
+    </script>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="output" style="width:100%;height:100%;"></div>
+    <div id="result" style="width:1750px;height:1000px;"></div>
+</body>
+
+</HTML>

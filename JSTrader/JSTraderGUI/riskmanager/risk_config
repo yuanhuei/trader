@@ -1,0 +1,7 @@
+active=false
+orderFlowLimit=11
+orderFlowClear=9
+orderSizeLimit=3
+tradeLimit=7
+workingOrderLimit=16
+orderCalcelLimit=0

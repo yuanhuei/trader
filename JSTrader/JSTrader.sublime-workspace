@@ -1,0 +1,319 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"lastDayRange",
+				"lastDayRange"
+			],
+			[
+				"open",
+				"openPrice"
+			],
+			[
+				"buffer",
+				"bufferSize"
+			],
+			[
+				"max",
+				"maximumPos"
+			],
+			[
+				"add",
+				"AddVolume"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 81.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 432.0
+	},
+	"console":
+	{
+		"height": 579.0,
+		"history":
+		[
+			"import urllib.request,os; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); open(os.path.join(ipp, pf), 'wb').write(urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ','%20')).read())",
+			"version",
+			"ls",
+			"refresh",
+			"encoding = \"utf-8\"",
+			"encoding = utf-8"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/E/gitJStrader/JSTrader/JSTrader/JSTraderGUI/ctamanager.cpp",
+		"/E/gitJStrader/JSTrader/JSTrader/JSTraderGUI/Strategy/strategysetting",
+		"/E/gitJStrader/JSTrader/JSTrader/JSBacktest/Strategy/strategysetting",
+		"/E/gitJStrader/JSTrader/JSTrader/JSTraderGUI/CTPGateway/CTP_connect",
+		"/E/gitJStrader/JSTrader/releaseBin/CTPGateway/CTP_connect",
+		"/E/gitJStrader/JSTrader/JSTrader/atrBreak/atrBreak.h",
+		"/E/gitJStrader/JSTrader/releaseBin/strategy/strategysetting",
+		"/E/gitJStrader/JSTrader/JSTrader/JSTraderGUI/riskmanager/risk_config",
+		"/C/Users/apple/Desktop/data/a1705.csv",
+		"/C/Users/apple/Desktop/datanew/JD705.csv",
+		"/C/Users/apple/Desktop/datanew/al1705.csv",
+		"/C/Users/apple/Desktop/B10资料包/B10-日内1.XTRD",
+		"/C/Users/apple/Desktop/strategysetting",
+		"/C/Users/apple/Desktop/Hans123_rb.csv",
+		"/C/Users/apple/Desktop/新建文本文档.txt",
+		"/C/Users/apple/Desktop/h.txt",
+		"/E/JSTrader/src/JSBacktest/Strategy/strategysetting",
+		"/E/gitJStrader/JSTrader/如果这个文件DEV有 MASTER没有证明已经可以了.txt",
+		"/C/Users/apple/.ssh/id_rsa.pub",
+		"/E/gitJStrader/JSTrader/test.txt",
+		"/E/JSTrader/src/JSTraderGUI/IBGateway/IB_connect",
+		"/E/JSTrader/LICENSE",
+		"/E/JSTrader/README.md",
+		"/E/JSTrader/src/JSTraderGUI/IBGateway/IB_connect.json",
+		"/E/JSTrader/src/JSTraderGUI/CTPGateway/CTP_connect",
+		"/E/JSTrader/src/JSTraderGUI/Strategy/strategysetting",
+		"/E/strategys/修改的/StrategyTemplate.cpp",
+		"/E/TWS API/source/CppClient/client/TimeCondition.h",
+		"/E/JSTrader/src/JSTraderGUI/IBGateway/IBGateway.json",
+		"/C/Users/apple/Desktop/.accelerate/17E81AC6ED7DE677EA70090E87ECF905_0",
+		"/E/JSTrader/ReleaseBin/CTPGateway/CTP_connect",
+		"/C/Users/apple/Desktop/zguide-master/examples/C++/build",
+		"/C/Users/apple/Desktop/zguide-master/examples/C++/hwclient.cpp",
+		"/C/Users/apple/Desktop/zguide-master/examples/C++/hwserver.cpp",
+		"/E/JSTrader/ReleaseBin/CTPGateway/CTP_datarecord",
+		"/E/JSTrader/src/EventEngine/EventEngine.cpp",
+		"/C/Users/apple/Desktop/zguide-master/examples/C++/README",
+		"/C/Users/apple/Desktop/cppzmq-master/README",
+		"/C/Users/apple/Desktop/cppzmq-master/zmq.hpp",
+		"/C/Users/apple/Desktop/zguide-master/fragments/README",
+		"/C/Users/apple/Desktop/zguide-master/examples/C/clonecli1.c",
+		"/C/Users/apple/Desktop/zguide-master/listings/C/listing_3.c",
+		"/C/Users/apple/Desktop/zguide-master/listings/C/listing_1.c",
+		"/C/Users/apple/Desktop/zguide-master/examples/C++/c",
+		"/C/Users/apple/Desktop/zguide-master/examples/build",
+		"/E/Another/src/DataRecorder/CTPGateway/CTP_datarecord",
+		"/E/Another/src/JSTraderGUI/CTPGateway/CTP_connect",
+		"/E/Another/bin/CTPGateway/CTP_connect",
+		"/E/Another/新建文件夹/backTestingSystem/backtestingEngine.cpp",
+		"/C/Users/apple/Desktop/不频繁开仓ATR5MIN.不频繁开仓ATR5MIN",
+		"/E/JStrader/src/JSTraderGUI/Strategy/strategysetting",
+		"/E/Another/src/JStrader/CTPGateway/CTP_connect",
+		"/E/Another/src/JSTraderGUI/Strategy/strategysetting",
+		"/C/Users/apple/Desktop/rb_10mins.txt",
+		"/E/JStrader/src/JSTraderGUI/CTPGateway/CTP_connect",
+		"/E/JSTrader/src/JStrader/gatewaymanager.cpp",
+		"/E/JSTrader/include/structs.h",
+		"/E/JSTrader/include/talib.cpp",
+		"/E/JSTrader/include/JSgateway.cpp",
+		"/E/JSTrader/include/CTAAPI.h",
+		"/C/vnpy/vnpy/vn.ctp/CMakeLists.txt",
+		"/C/Users/apple/Documents/Tencent Files/515374371/FileRecv/rb1705.csv",
+		"/C/Users/apple/Desktop/胜哥生日快乐.txt",
+		"/E/JSTradingSystem/JSTradingSystem/CTPGateway/CTP_connect",
+		"/C/vnpy/vnpy/vn.ctp/build.sh",
+		"/C/Users/apple/Desktop/JSTradingSystem/DataRecorder/main.cpp",
+		"/E/JSTradingSystem/JSTradingSystem/JSTradingSystem.vcxproj",
+		"/C/Users/apple/Desktop/Recorder.cpp",
+		"/C/Users/apple/Desktop/DailyLastHL.pla",
+		"/C/Users/apple/Desktop/vnpy/vnpy/vn.trader/dataRecorder/DR_setting.json",
+		"/C/Users/apple/Desktop/JSTradingSystem/Release/CTPGateway/CTP_datarecord",
+		"/C/vnpy/vnpy/vn.trader/ctpGateway/CTP_connect.json",
+		"/C/Users/apple/Desktop/strategyAtrRsi.py",
+		"/C/Users/apple/Desktop/vnpy/vnpy/vn.ctp/vnctpmd/vnctpmd/vnctpmd.cpp",
+		"/C/vnpy/vnpy/vn.ctp/vnctpmd/vnctpmd/vnctpmd.cpp",
+		"/C/Users/apple/Desktop/JSTradingSystem/Debug/CTPGateway/CTP_connect",
+		"/D/isolinux/isolinux.cfg",
+		"/C/Users/apple/Desktop/vnpy/vnpy/vn.trader/eventEngine.py",
+		"/C/vnpy/vnpy/vn.trader/ctaAlgo/LLTstrategy.pos",
+		"/C/Users/apple/Desktop/flask/flasky/app/templates/base.html",
+		"/C/Users/apple/Desktop/flask/flasky/app/templates/auth/login.html",
+		"/C/Users/apple/Desktop/东东啊.html",
+		"/C/Users/apple/lala.pos",
+		"/C/Users/apple/Desktop/flask/flasky/app/templates/mail/new_user.html",
+		"/C/Users/apple/Desktop/flask/flasky/app/templates/mail/new_user.txt",
+		"/C/Users/apple/Desktop/flask/flasky/templates/base.html",
+		"/C/Users/apple/Desktop/flask/flasky/templates/index.html",
+		"/C/vnpy/vnpy/vn.trader/ctaAlgo/CTA_setting.json",
+		"/C/vnpy/vnpy/vn.trader/dataRecorder/DR_setting.json",
+		"/C/Users/apple/Desktop/K95 RGB灯效.rar",
+		"/C/Users/apple/Desktop/0921/2016092100.html",
+		"/C/vnpy-master/vn.trader/ctpGateway/CTP_connect.json",
+		"/C/vnpy/vnpy/vn.trader/VT_setting.json",
+		"/C/Users/apple/Desktop/my_C_code/game.c",
+		"/C/Users/apple/Desktop/cython/sample.c",
+		"/C/Users/apple/public_html/index.html",
+		"/C/Users/apple/Desktop/untitled/Exchange.py",
+		"/C/Anaconda2/Lib/site-packages/PyQt4/QtDesigner.pyd",
+		"/C/vnpy-master/vn.trader/ctaAlgo/CTA_setting.json",
+		"/C/Users/apple/PycharmProjects/New_journey/my_requests",
+		"/C/Users/apple/Desktop/hfcta/ctamd/vnctpmd.cpp",
+		"/C/vnpy/vnpy/vn.trader/vtMain.py",
+		"/C/vnpy/vnpy/vn.trader/vtEngine.py",
+		"/C/Users/apple/Desktop/hfcta/ctamd/ThostFtdcMdApi.h",
+		"/C/Users/apple/Desktop/tradeapidll/ThostFtdcTraderApi.h",
+		"/C/vnpy-master/vn.trader/ctpGateway/vnctpmd.pyd",
+		"/C/vnpy-master/vn.trader/ctaAlgo/ctaBacktesting.py",
+		"/C/vnpy-master/vn.trader/VT_setting.json",
+		"/C/vnpy/vnpy-master/vn.trader/eventEngine.py",
+		"/C/vnpy/vnpy-master/vn.trader/ctaAlgo/CTA_setting.json",
+		"/C/Users/apple/Desktop/tradeapidll/ThostFtdcMdApi.h",
+		"/C/Users/apple/Desktop/vnpy资料/vnpy Logical Design 1.1.vsdx",
+		"/C/vnpy/vnpy-master/vn.trader/VT_setting.json",
+		"/C/Users/apple/Desktop/tradeapidll/ThostFtdcUserApiDataType.h",
+		"/C/vnpy/vnpy-master/vn.trader/ctaAlgo/ctaBacktesting.py",
+		"/C/vnpy/vnpy-master/vn.trader/ctaAlgo/ctaBase.py",
+		"/C/vnpy/vnpy-master/vn.trader/ctaAlgo/ctaEngine.py",
+		"/C/vnpy/vnpy-master/vn.trader/ctaAlgo/ctaDemo.py",
+		"/C/vnpy/vnpy-master/vn.trader/ctaAlgo/ctaHistoryData.py",
+		"/C/vnpy/vnpy-master/vn.trader/ctaAlgo/__init__.py",
+		"/C/vnpy/vnpy-master/vn.trader/ctpGateway/CTP_connect.json",
+		"/C/Anaconda2win32/Scripts/pip-script.py",
+		"/C/Anaconda2/Scripts/pip-script.py",
+		"/C/vnpy/vnpy-master/vn.trader/uiMainWindow.py",
+		"/C/Users/apple/Desktop/gmsdk-2.8.2-py2-x64-windows/examples/test_timer.py",
+		"/C/vnpy-master/vn.trader/uiMainWindow.py",
+		"/C/vnpy-master/README.md",
+		"/C/Users/apple/Desktop/pyctp/MdApi.py"
+	],
+	"find":
+	{
+		"height": 28.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"addstate"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 28.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "JSTrader.sublime-project",
+	"replace":
+	{
+		"height": 52.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 225.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
