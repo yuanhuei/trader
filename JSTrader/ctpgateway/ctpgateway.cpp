@@ -4,7 +4,7 @@ CTPGateway::CTPGateway(EventEngine *eventengine, std::string gatewayname) :JSGat
 	m_eventengine = eventengine;
 	m_gatewayname = gatewayname;
 
-	//´´½¨ĞĞÇéºÍ½»Ò×µÄ»Øµ÷¶ÔÏó
+	//åˆ›å»ºè¡Œæƒ…å’Œäº¤æ˜“çš„å›è°ƒå¯¹è±¡
 	m_MDSPI = new CTPMD(this, gatewayname);
 	m_TDSPI = new CTPTD(this, gatewayname);
 
@@ -12,6 +12,7 @@ CTPGateway::CTPGateway(EventEngine *eventengine, std::string gatewayname) :JSGat
 	ctptdconnected = false;
 	m_qryEnabled = false;
 	m_qrycount = 0;
+	m_eventengine->RegEvent(EVENT_TIMER, std::bind(&CTPGateway::query, this));//æ³¨å†Œåˆ°äº‹ä»¶é©±åŠ¨å¼•æ“ï¼Œå¾ªç¯æŸ¥è¯¢
 }
 
 CTPGateway::~CTPGateway()
@@ -28,17 +29,17 @@ CTPGateway::~CTPGateway()
 
 void CTPGateway::connect()
 {
-	//Á¬½ÓĞĞÇéºÍ½»Ò×
-	//ÏÈÉ¨ÃèÎÄµµÏÂµÄÕËºÅÃÜÂëÅäÖÃÎÄ¼ş
+	//è¿æ¥è¡Œæƒ…å’Œäº¤æ˜“
+	//å…ˆæ‰«ææ–‡æ¡£ä¸‹çš„è´¦å·å¯†ç é…ç½®æ–‡ä»¶
 	if (_access("./CTPGateway", 0) != -1)
 	{
 		std::fstream f;
 		f.open("./CTPGateway/CTP_connect");
 		if (!f.is_open())
 		{
-			//Èç¹û´ò²»¿ªÎÄ¼ş
+			//å¦‚æœæ‰“ä¸å¼€æ–‡ä»¶
 			std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-			e->msg = "ÎŞ·¨¶ÁÈ¡±¾µØÅäÖÃÎÄ¼ş";
+			e->msg = "æ— æ³•è¯»å–æœ¬åœ°é…ç½®æ–‡ä»¶";
 			e->gatewayname = m_gatewayname;
 			this->onLog(e);
 			return;
@@ -48,7 +49,7 @@ void CTPGateway::connect()
 		while (!f.eof())
 		{
 			getline(f, line);
-			std::string::size_type pos = line.find("=");//°´ÕÕµÈºÅ·Ö¸ô
+			std::string::size_type pos = line.find("=");//æŒ‰ç…§ç­‰å·åˆ†éš”
 			configmap.insert(std::make_pair(line.substr(0, pos), line.substr(pos + 1, line.size() - 1)));
 		}
 		m_MDSPI->connect(configmap["userid"], configmap["password"], configmap["brokerid"], configmap["mdaddress"]);
@@ -57,7 +58,7 @@ void CTPGateway::connect()
 	else
 	{
 		std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-		e->msg = "ÎŞ·¨¶ÁÈ¡±¾µØÅäÖÃÎÄ¼ş";
+		e->msg = "æ— æ³•è¯»å–æœ¬åœ°é…ç½®æ–‡ä»¶";
 		e->gatewayname = m_gatewayname;
 		this->onLog(e);
 	}
@@ -114,7 +115,6 @@ void CTPGateway::initQuery()
 {
 	std::this_thread::sleep_for(std::chrono::seconds(5));
 	m_qryEnabled = true;
-	m_eventengine->RegEvent(EVENT_TIMER, std::bind(&CTPGateway::query, this));//×¢²áµ½ÊÂ¼şÇı¶¯ÒıÇæ£¬Ñ­»·²éÑ¯
 }
 
 void CTPGateway::query()
