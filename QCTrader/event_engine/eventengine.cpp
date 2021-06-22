@@ -114,7 +114,7 @@ void EventEngine::DoTask()
 		{
 			break;
 		}
-		std::pair<std::multimap<std::string, TASK>::iterator, std::multimap<std::string, TASK>::iterator>ret;
+		std::pair<std::multimap<std::string, TASK>::iterator, std::multimap<std::string, TASK>::iterator> ret;
 		m_mutex.lock();
 		ret = m_task_map->equal_range(e->GetEventType());															//获取事件类型进行对比
 		m_mutex.unlock();

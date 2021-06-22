@@ -1,5 +1,9 @@
 #include"ctptd.h"
 
+#include"ctpgateway.h"
+#include<io.h>
+#include< direct.h>
+
 CTPTD::CTPTD(CTPGateway* CTPGateway, std::string gatewayname)//验证无问题
 {
 	m_ctpgateway = CTPGateway;

@@ -1,4 +1,8 @@
 #include"ctpmd.h"
+#include"../qcgateway.hpp"
+#include"../ctp_gateway/ctpgateway.h"
+#include<io.h>
+#include<direct.h>
 
 CTPMD::CTPMD(CTPGateway* CTPGateway, std::string gatewayname)//已验证没问题
 {

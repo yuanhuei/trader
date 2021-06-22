@@ -13,7 +13,7 @@
 
 class CTPGateway;
 
-class CTPMD: public  CThostFtdcMdSpi
+class CTPMD : public  CThostFtdcMdSpi
 {
 public:
 	CTPMD(CTPGateway* CTPGateway, std::string gatewayname);
@@ -78,6 +78,6 @@ private:
 	std::set<std::string> m_ninetoone;
 	std::set<std::string> m_ninetohalftwo;
 
-}
+};
 
-#endif // !CTPMD_H
+#endif 

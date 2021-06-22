@@ -62,6 +62,10 @@
     <ClCompile>
       <AdditionalIncludeDirectories>..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>../lib;../bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>mongoc-1.0.lib;bson-1.0.lib;thostmduserapi.lib;thosttraderapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'" Label="Configuration">
     <ClCompile>
@@ -90,23 +94,43 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ClickTableView.cpp" />
+    <ClCompile Include="jstradergui.cpp" />
+    <ClCompile Include="portfolio.cpp" />
+    <ClCompile Include="ReadOnlyDelegate.cpp" />
+    <ClCompile Include="risk_manager\riskmanager.cpp" />
+    <ClCompile Include="SpinBoxDelegate.cpp" />
     <QtRcc Include="QCTrader.qrc" />
     <QtUic Include="QCTrader.ui" />
     <QtMoc Include="QCTrader.h" />
-    <ClCompile Include="event_engine\enventengine.cpp" />
+    <ClCompile Include="cta_strategy\ctamangager.cpp" />
+    <ClCompile Include="cta_strategy\StrategyTemplate.cpp" />
+    <ClCompile Include="event_engine\eventengine.cpp" />
     <ClCompile Include="gateway\ctp_gateway\ctpgateway.cpp" />
     <ClCompile Include="gateway\ctp_gateway\ctpmd.cpp" />
     <ClCompile Include="gateway\ctp_gateway\ctptd.cpp" />
+    <ClCompile Include="gateway\gatewaymanager.cpp" />
+    <ClCompile Include="gateway\qcgateway.hpp" />
     <ClCompile Include="main_engine\mainengine.cpp" />
     <ClCompile Include="QCTrader.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="event_engine\enventengine.h" />
+    <QtMoc Include="ClickTableView.h" />
+    <ClInclude Include="cta_strategy\ctamanager.h" />
+    <ClInclude Include="cta_strategy\StrategyTemplate.h" />
+    <ClInclude Include="event_engine\eventengine.h" />
     <ClInclude Include="gateway\ctp_gateway\ctpgateway.h" />
     <ClInclude Include="gateway\ctp_gateway\ctpmd.h" />
     <ClInclude Include="gateway\ctp_gateway\ctptd.h" />
+    <ClInclude Include="gateway\gatewaymanager.h" />
+    <QtMoc Include="SpinBoxDelegate.h" />
+    <QtMoc Include="jstradergui.h" />
     <ClInclude Include="main_engine\mainengine.h" />
+    <ClInclude Include="portfolio.h" />
+    <ClInclude Include="qcstructs.h" />
+    <QtMoc Include="ReadOnlyDelegate.h" />
+    <ClInclude Include="risk_manager\riskmanager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

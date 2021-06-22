@@ -40,7 +40,7 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="event_engine\enventengine.cpp">
+    <ClCompile Include="event_engine\eventengine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main_engine\mainengine.cpp">
@@ -55,9 +55,39 @@
     <ClCompile Include="gateway\ctp_gateway\ctpmd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gateway\qcgateway.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cta_strategy\ctamangager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cta_strategy\StrategyTemplate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gateway\gatewaymanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="risk_manager\riskmanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="jstradergui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="portfolio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReadOnlyDelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SpinBoxDelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClickTableView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="event_engine\enventengine.h">
+    <ClInclude Include="event_engine\eventengine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="main_engine\mainengine.h">
@@ -72,5 +102,37 @@
     <ClInclude Include="gateway\ctp_gateway\ctpmd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="qcstructs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cta_strategy\ctamanager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cta_strategy\StrategyTemplate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gateway\gatewaymanager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="risk_manager\riskmanager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="portfolio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="jstradergui.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="ReadOnlyDelegate.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="SpinBoxDelegate.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="ClickTableView.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
 </Project>
