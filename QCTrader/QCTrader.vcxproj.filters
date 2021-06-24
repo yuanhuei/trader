@@ -58,7 +58,7 @@
     <ClCompile Include="gateway\qcgateway.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cta_strategy\ctamangager.cpp">
+    <ClCompile Include="cta_strategy\ctamanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cta_strategy\StrategyTemplate.cpp">
@@ -83,6 +83,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ClickTableView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AlgorithmOrder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="json11.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\MongoCxx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -118,6 +127,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="portfolio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AlgorithmOrder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="json11.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\MongoCxx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug\uic\ui_QCTrader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,15 +1,6 @@
 
 #include"ctamanager.h"
-#include"json11.h"
-#include"utils.hpp"
-#include"../event_engine/eventengine.h"
 
-#include"../risk_manager/riskmanager.h"
-//#include"CTAAPI.h"
-#include"StrategyTemplate.h"
-#include"../portfolio.h"
-#include<functional>
-#include<cstdio>
 
 typedef StrategyTemplate* (*Dllfun)(CTAmanager*);
 typedef int(*Release)();

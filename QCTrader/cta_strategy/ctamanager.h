@@ -1,30 +1,38 @@
 #pragma once
 #ifndef CTAMANAGER_H
 #define CTAMANAGER_H
-//#include"EventEngine.h"
-//#include"gatewaymanager.h"
-//#include"riskmanager.h"
-//#include"CTAAPI.h"
-//#include"StrategyTemplate.h"
-//#include"portfolio.h"
-#include"../../include/libmongoc-1.0/mongoc.h"
-#include"../../include/libbson-1.0/bson.h"
-#include<fstream>
-#include<vector>
-#include"../qcstructs.h"
+
+#include"json11.hpp"
+#include"utils.hpp"
+#include"../event_engine/eventengine.h"
+#include"../risk_manager/riskmanager.h"
+#include"../cta_strategy/StrategyTemplate.h"
+#include"../gateway/gatewaymanager.h"
+#include"../portfolio.h"
+#include<functional>
+#include<cstdio>
+//#include <windows.h>
+//#include<minwindef.h>
+#include"MongoCxx.h"
+#include"../include/libmongoc-1.0/mongoc.h"
+#include"../include/libbson-1.0/bson.h"
+//#include "stdafx.h"
+
+//#include "second.h"
 #define CTAORDER_BUY "ctaorderbuy"
 #define CTAORDER_SELL "ctaordersell"
 #define CTAORDER_SHORT "ctaordershort"
 #define CTAORDER_COVER "ctaordercover"
-class EventEngine;
-class Gatewaymanager;
-class riskmanager;
+//class EventEngine;
+//class Gatewaymanager;
+//class riskmanager;
 class StrategyTemplate;
-class mongoc_uri_t;
-class mongoc_client_pool_t;
+//class mongoc_uri_t;
+//class mongoc_client_pool_t;
 class Portfolio;
 
-
+//typedef StrategyTemplate* (*Dllfun)(CTAmanager*);
+//typedef int(*Release)();
 /*******************************************/
 class PositionBuffer//用来缓存持仓
 {
@@ -105,6 +113,7 @@ private:
 
 	//MONGOC 线程池
 	mongoc_uri_t* m_uri;
+public:
 	mongoc_client_pool_t* m_pool;
 
 	//portfolio

@@ -60,7 +60,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\include\libbson-1.0;..\include\libmongoc-1.0;..;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>../lib;../bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -94,7 +94,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\include\MongoCxx.cpp" />
+    <ClCompile Include="AlgorithmOrder.cpp" />
     <ClCompile Include="ClickTableView.cpp" />
+    <ClCompile Include="json11.cpp" />
     <ClCompile Include="jstradergui.cpp" />
     <ClCompile Include="portfolio.cpp" />
     <ClCompile Include="ReadOnlyDelegate.cpp" />
@@ -103,7 +106,7 @@
     <QtRcc Include="QCTrader.qrc" />
     <QtUic Include="QCTrader.ui" />
     <QtMoc Include="QCTrader.h" />
-    <ClCompile Include="cta_strategy\ctamangager.cpp" />
+    <ClCompile Include="cta_strategy\ctamanager.cpp" />
     <ClCompile Include="cta_strategy\StrategyTemplate.cpp" />
     <ClCompile Include="event_engine\eventengine.cpp" />
     <ClCompile Include="gateway\ctp_gateway\ctpgateway.cpp" />
@@ -117,8 +120,11 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="ClickTableView.h" />
+    <ClInclude Include="..\include\MongoCxx.h" />
+    <ClInclude Include="AlgorithmOrder.h" />
     <ClInclude Include="cta_strategy\ctamanager.h" />
     <ClInclude Include="cta_strategy\StrategyTemplate.h" />
+    <ClInclude Include="Debug\uic\ui_QCTrader.h" />
     <ClInclude Include="event_engine\eventengine.h" />
     <ClInclude Include="gateway\ctp_gateway\ctpgateway.h" />
     <ClInclude Include="gateway\ctp_gateway\ctpmd.h" />
@@ -126,6 +132,7 @@
     <ClInclude Include="gateway\gatewaymanager.h" />
     <QtMoc Include="SpinBoxDelegate.h" />
     <QtMoc Include="jstradergui.h" />
+    <ClInclude Include="json11.hpp" />
     <ClInclude Include="main_engine\mainengine.h" />
     <ClInclude Include="portfolio.h" />
     <ClInclude Include="qcstructs.h" />

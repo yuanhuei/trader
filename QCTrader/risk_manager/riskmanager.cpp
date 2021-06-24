@@ -6,6 +6,24 @@
 #include<fstream>
 #include"../qcstructs.h"
 
+riskmanager::riskmanager(EventEngine* eventengine)
+{
+	eventengine_ptr = eventengine;
+	active = false;
+	orderFlowLimit = 0;
+	orderFlowCount = 0;
+	orderFlowClear = 0;
+	orderFlowTimer = 0;
+	orderSizeLimit = 0;
+	tradeCount = 0;
+	tradeLimit = 0;
+	orderCancelLimit;
+	workingOrderLimit = 0;
+	loadSetting();
+	registerEvent();
+}
+riskmanager::~riskmanager() {}
+
 void riskmanager::loadSetting()
 {
 	if (_access("./riskmanager", 0) != -1)

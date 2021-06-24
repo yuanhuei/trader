@@ -3,7 +3,7 @@
 #define CTPTD_H
 
 #include<string>
-#include"..\..\qcstructs.h"
+#include"../../qcstructs.h"
 #include"CTPAPI/ThostFtdcUserApiDataType.h"
 #include"CTPAPI/ThostFtdcTraderApi.h"
 

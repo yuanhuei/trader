@@ -5,9 +5,9 @@
 #include<memory>
 #include<atomic>
 #include<vector>
-#include"structs.h"
-#include"../cta_strategy/ctamanager.h"
-#include"json11.h"
+#include"../qcstructs.h"
+#include"ctamanager.h"
+#include"json11.hpp"
 #include"AlgorithmOrder.h"
 #include"MongoCxx.h"
 #include"../include/libmongoc-1.0/mongoc.h"
@@ -17,7 +17,8 @@
 
 class algorithmOrder;
 class MongoCxx;
-class CTPAPI;
+class CTAmanager;
+
 
 class StrategyData
 {
@@ -52,7 +53,7 @@ public:
 
 	//算法交易部分变量						默认值，可以不修改在策略实例中调用setlimit函数来重新设置
 	double unitLimit;						//算法下单
-	Mode TradingMode;				//回测还是实盘
+	enum Mode TradingMode;				//回测还是实盘
 
 	/******************************CTAMANAGER控制策略***********************************************/
 	//初始化

@@ -1,28 +1,21 @@
 #ifndef RISKMANAGER_H
 #define RISKMANAGER_H
-
+#include<memory>
+#include<functional>
+#include"utils.hpp"
+#include<io.h>
+#include<direct.h>
+#include<fstream>
+#include"../qcstructs.h"
 class Event;
+class EventEngine;
 
 class riskmanager
 {
-	
+
 public:
-	riskmanager( EventEngine *eventengine)
-	{
-		eventengine_ptr = eventengine;
-		active = false;
-		orderFlowLimit = 0;
-		orderFlowCount = 0;
-		orderFlowClear = 0;
-		orderFlowTimer = 0;
-		orderSizeLimit = 0;
-		tradeCount = 0;
-		tradeLimit = 0;
-		orderCancelLimit;
-		workingOrderLimit = 0;
-		loadSetting();
-		registerEvent();
-	}
+	riskmanager(EventEngine* eventengine);
+	~riskmanager();
 	void loadSetting();
 	void registerEvent();
 	void onLog(std::shared_ptr<Event>e);
@@ -58,11 +51,10 @@ public:
 	std::atomic_int workingOrderLimit;
 
 private:
-	EventEngine *eventengine_ptr;
+	EventEngine* eventengine_ptr;
 	std::atomic_int orderFlowCount;
 	std::atomic_int tradeCount;
 
 
 };
-
 #endif

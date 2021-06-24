@@ -2,18 +2,19 @@
 #ifndef EVENTENGINE_H
 #define EVENTENGINE_H
 
-//#include<string>
-//#include<queue>
-//#include<mutex>
-//#include<memory>
-//#include<condition_variable>
-//#include<map>
-//#include<thread>
-//#include<atomic>
-//#include<chrono>
-//#include<time.h>
-//#include"structs.h"
+
 #include<functional>
+#include<string>
+#include<queue>
+#include<mutex>
+#include<memory>
+#include<condition_variable>
+#include<map>
+#include<thread>
+#include<atomic>
+#include<chrono>
+#include<time.h>
+#include"../qcstructs.h"
 /*********************************同步队列****************************************/
 //同步队列
 template<typename EVENT>

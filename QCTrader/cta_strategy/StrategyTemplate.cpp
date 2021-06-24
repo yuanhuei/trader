@@ -1,4 +1,5 @@
 #include"StrategyTemplate.h"
+
 StrategyTemplate::StrategyTemplate(CTAmanager*ctamanager)
 {
 	m_ctamanager = ctamanager;

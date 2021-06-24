@@ -1,15 +1,5 @@
 #include "eventengine.h"
-#include<string>
-#include<queue>
-#include<mutex>
-#include<memory>
-#include<condition_variable>
-#include<map>
-#include<thread>
-#include<atomic>
-#include<chrono>
-#include<time.h>
-#include"../qcstructs.h"
+
 
 EventEngine::EventEngine()
 {

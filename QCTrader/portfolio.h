@@ -2,9 +2,11 @@
 #define PORTFOLIO_H
 #include<map>
 #include<mutex>
+
 #include"cta_strategy/StrategyTemplate.h"
 #include"gateway/gatewaymanager.h"
 #include"event_engine/eventengine.h"
+class StrategyTemplate;
 
 class TradingResult
 {

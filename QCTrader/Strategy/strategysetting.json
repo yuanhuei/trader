@@ -1,0 +1,10 @@
+[{
+	"strategy": "oneminutebreak.dll",
+	"symbol": ["rb1710"],
+	"param": [{
+		"gatewayname": "CTP",
+		"name": "oneminutebreak_rb",
+		"slippage_rb": "1",
+		"rb1710": "0.000045"
+	}]
+}]

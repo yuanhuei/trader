@@ -1,7 +1,11 @@
 #ifndef GATEWAYMANAGER_H
 #define GATEWAYMANAGER_H
+#include "../event_engine/eventengine.h"
+#include "../qcstructs.h"
+#include "ctp_gateway/ctpgateway.h"
+#include "qcgateway.hpp"
 
-class EventEngine;
+
 class Gatewaymanager
 {
 public:

@@ -1,9 +1,6 @@
 #include"gatewaymanager.h"
 
-#include "../event_engine/eventengine.h"
-#include "../qcstructs.h"
-#include "ctp_gateway/ctpgateway.h"
-#include "QCgateway.hpp"
+
 
 Gatewaymanager::Gatewaymanager(EventEngine *eventengine)
 {
