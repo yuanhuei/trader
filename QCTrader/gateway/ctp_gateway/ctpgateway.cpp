@@ -151,3 +151,11 @@ void CTPGateway::query()
 		m_qrycount = 0;
 	}
 }
+
+void CTPGateway::write_error(std::string msg, CThostFtdcRspInfoField* pRspInfo)
+{
+	std::string newMsg;
+	newMsg = msg + ",´úÂë" + std::to_string(pRspInfo->ErrorID) + ",ÐÅÏ¢" + pRspInfo->ErrorMsg;
+	write_log(newMsg);
+
+}

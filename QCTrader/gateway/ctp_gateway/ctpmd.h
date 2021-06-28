@@ -39,6 +39,9 @@ public:
 	///错误应答
 	virtual void OnRspError(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast);
 
+	//订阅应答响应
+	virtual void OnRspSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificInstrument, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast);
+
 	///深度行情通知
 	virtual void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField* pDepthMarketData);
 
@@ -50,13 +53,13 @@ public:
 	void connect(std::string userID, std::string password, std::string brokerID, std::string address);
 	//登录函数
 	void login();
-	//订阅函数
+	//订阅函数,调用subscribeMarketData
 	void subscribe(SubscribeReq& subscribeReq);
 	//退出登录
 	void logout();
 
-	void subscribeMarketData(std::string instrumentID);
-	//订阅
+	void subscribeMarketData(std::string instrumentID);//订阅合约，调用m_mdapi->SubscribeMarketData
+	
 	void close();
 	//退出线程
 private:

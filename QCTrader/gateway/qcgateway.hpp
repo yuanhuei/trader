@@ -45,6 +45,13 @@ public:
 	{
 		m_eventengine->Put(e);
 	}
+	void QCGateway::write_log(std::string msg)
+	{
+		std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
+		e->gatewayname = m_gatewayname;
+		e->msg = msg;
+		this->onLog(e);
+	}
 	virtual void connect() = 0;																					//连接
 	virtual void subscribe(SubscribeReq& subscribeReq) = 0;														//订阅
 	virtual std::string sendOrder(OrderReq& req) = 0;															//发单

@@ -12,6 +12,7 @@
 //#include"CTPAPI/ThostFtdcMdApi.h"
 //#include"CTPAPI/ThostFtdcTraderApi.h"
 #include"../qcgateway.hpp"
+#include"CTPAPI/ThostFtdcMdApi.h"
 //#include"../../event_engine/eventengine.h"
 //#include"ctpmd.h"
 //#include"ctptd.h"
@@ -39,6 +40,8 @@ public:
 	std::shared_ptr<Event_Order>getorder(std::string orderID);		//获取order
 	//订单维护
 	std::map<std::string, std::shared_ptr<Event_Order>>m_ordermap; std::mutex m_ordermapmtx;//存放委托的map
+
+	void write_error(std::string msg, CThostFtdcRspInfoField* pRspInfo);//格式化错误信息，调用基类的write_log
 
 private:
 	//事件驱动

@@ -1,0 +1,1041 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ctpClass</class>
+ <widget class="QMainWindow" name="ctpClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1384</width>
+    <height>876</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>CTP接口测试程序(for QT)</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QSplitter" name="splitter_4">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>3</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QFrame" name="frame_6">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>400</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QSplitter" name="splitter_3">
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QFrame" name="frame_5">
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(234, 234, 234);</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <widget class="QFrame" name="frame_4">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>0</y>
+              <width>191</width>
+              <height>251</height>
+             </rect>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <widget class="QFrame" name="frame">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>120</y>
+               <width>171</width>
+               <height>31</height>
+              </rect>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <widget class="QRadioButton" name="radioPJ">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>81</width>
+                <height>16</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>平今仓</string>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="radioPZ">
+              <property name="geometry">
+               <rect>
+                <x>94</x>
+                <y>12</y>
+                <width>81</width>
+                <height>16</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>平昨仓</string>
+              </property>
+             </widget>
+            </widget>
+            <widget class="QFrame" name="frame_2">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>160</y>
+               <width>171</width>
+               <height>81</height>
+              </rect>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <widget class="QRadioButton" name="radioSJ">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>50</y>
+                <width>71</width>
+                <height>16</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>市价</string>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="radioXJ">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>71</width>
+                <height>16</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>限价</string>
+              </property>
+             </widget>
+             <widget class="QComboBox" name="comboXd">
+              <property name="geometry">
+               <rect>
+                <x>99</x>
+                <y>47</y>
+                <width>61</width>
+                <height>20</height>
+               </rect>
+              </property>
+              <item>
+               <property name="text">
+                <string>开多</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>平多</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>开空</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>平空</string>
+               </property>
+              </item>
+             </widget>
+             <widget class="QLineEdit" name="EditXj">
+              <property name="geometry">
+               <rect>
+                <x>74</x>
+                <y>11</y>
+                <width>81</width>
+                <height>20</height>
+               </rect>
+              </property>
+             </widget>
+            </widget>
+            <widget class="QWidget" name="layoutWidget123">
+             <property name="geometry">
+              <rect>
+               <x>11</x>
+               <y>11</y>
+               <width>151</width>
+               <height>26</height>
+              </rect>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_15">
+              <item>
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>合约代码:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="Editdm"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="layoutWidget">
+             <property name="geometry">
+              <rect>
+               <x>11</x>
+               <y>80</y>
+               <width>151</width>
+               <height>26</height>
+              </rect>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_16">
+              <item>
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>下单数量:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="EditLots"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QLabel" name="label_17">
+             <property name="geometry">
+              <rect>
+               <x>20</x>
+               <y>50</y>
+               <width>68</width>
+               <height>24</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>交易所:</string>
+             </property>
+            </widget>
+            <widget class="QComboBox" name="comboJYS">
+             <property name="geometry">
+              <rect>
+               <x>90</x>
+               <y>50</y>
+               <width>71</width>
+               <height>20</height>
+              </rect>
+             </property>
+             <item>
+              <property name="text">
+               <string>CZCE</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>DCE</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>SHFE</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>INE</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CFFEX</string>
+              </property>
+             </item>
+            </widget>
+           </widget>
+           <widget class="QFrame" name="frame_3">
+            <property name="geometry">
+             <rect>
+              <x>220</x>
+              <y>0</y>
+              <width>151</width>
+              <height>201</height>
+             </rect>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <item>
+                <widget class="QLabel" name="label_8">
+                 <property name="text">
+                  <string>卖一价:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="labelAsk">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_8">
+               <item>
+                <widget class="QLabel" name="label_11">
+                 <property name="text">
+                  <string>最新价:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="labelLast">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_9">
+               <item>
+                <widget class="QLabel" name="label_12">
+                 <property name="text">
+                  <string>买一价:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="labelBid">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_10">
+               <item>
+                <widget class="QLabel" name="label_13">
+                 <property name="text">
+                  <string>涨停价:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="labelUP">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_11">
+               <item>
+                <widget class="QLabel" name="label_14">
+                 <property name="text">
+                  <string>跌停价:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="labelDOWN">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QPushButton" name="BtnXd">
+            <property name="geometry">
+             <rect>
+              <x>80</x>
+              <y>290</y>
+              <width>201</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>下  单</string>
+            </property>
+           </widget>
+          </widget>
+          <widget class="QFrame" name="frame_10">
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QSplitter" name="splitter_2">
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <widget class="QTabWidget" name="tabWidget_2">
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(234, 234, 234);</string>
+               </property>
+               <property name="currentIndex">
+                <number>0</number>
+               </property>
+               <widget class="QWidget" name="tab_7">
+                <attribute name="title">
+                 <string>行情</string>
+                </attribute>
+                <layout class="QVBoxLayout" name="verticalLayout_7">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QFrame" name="frame_18">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>36</height>
+                    </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                   <widget class="QPushButton" name="btnHQ">
+                    <property name="geometry">
+                     <rect>
+                      <x>20</x>
+                      <y>4</y>
+                      <width>93</width>
+                      <height>28</height>
+                     </rect>
+                    </property>
+                    <property name="text">
+                     <string>订阅行情</string>
+                    </property>
+                   </widget>
+                   <widget class="QPushButton" name="btnHQQX">
+                    <property name="geometry">
+                     <rect>
+                      <x>130</x>
+                      <y>4</y>
+                      <width>93</width>
+                      <height>28</height>
+                     </rect>
+                    </property>
+                    <property name="text">
+                     <string>取消订阅</string>
+                    </property>
+                   </widget>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QTableWidget" name="HQTable"/>
+                 </item>
+                </layout>
+               </widget>
+               <widget class="QWidget" name="tab_8">
+                <attribute name="title">
+                 <string>合约</string>
+                </attribute>
+                <layout class="QVBoxLayout" name="verticalLayout_6">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QFrame" name="frame_17">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>36</height>
+                    </size>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::StyledPanel</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                   <widget class="QPushButton" name="btnHY">
+                    <property name="geometry">
+                     <rect>
+                      <x>20</x>
+                      <y>4</y>
+                      <width>93</width>
+                      <height>28</height>
+                     </rect>
+                    </property>
+                    <property name="text">
+                     <string>查合约</string>
+                    </property>
+                   </widget>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QTableWidget" name="HYTable"/>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+              <widget class="QFrame" name="frame_12">
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(234, 234, 234);</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QFrame" name="frame_11">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>30</height>
+                   </size>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::StyledPanel</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Raised</enum>
+                  </property>
+                  <widget class="QLabel" name="label_16">
+                   <property name="geometry">
+                    <rect>
+                     <x>20</x>
+                     <y>10</y>
+                     <width>72</width>
+                     <height>15</height>
+                    </rect>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true"/>
+                   </property>
+                   <property name="text">
+                    <string>委托</string>
+                   </property>
+                  </widget>
+                  <widget class="QPushButton" name="btnWT">
+                   <property name="geometry">
+                    <rect>
+                     <x>70</x>
+                     <y>0</y>
+                     <width>93</width>
+                     <height>28</height>
+                    </rect>
+                   </property>
+                   <property name="text">
+                    <string>查委托</string>
+                   </property>
+                  </widget>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QTableWidget" name="WTTable"/>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QFrame" name="frame_13">
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(234, 234, 234);</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_5">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QFrame" name="frame_14">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>30</height>
+                   </size>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::StyledPanel</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Raised</enum>
+                  </property>
+                  <widget class="QLabel" name="label_15">
+                   <property name="geometry">
+                    <rect>
+                     <x>20</x>
+                     <y>10</y>
+                     <width>72</width>
+                     <height>15</height>
+                    </rect>
+                   </property>
+                   <property name="text">
+                    <string>成交</string>
+                   </property>
+                  </widget>
+                  <widget class="QPushButton" name="btnCJ">
+                   <property name="geometry">
+                    <rect>
+                     <x>70</x>
+                     <y>0</y>
+                     <width>93</width>
+                     <height>28</height>
+                    </rect>
+                   </property>
+                   <property name="text">
+                    <string>查成交</string>
+                   </property>
+                  </widget>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QTableWidget" name="CJTable"/>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QFrame" name="frame_7">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QSplitter" name="splitter">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QTableWidget" name="tw_Log">
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(234, 234, 234);</string>
+           </property>
+           <column>
+            <property name="text">
+             <string>操作日志</string>
+            </property>
+           </column>
+          </widget>
+          <widget class="QFrame" name="frame_8">
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(234, 234, 234);</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QFrame" name="frame_15">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <widget class="QLabel" name="label_10">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>10</y>
+                 <width>72</width>
+                 <height>15</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>资金</string>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="btnZJ">
+               <property name="geometry">
+                <rect>
+                 <x>50</x>
+                 <y>0</y>
+                 <width>93</width>
+                 <height>28</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>查资金</string>
+               </property>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTableWidget" name="ZJTable"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QFrame" name="frame_9">
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(234, 234, 234);</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QFrame" name="frame_16">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <widget class="QLabel" name="label_9">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>10</y>
+                 <width>72</width>
+                 <height>15</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>持仓</string>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="btnCC">
+               <property name="geometry">
+                <rect>
+                 <x>50</x>
+                 <y>0</y>
+                 <width>93</width>
+                 <height>28</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>查持仓</string>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="btnSubscribe_6">
+               <property name="geometry">
+                <rect>
+                 <x>127</x>
+                 <y>198</y>
+                 <width>93</width>
+                 <height>28</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>订阅行情</string>
+               </property>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTableWidget" name="CCTable"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1384</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actioncd">
+   <property name="text">
+    <string>撤单</string>
+   </property>
+  </action>
+  <action name="actionAdd">
+   <property name="text">
+    <string>增加</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="QCTrader.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>HQTable</sender>
+   <signal>currentCellChanged(int,int,int,int)</signal>
+   <receiver>ctpClass</receiver>
+   <slot>OnHQCellChanged(int,int,int,int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>153</x>
+     <y>189</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>646</x>
+     <y>757</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>MDLogin()</slot>
+  <slot>OnHQCellChanged(int,int,int,int)</slot>
+ </slots>
+</ui>
