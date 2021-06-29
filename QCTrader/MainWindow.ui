@@ -155,6 +155,19 @@
                 </widget>
                </item>
                <item>
+                <spacer name="horizontalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>110</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
                 <widget class="QLineEdit" name="lineEdit_2"/>
                </item>
                <item>
@@ -360,21 +373,191 @@
               <widget class="QTableWidget" name="tableWidget_4">
                <column>
                 <property name="text">
-                 <string>行情</string>
+                 <string>交易所</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>名称</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>最新价</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>成交量</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>开盘价</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>最高价</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>最低价</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>买一价</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>买一量</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>卖一量</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>卖一量</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>时间</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>接口</string>
                 </property>
                </column>
               </widget>
               <widget class="QTableWidget" name="tableWidget_5">
                <column>
                 <property name="text">
-                 <string>委托</string>
+                 <string>委托号</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>来源</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>代码</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>交易所</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>类型</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>方向</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>开平</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>价格</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>总数量</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>已成交</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>状态</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>时间</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>接口</string>
                 </property>
                </column>
               </widget>
               <widget class="QTableWidget" name="tableWidget_6">
                <column>
                 <property name="text">
-                 <string>成交</string>
+                 <string>成交号</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>委托号</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>代码</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>交易所</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>方向</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>开平</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>价格</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>数量</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>时间</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>接口</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string/>
                 </property>
                </column>
               </widget>
@@ -408,7 +591,17 @@
           <widget class="QTableWidget" name="tableWidget">
            <column>
             <property name="text">
-             <string>操作日志</string>
+             <string>时间</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>信息</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>接口</string>
             </property>
            </column>
           </widget>
@@ -418,11 +611,71 @@
              <string>资金</string>
             </property>
            </column>
+           <column>
+            <property name="text">
+             <string>余额</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>冻结</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>可用</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>接口</string>
+            </property>
+           </column>
           </widget>
           <widget class="QTableWidget" name="tableWidget_3">
            <column>
             <property name="text">
              <string>持仓</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>交易所</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>方向</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>数量</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>昨仓</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>冻结</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>均价</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>盈亏</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>接口</string>
             </property>
            </column>
           </widget>
