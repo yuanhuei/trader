@@ -17,7 +17,7 @@ void CTPMD::OnFrontConnected()
 {
 	m_connectionStatus = true;
 	m_ctpgateway->write_log("行情服务器连接成功");
-	this->login();
+	login();
 }
 
 void CTPMD::OnFrontDisconnected(int nReason)
@@ -73,11 +73,11 @@ void CTPMD::subscribe(SubscribeReq& subscribeReq)
 
 void CTPMD::subscribeMarketData(std::string instrumentID)
 {
-	const char* buffer = instrumentID.c_str();
-	char* newbuffer;
-	strcpy(newbuffer, buffer);
+	//const char* buffer = instrumentID.c_str();
+	//char[20] newbuffer;
+	//strcpy(newbuffer, buffer);
 	char* myreq[1];
-	myreq[0] = newbuffer;
+	myreq[0] =(char*) instrumentID.c_str();
 	this->m_mdapi->SubscribeMarketData(myreq, 1);
 }
 

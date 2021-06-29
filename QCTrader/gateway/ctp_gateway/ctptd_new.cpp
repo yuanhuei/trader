@@ -22,7 +22,37 @@ void CTPTD::OnFrontConnected()
 {
 	m_connectionStatus = true;
 	m_ctpgateway->write_log("交易服务器连接成功");
-	login();
+	if (m_authCode.length() == 0)
+		authenticate();
+	else
+		login();
+	
+}
+
+void CTPTD::authenticate()
+{
+	CThostFtdcReqAuthenticateField req;
+	m_reqID++;
+	strncpy(req.BrokerID, m_brokerID. c_str(), sizeof(req.BrokerID) - 1);
+	strncpy(req.UserID, m_userID.c_str(), sizeof(req.UserID) - 1);
+	strncpy(req.AuthCode, m_authCode.c_str(), sizeof(req.AuthCode) - 1);
+	if(m_productInfo.length()!=0)
+		strncpy(req.UserProductInfo, m_productInfo.c_str(), sizeof(req.UserProductInfo) - 1);
+
+	m_tdapi->ReqAuthenticate(&req, m_reqID);
+	
+}
+
+void CTPTD::OnRspAuthenticate(CThostFtdcRspAuthenticateField* pRspAuthenticateField, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
+{
+	if (!IsErrorRspInfo(pRspInfo))
+	{
+		auth_status = false;
+		m_ctpgateway->write_log("交易服务器授权认证成功");
+		login();
+	}
+	else
+		m_ctpgateway->write_error("交易服务器授权验证失败", pRspInfo);
 }
 
 void CTPTD::OnFrontDisconnected(int nReason)
@@ -303,6 +333,7 @@ void CTPTD::OnRspQryInstrument(CThostFtdcInstrumentField* pInstrument, CThostFtd
 	e->size = pInstrument->VolumeMultiple;
 	e->strikePrice = pInstrument->StrikePrice;
 	e->underlyingSymbol = pInstrument->UnderlyingInstrID;
+
 	//获取之后放入两个map中，一个是合约和交易所map，一个是合约与合约价格乘数map
 	m_symbolExchangeMap.insert(std::pair<std::string, std::string>(e->symbol, e->exchange));
 	m_symbolSizeMap.insert(std::pair<std::string, int>(e->symbol, e->size));
@@ -542,12 +573,15 @@ bool CTPTD::IsFlowControl(int iResult)
 }
 
 
-void CTPTD::connect(std::string userID, std::string password, std::string brokerID, std::string address)
+void CTPTD::connect(std::string userID, std::string password, std::string brokerID, std::string address, std::string authcode, std::string appid, std::string productinfo)
 {
 	m_userID = userID;
 	m_password = password;
 	m_brokerID = brokerID;
 	m_address = address;
+	m_authCode = authcode;
+	m_appID = appid;
+	m_productInfo = productinfo;
 	if (m_connectionStatus == false)
 	{
 		if (_access("./temp", 0) == -1)
@@ -564,10 +598,11 @@ void CTPTD::connect(std::string userID, std::string password, std::string broker
 	}
 	else
 	{
-		if (m_loginStatus == false)
-		{
-			login();
-		}
+		authenticate();
+		//if (m_loginStatus == false)
+		//{
+		//	login();
+		//}
 	}
 
 }

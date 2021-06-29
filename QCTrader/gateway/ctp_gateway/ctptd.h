@@ -64,7 +64,7 @@ public:
 
 	bool IsFlowControl(int iResult);
 
-	void connect(std::string userID, std::string password, std::string brokerID, std::string address);
+	void connect(std::string userID, std::string password, std::string brokerID, std::string address,std::string authcode, std::string appid, std::string productinfo);
 
 	void login();
 
@@ -79,19 +79,32 @@ public:
 	void cancelOrder(CancelOrderReq& req);
 
 	void close();
+
+	void authenticate();
+
+	///客户端认证响应
+	virtual void OnRspAuthenticate(CThostFtdcRspAuthenticateField* pRspAuthenticateField, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast);
+
 private:
 	CThostFtdcTraderApi* m_tdapi;
 	CTPGateway* m_ctpgateway;
 	std::string m_gatewayname;
 	std::atomic_int m_reqID;  //请求编号
 	int m_orderRef; std::mutex m_orderRefmtx;//报单编号
+
 	std::atomic_bool m_connectionStatus;
 	std::atomic_bool m_loginStatus;
+	std::atomic_bool m_login_failed = false;
+	std::atomic_bool auth_status=false;
+
 	std::string m_userID;//账号密码 经纪商地址例如9999 1080 服务器地址tcp://xxx.xxx.xxx.xxx
 	std::string m_password;
 	std::string m_brokerID;
 	std::string m_address;
-	bool m_login_failed = false;
+	
+	std::string m_authCode;
+	std::string m_appID;
+	std::string m_productInfo;
 
 	int m_frontID;//前置机编号
 	int m_sessionID;//会话编号

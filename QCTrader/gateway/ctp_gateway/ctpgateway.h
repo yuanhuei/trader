@@ -52,8 +52,8 @@ private:
 	//接口名
 	std::string m_gatewayname;
 	//查询相关变量
-	std::atomic_int m_qrycount;
+	std::atomic_int m_qrycount=0;
 	const int m_maxqry = 4;									//超过4就再从0开始
-	std::atomic_bool m_qryEnabled;
+	std::atomic_bool m_qryEnabled=false;                    //条件就绪，可以开始轮询账户和仓位了。
 };
 #endif
