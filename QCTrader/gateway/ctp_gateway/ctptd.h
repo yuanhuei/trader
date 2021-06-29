@@ -91,14 +91,15 @@ private:
 	std::string m_password;
 	std::string m_brokerID;
 	std::string m_address;
+	bool m_login_failed = false;
 
 	int m_frontID;//前置机编号
 	int m_sessionID;//会话编号
 
 	//
 	std::map<std::string, std::shared_ptr<Event_Position>>m_posBufferMap;		std::mutex m_positionbuffermtx;//缓存持仓
-	std::map<std::string, std::string>m_symbolExchangeMap;													   //只读不写，不需要加锁
-	std::map<std::string, int>m_symbolSizeMap;
+	std::map<std::string, std::string>m_symbolExchangeMap;//合约和交易所的map,只读不写，不需要加锁
+	std::map<std::string, int>m_symbolSizeMap;//合约和合约乘数的map
 };
 
 #endif // !CTPTD_H

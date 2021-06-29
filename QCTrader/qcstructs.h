@@ -12,18 +12,23 @@
 #define PRICETYPE_MARKETPRICE "pricetypemarket"
 #define PRICETYPE_FAK "FAK"
 #define PRICETYPE_FOK "FOK"
+
 #define DIRECTION_NONE "directionnone"
 #define DIRECTION_LONG "directionlong"
 #define DIRECTION_SHORT "directionshort"
 #define DIRECTION_UNKNOWN "unknow"
 #define DIRECTION_NET "directionnet"
+
 #define OFFSET_NONE "offsetnone"
 #define OFFSET_OPEN "offsetopen"
 #define OFFSET_CLOSE "offsetclose"
 #define OFFSET_CLOSETODAY "offsetclosetoday"
 #define OFFSET_CLOSEYESTERDAY "offsetcloseyesterday"
 #define OFFSET_UNKNOWN "offsetunknow"
-#define EXCHANGE_SHFE "SHFE"
+
+#define EXCHANGE_SHFE "SHFE"  //上海期货交易所
+#define EXCHANGE_INE "INE"    //上海国际能源交易中心
+
 #define STATUS_ALLTRADED "orderalltraded"
 #define STATUS_CANCELLED "ordercanceld"
 #define STATUS_WAITING "orderwaiting"
