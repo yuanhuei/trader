@@ -97,29 +97,26 @@
     <ClCompile Include="..\include\MongoCxx.cpp" />
     <ClCompile Include="AlgorithmOrder.cpp" />
     <ClCompile Include="ClickTableView.cpp" />
-    <ClCompile Include="ctp.cpp" />
     <ClCompile Include="CTPConnectWidgets.cpp" />
-    <ClCompile Include="gateway\ctp_gateway\ctpgateway.new.cpp" />
-    <ClCompile Include="gateway\ctp_gateway\ctpmd_new.cpp" />
-    <ClCompile Include="gateway\ctp_gateway\ctptd_new.cpp" />
+    <ClCompile Include="gateway\ctp_gateway\ctpgateway.cpp" />
+    <ClCompile Include="gateway\ctp_gateway\ctpmd.cpp" />
+    <ClCompile Include="gateway\ctp_gateway\ctptd.cpp" />
     <ClCompile Include="json11.cpp" />
     <ClCompile Include="jstradergui.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="portfolio.cpp" />
     <ClCompile Include="ReadOnlyDelegate.cpp" />
     <ClCompile Include="risk_manager\riskmanager.cpp" />
     <ClCompile Include="SpinBoxDelegate.cpp" />
     <ClCompile Include="utility.cpp" />
     <QtRcc Include="QCTrader.qrc" />
-    <QtUic Include="ctp.ui" />
     <QtUic Include="CTPConnectWidgets.ui" />
+    <QtUic Include="MainWindow.ui" />
     <QtUic Include="QCTrader.ui" />
     <QtMoc Include="QCTrader.h" />
     <ClCompile Include="cta_strategy\ctamanager.cpp" />
     <ClCompile Include="cta_strategy\StrategyTemplate.cpp" />
     <ClCompile Include="event_engine\eventengine.cpp" />
-    <ClCompile Include="gateway\ctp_gateway\ctpgateway.cpp" />
-    <ClCompile Include="gateway\ctp_gateway\ctpmd.cpp" />
-    <ClCompile Include="gateway\ctp_gateway\ctptd.cpp" />
     <ClCompile Include="gateway\gatewaymanager.cpp" />
     <ClCompile Include="gateway\qcgateway.hpp" />
     <ClCompile Include="main_engine\mainengine.cpp" />
@@ -127,6 +124,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="MainWindow.h" />
     <ClInclude Include="utility.h" />
     <QtMoc Include="ClickTableView.h" />
     <ClInclude Include="..\include\MongoCxx.h" />
@@ -134,7 +132,6 @@
     <ClInclude Include="cta_strategy\ctamanager.h" />
     <ClInclude Include="cta_strategy\StrategyTemplate.h" />
     <QtMoc Include="CTPConnectWidgets.h" />
-    <QtMoc Include="ctp.h" />
     <ClInclude Include="Debug\uic\ui_ctp.h" />
     <ClInclude Include="Debug\uic\ui_CTPConnectWidgets.h" />
     <ClInclude Include="Debug\uic\ui_QCTrader.h" />

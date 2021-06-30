@@ -1,6 +1,7 @@
 #include "QCTrader.h"
 #include "jstradergui.h"
 #include <QtWidgets/QApplication>
+#include"MainWindow.h"
 
 int main(int argc, char *argv[])
 {
@@ -8,7 +9,7 @@ int main(int argc, char *argv[])
     //JSTraderGUI w;
     //w.show();
 
-    QCTrader t;
+    MainWindow  t;
     t.show();
     return a.exec();
 }

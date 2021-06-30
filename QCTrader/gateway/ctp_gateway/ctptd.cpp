@@ -1,43 +1,67 @@
 #include"ctptd.h"
-
 #include"ctpgateway.h"
 #include<io.h>
-#include< direct.h>
+#include<direct.h>
 
-CTPTD::CTPTD(CTPGateway* CTPGateway, std::string gatewayname)//验证无问题
+CTPTD::CTPTD(CTPGateway* CTPGateway, std::string gatewayname)
 {
 	m_ctpgateway = CTPGateway;
 	m_gatewayname = gatewayname;
 	m_connectionStatus = false;
 	m_loginStatus = false;
-	m_reqID = 0;  //请求编号
-	m_orderRef = 1000; //报单编号
-}
+	m_reqID = 0;
+	m_orderRef = 0;
 
-CTPTD::~CTPTD()//验证无问题
+}
+CTPTD::~CTPTD()
 {
 
 }
 
-void CTPTD::OnFrontConnected()//验证无问题
+void CTPTD::OnFrontConnected()
 {
 	m_connectionStatus = true;
-	std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-	e->gatewayname = m_gatewayname;
-	e->msg = "交易服务器连接成功";
-	m_ctpgateway->onLog(e);
-	login();
+	m_ctpgateway->write_log("交易服务器连接成功");
+	if (m_authCode.length() == 0)
+		authenticate();
+	else
+		login();
+	
 }
 
-void CTPTD::OnFrontDisconnected(int nReason)//验证无问题
+void CTPTD::authenticate()
+{
+	CThostFtdcReqAuthenticateField req;
+	m_reqID++;
+	strncpy(req.BrokerID, m_brokerID. c_str(), sizeof(req.BrokerID) - 1);
+	strncpy(req.UserID, m_userID.c_str(), sizeof(req.UserID) - 1);
+	strncpy(req.AuthCode, m_authCode.c_str(), sizeof(req.AuthCode) - 1);
+	if(m_productInfo.length()!=0)
+		strncpy(req.UserProductInfo, m_productInfo.c_str(), sizeof(req.UserProductInfo) - 1);
+
+	m_tdapi->ReqAuthenticate(&req, m_reqID);
+	
+}
+
+void CTPTD::OnRspAuthenticate(CThostFtdcRspAuthenticateField* pRspAuthenticateField, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
+{
+	if (!IsErrorRspInfo(pRspInfo))
+	{
+		auth_status = false;
+		m_ctpgateway->write_log("交易服务器授权认证成功");
+		login();
+	}
+	else
+		m_ctpgateway->write_error("交易服务器授权验证失败", pRspInfo);
+}
+
+void CTPTD::OnFrontDisconnected(int nReason)
 {
 	m_connectionStatus = false;
 	m_loginStatus = false;
-	m_ctpgateway->ctptdconnected = false;
-	std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-	e->gatewayname = m_gatewayname;
-	e->msg = "交易服务器连接断开";
-	m_ctpgateway->onLog(e);
+	m_ctpgateway->write_log("交易服务器断开,原因:" + std::to_string(nReason));
+
+
 }
 
 void CTPTD::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)//验证无问题
@@ -51,11 +75,9 @@ void CTPTD::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CThostFtd
 		m_frontID = pRspUserLogin->FrontID;
 		m_sessionID = pRspUserLogin->SessionID;
 		m_loginStatus = true;
-		m_ctpgateway->ctptdconnected = true;
-		std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-		e->gatewayname = m_gatewayname;
-		e->msg = "交易服务器登录完成";
-		m_ctpgateway->onLog(e);
+		//m_ctpgateway->ctptdconnected = true;
+		m_ctpgateway->write_log("交易服务器登录完成");
+
 		//确认结算信息
 		CThostFtdcSettlementInfoConfirmField myreq;
 		strncpy(myreq.BrokerID, m_brokerID.c_str(), sizeof(myreq.BrokerID) - 1);
@@ -66,11 +88,9 @@ void CTPTD::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CThostFtd
 	else
 	{
 		//返回错误信息
-		std::shared_ptr<Event_Error>e = std::make_shared<Event_Error>();
-		e->gatewayname = m_gatewayname;
-		e->errorID = pRspInfo->ErrorID;
-		e->errorMsg = pRspInfo->ErrorMsg;
-		m_ctpgateway->onError(e);
+		m_ctpgateway->write_error("交易服务器登录失败", pRspInfo);
+		m_login_failed = true;
+
 	}
 }
 
@@ -84,20 +104,14 @@ void CTPTD::OnRspUserLogout(CThostFtdcUserLogoutField* pUserLogout, CThostFtdcRs
 	if (!IsErrorRspInfo(pRspInfo))
 	{
 		m_loginStatus = false;
-		m_ctpgateway->ctptdconnected = false;
-		std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-		e->gatewayname = m_gatewayname;
-		e->msg = "交易服务器登出完成";
-		m_ctpgateway->onLog(e);
+		//m_ctpgateway->ctptdconnected = false;
+		m_ctpgateway->write_log("交易服务器登出完成");
 	}
 	else
 	{
 		//返回错误信息
-		std::shared_ptr<Event_Error>e = std::make_shared<Event_Error>();
-		e->gatewayname = m_gatewayname;
-		e->errorID = pRspInfo->ErrorID;
-		e->errorMsg = pRspInfo->ErrorMsg;
-		m_ctpgateway->onError(e);
+		m_ctpgateway->write_error("交易服务器登出失败", pRspInfo);
+
 	}
 }
 
@@ -108,39 +122,55 @@ void CTPTD::OnRspOrderInsert(CThostFtdcInputOrderField* pInputOrder, CThostFtdcR
 	{
 		return;
 	}
-	std::shared_ptr<Event_Error>e = std::make_shared<Event_Error>();
-	e->gatewayname = m_gatewayname;
-	e->errorID = pRspInfo->ErrorID;
-	e->errorMsg = pRspInfo->ErrorMsg;
-	m_ctpgateway->onError(e);
+	m_ctpgateway->write_error("交易委托失败", pRspInfo);
+}
+
+void CTPTD::OnErrRtnOrderInsert(CThostFtdcInputOrderField* pInputOrder, CThostFtdcRspInfoField* pRspInfo)
+{
+	if (pInputOrder == nullptr)
+	{
+		//空指针
+		return;
+	}
+	//发单错误回报(交易所)
+
+	m_ctpgateway->write_error("交易委托失败",pRspInfo);
 }
 
 void CTPTD::OnRspOrderAction(CThostFtdcInputOrderActionField* pInputOrderAction, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)//验证无问题
 {
-	//撤单错误柜台
+	//撤单错误回报(柜台)
 	if (pInputOrderAction == nullptr)
 	{
 		return;
 	}
-	std::shared_ptr<Event_Error>e = std::make_shared<Event_Error>();
-	e->gatewayname = m_gatewayname;
-	e->errorID = pRspInfo->ErrorID;
-	e->errorMsg = pRspInfo->ErrorMsg;
-	m_ctpgateway->onError(e);
+	m_ctpgateway->write_error("交易撤单失败",pRspInfo);
 }
 
+/*
+void CTPTD::OnErrRtnOrderAction(CThostFtdcOrderActionField* pOrderAction, CThostFtdcRspInfoField* pRspInfo)
+{
+	if (pOrderAction == nullptr)
+	{
+		//空指针
+		return;
+	}
+	//撤单错误回报(交易所)
+
+	m_ctpgateway->write_error("交易撤单失败", pRspInfo);
+}
+*/
+
+//结算单确认回调函数,在里面开始发送合约查询
 void CTPTD::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField* pSettlementInfoConfirm, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)//验证无问题
 {
-	//结算单确认
+	
 	if (pSettlementInfoConfirm == nullptr)
 	{
 		return;
 	}
-	std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-	e->gatewayname = m_gatewayname;
-	e->msg = "结算单确认完成";
-	m_ctpgateway->onLog(e);
-	std::this_thread::sleep_for(std::chrono::seconds(5));
+	m_ctpgateway->write_log("结算单确认完成");
+	
 	m_reqID++;
 	CThostFtdcQryInstrumentField req;
 	memset(&req, 0, sizeof(req));
@@ -152,27 +182,30 @@ void CTPTD::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField* pSe
 		}
 		if (m_tdapi != nullptr)
 		{
-			int iResult = m_tdapi->ReqQryInstrument(&req, m_reqID);
-			if (!IsFlowControl(iResult))
+			int iResult = m_tdapi->ReqQryInstrument(&req, m_reqID);//请求查询合约
+			if (iResult==-2 || iResult==-3)
 			{
-				std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-				e->gatewayname = m_gatewayname;
-				e->msg = "查询合约请求发送";
-				m_ctpgateway->onLog(e);
-				break;
+				m_ctpgateway->write_log("查询合约请求流控限制");
+				std::this_thread::sleep_for(std::chrono::seconds(5)); //失败后等待5秒再发送
+
 			}
-			else
+			else if(iResult==-1)
 			{
-				std::this_thread::sleep_for(std::chrono::seconds(1));
-				std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-				e->gatewayname = m_gatewayname;
-				e->msg = "查询合约请求流控限制";
-				m_ctpgateway->onLog(e);
+				m_ctpgateway->write_log("表示网络连接失败");
+				std::this_thread::sleep_for(std::chrono::seconds(5));//失败后等待5秒再发送
+
+			}
+			else if (iResult == 0)
+			{
+				m_ctpgateway->write_log("查询合约请求发送");
+				break;
+
 			}
 		}
 	}
 }
 
+//账户查询回调函数
 void CTPTD::OnRspQryTradingAccount(CThostFtdcTradingAccountField* pTradingAccount, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)//验证无问题
 {
 	if (pTradingAccount == nullptr)
@@ -196,21 +229,22 @@ void CTPTD::OnRspQryTradingAccount(CThostFtdcTradingAccountField* pTradingAccoun
 	m_ctpgateway->onAccount(e);
 }
 
+//持仓查询回调函数
 void CTPTD::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* pInvestorPosition, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
-	//持仓查询
+	
 	if (pInvestorPosition == nullptr)
 	{
 		//空指针
 		return;
 	}
 	std::string symboldirection = pInvestorPosition->InstrumentID;//合约名
-	symboldirection += pInvestorPosition->PosiDirection;
-	std::unique_lock<std::mutex>lck(m_positionbuffermtx);
-	if (m_posBufferMap.find(symboldirection) == m_posBufferMap.end())//如果找不到这个合约
+	symboldirection += pInvestorPosition->PosiDirection;          //合约+多空方向作为键，Event_Position为值
+	std::unique_lock<std::mutex>lck(m_positionbuffermtx);         //加锁
+	if (m_posBufferMap.find(symboldirection) == m_posBufferMap.end())//如果找不到这个合约则创建一个
 	{
 		std::shared_ptr<Event_Position>e = std::make_shared<Event_Position>();
-		m_posBufferMap.insert(std::pair<std::string, std::shared_ptr<Event_Position>>(symboldirection, e));//创建缓存
+		m_posBufferMap.insert(std::pair<std::string, std::shared_ptr<Event_Position>>(symboldirection, e));//创建一个键和值
 	}
 	m_posBufferMap[symboldirection]->gatewayname = "CTP";
 	m_posBufferMap[symboldirection]->symbol = pInvestorPosition->InstrumentID;
@@ -224,8 +258,13 @@ void CTPTD::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* pInvestorP
 	}
 
 	std::string exchange = m_symbolExchangeMap[pInvestorPosition->InstrumentID];
-	if (exchange == EXCHANGE_SHFE)
+
+/*对于非上期 / 能源的交易所，合约的昨仓YdPosition和今仓TodayPosition在一条记录里面，而上期 / 能源是分成了两条记录
+具体参考网页https://mp.weixin.qq.com/s?__biz=Mzg5MjEwNDEwMQ==&mid=2247483885&idx=1&sn=771b9a43ac413837a9cd37665c9cd5ef&chksm=cfc27d27f8b5f431f959381e30ff53b2a4be24ca1bcfb82e60a2c71c538432c59a2709b1e4cb&scene=178&cur_album_id=1545992091560968194#rd
+*/
+	if (exchange == EXCHANGE_SHFE|| exchange==EXCHANGE_INE )//上期 / 能源交易所
 	{
+		//  两条记录中昨仓的记录，记录中的position是针对昨仓和今仓的，不是真实的总持仓
 		if (pInvestorPosition->YdPosition)
 		{
 			m_posBufferMap[symboldirection]->ydPosition = pInvestorPosition->Position;
@@ -239,19 +278,20 @@ void CTPTD::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* pInvestorP
 
 		m_posBufferMap[symboldirection]->position = m_posBufferMap[symboldirection]->ydPosition + m_posBufferMap[symboldirection]->todayPosition;
 
-		if (m_posBufferMap[symboldirection]->todayPosition || m_posBufferMap[symboldirection]->ydPosition)
+		if (m_posBufferMap[symboldirection]->todayPosition || m_posBufferMap[symboldirection]->ydPosition)//昨仓和今仓有一个非0
 		{
+			//计算持仓成本，按昨仓和今仓合纵计算
 			m_posBufferMap[symboldirection]->price = (m_posBufferMap[symboldirection]->ydPositionCost + m_posBufferMap[symboldirection]->todayPositionCost) / ((m_posBufferMap[symboldirection]->todayPosition + m_posBufferMap[symboldirection]->ydPosition) * m_symbolSizeMap[pInvestorPosition->InstrumentID]);
 		}
-		else
+		else//空仓
 		{
 			m_posBufferMap[symboldirection]->price = 0;
 		}
 	}
-	else
+	else//其他交易所
 	{
 		m_posBufferMap[symboldirection]->position = pInvestorPosition->Position;
-		m_posBufferMap[symboldirection]->ydPosition = 0;
+		m_posBufferMap[symboldirection]->ydPosition = 0;//无昨仓的概念
 
 		if (m_posBufferMap[symboldirection]->position)
 		{
@@ -273,6 +313,7 @@ void CTPTD::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* pInvestorP
 	}
 }
 
+//发送合约查询的回调函数
 void CTPTD::OnRspQryInstrument(CThostFtdcInstrumentField* pInstrument, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)//验证无问题
 {
 	if (pInstrument == nullptr)
@@ -292,6 +333,8 @@ void CTPTD::OnRspQryInstrument(CThostFtdcInstrumentField* pInstrument, CThostFtd
 	e->size = pInstrument->VolumeMultiple;
 	e->strikePrice = pInstrument->StrikePrice;
 	e->underlyingSymbol = pInstrument->UnderlyingInstrID;
+
+	//获取之后放入两个map中，一个是合约和交易所map，一个是合约与合约价格乘数map
 	m_symbolExchangeMap.insert(std::pair<std::string, std::string>(e->symbol, e->exchange));
 	m_symbolSizeMap.insert(std::pair<std::string, int>(e->symbol, e->size));
 	m_ctpgateway->onContract(e);
@@ -305,6 +348,7 @@ void CTPTD::OnRspQryInstrument(CThostFtdcInstrumentField* pInstrument, CThostFtd
 	}
 }
 
+//委托成功回报函数
 void CTPTD::OnRtnOrder(CThostFtdcOrderField* pOrder)
 {
 	if (pOrder == nullptr)
@@ -312,10 +356,13 @@ void CTPTD::OnRtnOrder(CThostFtdcOrderField* pOrder)
 		//空指针
 		return;
 	}
+	//报单编号不断累加
 	const char* neworderref = pOrder->OrderRef;
 	m_orderRefmtx.lock();
 	m_orderRef = std::max(atoi(neworderref), m_orderRef);
 	m_orderRefmtx.unlock();
+
+	//从回报中获取订单最新状态
 	std::shared_ptr<Event_Order>e = std::make_shared<Event_Order>();
 	e->symbol = pOrder->InstrumentID;
 	e->exchange = pOrder->ExchangeID;
@@ -393,8 +440,8 @@ void CTPTD::OnRtnOrder(CThostFtdcOrderField* pOrder)
 	e->frontID = pOrder->FrontID;
 	e->sessionID = pOrder->SessionID;
 
-	//维护订单状态
-	if (e->status == STATUS_ALLTRADED || e->status == STATUS_CANCELLED)
+	//维护订单状态，订单通过m_ordermap维护，其中key为orderID,orderID来自于OrderRef，
+	if (e->status == STATUS_ALLTRADED || e->status == STATUS_CANCELLED)//订单成交或者取消，从map中删除
 	{
 		std::unique_lock<std::mutex>lck(m_ctpgateway->m_ordermapmtx);
 		if (m_ctpgateway->m_ordermap.find(e->orderID) != m_ctpgateway->m_ordermap.end())
@@ -402,14 +449,14 @@ void CTPTD::OnRtnOrder(CThostFtdcOrderField* pOrder)
 			m_ctpgateway->m_ordermap.erase(e->orderID);
 		}
 	}
-	else
+	else//其他状况更新订单状态
 	{
 		std::unique_lock<std::mutex>lck(m_ctpgateway->m_ordermapmtx);
-		if (m_ctpgateway->m_ordermap.find(e->orderID) != m_ctpgateway->m_ordermap.end())
+		if (m_ctpgateway->m_ordermap.find(e->orderID) != m_ctpgateway->m_ordermap.end())//新订单，插入
 		{
 			m_ctpgateway->m_ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(e->orderID, e));
 		}
-		else
+		else//老订单更新状态
 		{
 			m_ctpgateway->m_ordermap[e->orderID] = e;
 		}
@@ -417,7 +464,7 @@ void CTPTD::OnRtnOrder(CThostFtdcOrderField* pOrder)
 
 	m_ctpgateway->onOrder(e);
 }
-
+//针对用户请求的出错通知
 void CTPTD::OnRspError(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (pRspInfo == nullptr)
@@ -425,11 +472,7 @@ void CTPTD::OnRspError(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bI
 		//空指针
 		return;
 	}
-	std::shared_ptr<Event_Error>e = std::make_shared<Event_Error>();
-	e->errorMsg = pRspInfo->ErrorMsg;
-	e->errorID = pRspInfo->ErrorID;
-	e->gatewayname = m_gatewayname;
-	m_ctpgateway->onError(e);
+	m_ctpgateway->write_error("用户请求出错", pRspInfo);
 }
 
 void CTPTD::OnRtnTrade(CThostFtdcTradeField* pTrade)
@@ -445,12 +488,12 @@ void CTPTD::OnRtnTrade(CThostFtdcTradeField* pTrade)
 	e->exchange = pTrade->ExchangeID;
 	e->tradeID = pTrade->TradeID;
 	e->orderID = pTrade->OrderRef;
-	if (pTrade->Direction == '0')
+	if (pTrade->Direction == THOST_FTDC_D_Buy)
 	{
 		//多
 		e->direction = DIRECTION_LONG;
 	}
-	else if (pTrade->Direction == '1')
+	else if (pTrade->Direction == THOST_FTDC_D_Sell)
 	{
 		//空
 		e->direction = DIRECTION_SHORT;
@@ -461,20 +504,20 @@ void CTPTD::OnRtnTrade(CThostFtdcTradeField* pTrade)
 		e->direction = DIRECTION_UNKNOWN;
 	}
 
-	if (pTrade->OffsetFlag == '0')
+	if (pTrade->OffsetFlag == THOST_FTDC_OF_Open)
 	{
 		//开
 		e->offset = OFFSET_OPEN;
 	}
-	else if (pTrade->OffsetFlag == '1')
+	else if (pTrade->OffsetFlag == THOST_FTDC_OF_Close )
 	{
 		e->offset = OFFSET_CLOSE;
 	}
-	else if (pTrade->OffsetFlag == '3')
+	else if (pTrade->OffsetFlag == THOST_FTDC_OF_CloseToday)
 	{
 		e->offset = OFFSET_CLOSETODAY;
 	}
-	else if (pTrade->OffsetFlag == '4')
+	else if (pTrade->OffsetFlag == THOST_FTDC_OF_CloseYesterday)
 	{
 		e->offset = OFFSET_CLOSEYESTERDAY;
 	}
@@ -488,6 +531,8 @@ void CTPTD::OnRtnTrade(CThostFtdcTradeField* pTrade)
 	m_ctpgateway->onTrade(e);
 }
 
+//报单录入错误回报
+/*
 void CTPTD::OnErrRtnOrderInsert(CThostFtdcInputOrderField* pInputOrder, CThostFtdcRspInfoField* pRspInfo)
 {
 	if (pInputOrder == nullptr)
@@ -496,12 +541,11 @@ void CTPTD::OnErrRtnOrderInsert(CThostFtdcInputOrderField* pInputOrder, CThostFt
 		return;
 	}
 	//发单错误回报(交易所)
-	std::shared_ptr<Event_Error>e = std::make_shared<Event_Error>();
-	e->errorID = pRspInfo->ErrorID;
-	e->errorMsg = pRspInfo->ErrorMsg;
-	m_ctpgateway->onError(e);
-};
 
+	m_ctpgateway->write_error("订单提交错误",pRspInfo);
+};
+*/
+//撤单错误回报
 void CTPTD::OnErrRtnOrderAction(CThostFtdcOrderActionField* pOrderAction, CThostFtdcRspInfoField* pRspInfo)
 {
 	if (pOrderAction == nullptr)
@@ -513,8 +557,9 @@ void CTPTD::OnErrRtnOrderAction(CThostFtdcOrderActionField* pOrderAction, CThost
 	std::shared_ptr<Event_Error>e = std::make_shared<Event_Error>();
 	e->errorID = pRspInfo->ErrorID;
 	e->errorMsg = pRspInfo->ErrorMsg;
-	m_ctpgateway->onError(e);
+	m_ctpgateway->write_error("撤单错误",pRspInfo);
 }
+
 
 bool CTPTD::IsErrorRspInfo(CThostFtdcRspInfoField* pRspInfo)
 {
@@ -522,17 +567,22 @@ bool CTPTD::IsErrorRspInfo(CThostFtdcRspInfoField* pRspInfo)
 	return bResult;
 }
 
+
 bool CTPTD::IsFlowControl(int iResult)
 {
 	return ((iResult == -2) || (iResult == -3));
 }
 
-void CTPTD::connect(std::string userID, std::string password, std::string brokerID, std::string address)
+
+void CTPTD::connect(std::string userID, std::string password, std::string brokerID, std::string address, std::string authcode, std::string appid, std::string productinfo)
 {
 	m_userID = userID;
 	m_password = password;
 	m_brokerID = brokerID;
 	m_address = address;
+	m_authCode = authcode;
+	m_appID = appid;
+	m_productInfo = productinfo;
 	if (m_connectionStatus == false)
 	{
 		if (_access("./temp", 0) == -1)
@@ -549,10 +599,11 @@ void CTPTD::connect(std::string userID, std::string password, std::string broker
 	}
 	else
 	{
-		if (m_loginStatus == false)
-		{
-			login();
-		}
+		authenticate();
+		//if (m_loginStatus == false)
+		//{
+		//	login();
+		//}
 	}
 
 }
@@ -570,6 +621,7 @@ void CTPTD::login()
 	}
 }
 
+//提交订单
 std::string CTPTD::sendOrder(OrderReq& req)
 {
 	std::unique_lock<std::mutex>lck(m_orderRefmtx);
@@ -645,7 +697,7 @@ std::string CTPTD::sendOrder(OrderReq& req)
 	int i = m_tdapi->ReqOrderInsert(&myreq, m_reqID);
 	return std::to_string(m_orderRef);
 }
-
+//取消订单
 void CTPTD::cancelOrder(CancelOrderReq& req)
 {
 	m_reqID += 1;
@@ -664,8 +716,8 @@ void CTPTD::cancelOrder(CancelOrderReq& req)
 
 	m_tdapi->ReqOrderAction(&myreq, m_reqID);
 }
-
-void CTPTD::qryPosition()//验证无问题
+//查询仓位
+void CTPTD::qryPosition()
 {
 	m_reqID++;
 	CThostFtdcQryInvestorPositionField req = CThostFtdcQryInvestorPositionField();
@@ -677,8 +729,8 @@ void CTPTD::qryPosition()//验证无问题
 		m_tdapi->ReqQryInvestorPosition(&req, m_reqID);
 	}
 }
-
-void CTPTD::qryAccount()//验证无问题
+//查询账户信息
+void CTPTD::qryAccount()
 {
 	m_reqID++;
 	CThostFtdcQryTradingAccountField req = CThostFtdcQryTradingAccountField();
@@ -701,7 +753,7 @@ void CTPTD::logout()
 }
 
 
-void CTPTD::close()//验证无问题
+void CTPTD::close()
 {
 	if (m_tdapi != NULL)
 	{

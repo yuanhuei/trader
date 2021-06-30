@@ -5,7 +5,8 @@ CTPConnectWidgets::CTPConnectWidgets(QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
-
+	//setFixedSize();
+	/*
 	QStringList strList;
 	strList << "CFFEX" << "SHFE" << "CZCE" << "DCE" << "INE";
 	ui.comboBox_exchange->addItems(strList);
@@ -26,6 +27,7 @@ CTPConnectWidgets::CTPConnectWidgets(QWidget *parent)
 	QStringList strList5;
 	strList5 << "CTP";
 	ui.comboBox_ordertypy->addItems(strList5);
+	*/
 }
 
 CTPConnectWidgets::~CTPConnectWidgets()

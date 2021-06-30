@@ -13,4 +13,8 @@ public:
 
 private:
 	Ui::MainWindow ui;
+
+public slots:
+	void menu_ctp_connect();
+	void menu_exit();
 };

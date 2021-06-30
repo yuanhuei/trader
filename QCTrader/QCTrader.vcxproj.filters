@@ -46,15 +46,6 @@
     <ClCompile Include="main_engine\mainengine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gateway\ctp_gateway\ctpgateway.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gateway\ctp_gateway\ctptd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gateway\ctp_gateway\ctpmd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="gateway\qcgateway.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -95,6 +86,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CTPConnectWidgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gateway\ctp_gateway\ctpmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gateway\ctp_gateway\ctptd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gateway\ctp_gateway\ctpgateway.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -147,6 +153,12 @@
     <ClInclude Include="Debug\uic\ui_CTPConnectWidgets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug\uic\ui_ctp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="jstradergui.h">
@@ -164,12 +176,15 @@
     <QtMoc Include="CTPConnectWidgets.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="MainWindow.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="CTPConnectWidgets.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtUic Include="ctp.ui">
+    <QtUic Include="MainWindow.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
