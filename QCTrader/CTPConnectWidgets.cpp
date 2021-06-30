@@ -1,11 +1,16 @@
 #include "CTPConnectWidgets.h"
 #include"utility.h"
+#include <qvalidator.h>
 
 CTPConnectWidgets::CTPConnectWidgets(QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
 	//setFixedSize();
+	// 
+	// 这个行编辑只接受从0到100000的整数
+	QIntValidator v(0, 100000, this);	
+	ui.lineEdit_3->setValidator(&v);
 	/*
 	QStringList strList;
 	strList << "CFFEX" << "SHFE" << "CZCE" << "DCE" << "INE";
@@ -34,12 +39,12 @@ CTPConnectWidgets::~CTPConnectWidgets()
 {
 }
 
-void CTPConnectWidgets::SendOrderbuttonclicked()
+void CTPConnectWidgets::buttonOk_clicked()
 {
 
 }
 
-void CTPConnectWidgets::CancelOrderbutttonclicded()
+void CTPConnectWidgets::buttonCancel_clicked()
 {
 
 }

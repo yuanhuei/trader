@@ -10,8 +10,9 @@ class CTPConnectWidgets : public QDialog
 public:
 	CTPConnectWidgets(QWidget *parent = Q_NULLPTR);
 	~CTPConnectWidgets();
-	void SendOrderbuttonclicked();
-	void CancelOrderbutttonclicded();
+public slots:
+	void buttonOk_clicked();
+	void buttonCancel_clicked();
 	
 
 private:
