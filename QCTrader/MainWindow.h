@@ -13,16 +13,24 @@ class Gatewaymanager;
 struct UpdatePriceTableData
 {
 	std::string symbol;
+	std::string exchange;
+	
 	//成交数据
 	double lastprice;//最新成交价
 	double openInterest;//持仓量
-	std::string date;//日期
-	std::string time;//时间
+
 	double upperLimit;//涨停
 	double lowerLimit;//跌停
 	double bidprice1;
 	double askprice1;
+
+	std::string date;//日期
+	std::string time;//时间
+
+	std::string gatewayname;
 };
+
+
 
 struct UpdateStrategyData
 {
@@ -101,6 +109,8 @@ public:
 	void ConnectSignalAndSlot();
 	void write_log(std::string msg, std::string gateway_name);
 
+	void UpdateSymbolBox(UpdatePriceTableData data);
+
 signals:
 	void UpdateLog(LogData data);
 	//void LoadStrategySignal(LoadStrategyData data);
@@ -134,4 +144,5 @@ public:
     //model
 	QStandardItemModel* m_AccountModel;
 	QStandardItemModel* m_PositionModel;
+	QStandardItemModel* m_SymbolSubscribedTableModel;
 };

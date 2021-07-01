@@ -426,73 +426,7 @@
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
-              <widget class="QTableWidget" name="tableWidget_4">
-               <column>
-                <property name="text">
-                 <string>交易所</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>名称</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>最新价</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>成交量</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>开盘价</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>最高价</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>最低价</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>买一价</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>买一量</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>卖一量</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>卖一量</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>时间</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>接口</string>
-                </property>
-               </column>
-              </widget>
+              <widget class="QTableView" name="tableView_4"/>
               <widget class="QTableWidget" name="tableWidget_5">
                <column>
                 <property name="text">

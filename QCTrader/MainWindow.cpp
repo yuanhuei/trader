@@ -9,18 +9,32 @@ MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
-	setWindowState(Qt::WindowMaximized);//设置窗口最大化
 	setUI();
 	LoadEngine();
-	ConnectSignalAndSlot();
+	
 }
 
 MainWindow::~MainWindow()
 {
+	//delete portfoliowidget;
+	//delete riskControlWidget;
+	//delete m_portfolioModel;
+	delete m_AccountModel;
+	delete m_PositionModel;
+	delete m_SymbolSubscribedTableModel;
+
+	m_gatewaymanager->exit();
+	//delete m_riskmanager;
+	//delete m_ctamanager;
+	delete m_gatewaymanager;
+	delete m_eventengine;
 }
 
+//对UI生成的界面做一些设置
 void  MainWindow::setUI()
 {
+
+	setWindowState(Qt::WindowMaximized);//设置窗口最大化
 	//设置资金表
 	m_AccountModel = new QStandardItemModel;
 	QStringList accountheader;
@@ -46,6 +60,19 @@ void  MainWindow::setUI()
 	ui.tableView_3->setSelectionMode(QAbstractItemView::SingleSelection); //设置只能选择一行，不能多行选中  
 	ui.tableView_3->setAlternatingRowColors(true);
 
+	//设置行情订阅表
+	m_SymbolSubscribedTableModel = new QStandardItemModel;
+	QStringList positionheader;
+	positionheader << str2qstr_new("合约代码") << str2qstr_new("交易所") << str2qstr_new("最新价") << str2qstr_new("持仓量") << str2qstr_new("涨停") << str2qstr_new("跌停") << str2qstr_new("买一价") << str2qstr_new("卖一价")<< str2qstr_new("时间") << str2qstr_new("接口");
+	m_SymbolSubscribedTableModel->setHorizontalHeaderLabels(positionheader);
+	//QTableView* PositionView = new QTableView;
+	ui.tableView_4->setModel(m_SymbolSubscribedTableModel);
+	ui.tableView_4->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	ui.tableView_4->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	ui.tableView_4->setSelectionBehavior(QAbstractItemView::SelectRows);  //单击选择一行  
+	ui.tableView_4->setSelectionMode(QAbstractItemView::SingleSelection); //设置只能选择一行，不能多行选中  
+	ui.tableView_4->setAlternatingRowColors(true);
+
 }
 
 
@@ -60,6 +87,7 @@ void MainWindow::LoadEngine()
 	//m_ctamanager = new CTAmanager(m_gatewaymanager, m_eventengine, m_riskmanager);//cta管理器
 
 	RegEvent();
+	ConnectSignalAndSlot();
 	m_eventengine->StartEngine();
 }
 
@@ -93,20 +121,9 @@ void MainWindow::ConnectSignalAndSlot()
 	//connect(this, SIGNAL(UpdatePortfolioSignal(PortfolioData)), this, SLOT(UpdatePortfolioBox(PortfolioData)), Qt::QueuedConnection);
 }
 
-//点击菜单退出后的槽函数
-void MainWindow::menu_exit()
-{
-	this->close();
-}
 
-//点击菜单CTP连接 的槽函数 弹出对话框
-void MainWindow::menu_ctp_connect()
-{
-	CTPConnectWidgets* e = new CTPConnectWidgets(this);
-	e->show();
-
-}
-
+////////////////////////////////////////////////////事件处理函数部分 On_开头////////////
+// 
 //EVENT_LOG事件的处理函数，发送UpdateLog信号给窗口
 void MainWindow::OnLogUpdate(std::shared_ptr<Event>e)
 {
@@ -168,9 +185,71 @@ void MainWindow::onPriceTableUpdate(std::shared_ptr<Event>e)
 	data.symbol = eTick->symbol;
 	data.time = eTick->time;
 	data.upperLimit = eTick->upperLimit;
+	data.exchange = eTick->exchange;
+	data.gatewayname = eTick->gatewayname;
+
 	emit UpdatePriceTableSignal(data);
 }
 
+//////////////////////////////////////槽函数部分 //////////////////////////////
+// 
+//更新行情订阅表
+void MainWindow::UpdateSymbolBox(UpdatePriceTableData data)
+{
+	//第一次插入数据
+	if (m_SymbolSubscribedTableModel->rowCount() == 0)
+	{
+		m_SymbolSubscribedTableModel->setItem(0, 0, new QStandardItem(str2qstr_new(data.symbol)));
+		m_SymbolSubscribedTableModel->setItem(0, 1, new QStandardItem(str2qstr_new(data.exchange)));
+		m_SymbolSubscribedTableModel->setItem(0, 2, new QStandardItem(QString::fromStdString((std::to_string(data.lastprice)))));
+		m_SymbolSubscribedTableModel->setItem(0, 3, new QStandardItem(QString::fromStdString((std::to_string(data.openInterest)))));
+		m_SymbolSubscribedTableModel->setItem(0, 4, new QStandardItem(QString::fromStdString((std::to_string(data.upperLimit)))));
+		m_SymbolSubscribedTableModel->setItem(0, 5, new QStandardItem(QString::fromStdString((std::to_string(data.lowerLimit)))));
+		m_SymbolSubscribedTableModel->setItem(0, 6, new QStandardItem(QString::fromStdString((std::to_string(data.askprice1)))));
+		m_SymbolSubscribedTableModel->setItem(0, 7, new QStandardItem(QString::fromStdString((std::to_string(data.bidprice1)))));
+		std::string DateTime = data.date + " " + data.time;
+		m_SymbolSubscribedTableModel->setItem(0, 8, new QStandardItem(QString::fromStdString(DateTime)));
+		m_SymbolSubscribedTableModel->setItem(0, 9, new QStandardItem(QString::fromStdString(data.gatewayname)));
+	
+		return;
+	}
+	//更新数据，如果已经存在就更新，如果没有就插入
+	for (int i = 0; i < m_AccountModel->rowCount(); i++)
+	{
+		if (m_AccountModel->item(i, 0)->text().toStdString() == data.gatewayname)//判断表格的接口和这个接口是否一样
+		{
+			m_SymbolSubscribedTableModel->setItem(i, 0, new QStandardItem(str2qstr_new(data.symbol)));
+			m_SymbolSubscribedTableModel->setItem(i, 1, new QStandardItem(str2qstr_new(data.exchange)));
+			m_SymbolSubscribedTableModel->setItem(i, 2, new QStandardItem(QString::fromStdString((std::to_string(data.lastprice)))));
+			m_SymbolSubscribedTableModel->setItem(i, 3, new QStandardItem(QString::fromStdString((std::to_string(data.openInterest)))));
+			m_SymbolSubscribedTableModel->setItem(i, 4, new QStandardItem(QString::fromStdString((std::to_string(data.upperLimit)))));
+			m_SymbolSubscribedTableModel->setItem(i, 5, new QStandardItem(QString::fromStdString((std::to_string(data.lowerLimit)))));
+			m_SymbolSubscribedTableModel->setItem(i, 6, new QStandardItem(QString::fromStdString((std::to_string(data.askprice1)))));
+			m_SymbolSubscribedTableModel->setItem(i, 7, new QStandardItem(QString::fromStdString((std::to_string(data.bidprice1)))));
+			std::string DateTime = data.date + " " + data.time;
+			m_SymbolSubscribedTableModel->setItem(i, 8, new QStandardItem(QString::fromStdString(DateTime)));
+			m_SymbolSubscribedTableModel->setItem(i, 9, new QStandardItem(QString::fromStdString(data.gatewayname)));
+			break;
+		}
+		if (i == m_AccountModel->rowCount() - 1)
+		{
+			//最后一个了还没找到
+			m_SymbolSubscribedTableModel->setItem(i+1, 0, new QStandardItem(str2qstr_new(data.symbol)));
+			m_SymbolSubscribedTableModel->setItem(i + 1, 1, new QStandardItem(str2qstr_new(data.exchange)));
+			m_SymbolSubscribedTableModel->setItem(i + 1, 2, new QStandardItem(QString::fromStdString((std::to_string(data.lastprice)))));
+			m_SymbolSubscribedTableModel->setItem(i + 1, 3, new QStandardItem(QString::fromStdString((std::to_string(data.openInterest)))));
+			m_SymbolSubscribedTableModel->setItem(i + 1, 4, new QStandardItem(QString::fromStdString((std::to_string(data.upperLimit)))));
+			m_SymbolSubscribedTableModel->setItem(i + 1, 5, new QStandardItem(QString::fromStdString((std::to_string(data.lowerLimit)))));
+			m_SymbolSubscribedTableModel->setItem(i + 1, 6, new QStandardItem(QString::fromStdString((std::to_string(data.askprice1)))));
+			m_SymbolSubscribedTableModel->setItem(i + 1, 7, new QStandardItem(QString::fromStdString((std::to_string(data.bidprice1)))));
+			std::string DateTime = data.date + " " + data.time;
+			m_SymbolSubscribedTableModel->setItem(i + 1, 8, new QStandardItem(QString::fromStdString(DateTime)));
+			m_SymbolSubscribedTableModel->setItem(i + 1, 9, new QStandardItem(QString::fromStdString(data.gatewayname)));
+			break;
+		}
+	}
+
+}
 
 //更新账户资金表
 void MainWindow::UpdateAccountBox(AccountData data)
@@ -298,7 +377,7 @@ void MainWindow::UpdateLogTable(LogData data)
 	ui.tableWidget->setItem(rowCount, 3, new QTableWidgetItem(QString::fromStdString(data.gatewayname)));
 }
 
-
+//更新价格显示以及合约订阅表
 void MainWindow::UpdateTickTable(UpdatePriceTableData data)
 {
 	std::string strSymbol = ui.lineEdit->text().toStdString();
@@ -309,23 +388,19 @@ void MainWindow::UpdateTickTable(UpdatePriceTableData data)
 		ui.label_3->setText(QString::fromStdString((std::to_string(data.askprice1))));//设置卖一价
 		ui.label_5->setText(QString::fromStdString((std::to_string(data.upperLimit))));//设置涨停价
 		ui.label_9->setText(QString::fromStdString((std::to_string(data.lowerLimit))));//设置跌停价
-
+		if (ui.checkBox->isChecked() == true) //如果价格的复选框勾选，也要更新这个价格
+		{
+			ui.lineEdit_2->setText(QString::fromStdString((std::to_string(data.lastprice))));
+		}
 	}
-
+	UpdateSymbolBox(data);
 
 }
 
 
-void MainWindow::write_log(std::string msg,std::string gateway_name)
-{
-	std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-	e->gatewayname = gateway_name;
-	e->msg = msg;
-	
-	m_eventengine->Put(e);
-}
 
 
+//输入合约代码回车后的槽函数
 void MainWindow::symbol_ReturnPressed()
 {
 
@@ -335,4 +410,28 @@ void MainWindow::symbol_ReturnPressed()
 		m_gatewaymanager->subscribe(req,"CTP");
 
 
+}
+
+//点击菜单退出后的槽函数
+void MainWindow::menu_exit()
+{
+	this->close();
+}
+
+//点击菜单CTP连接 的槽函数 弹出对话框
+void MainWindow::menu_ctp_connect()
+{
+	CTPConnectWidgets* e = new CTPConnectWidgets(this);
+	e->show();
+
+}
+
+//mainwindow类的记录日志
+void MainWindow::write_log(std::string msg, std::string gateway_name)
+{
+	std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
+	e->gatewayname = gateway_name;
+	e->msg = msg;
+
+	m_eventengine->Put(e);
 }
