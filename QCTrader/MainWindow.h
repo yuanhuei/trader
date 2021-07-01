@@ -14,7 +14,10 @@ struct UpdatePriceTableData
 {
 	std::string symbol;
 	std::string exchange;
-	
+	std::string gatewayname;
+	std::string date;//日期
+	std::string time;//时间
+
 	//成交数据
 	double lastprice;//最新成交价
 	double openInterest;//持仓量
@@ -23,11 +26,6 @@ struct UpdatePriceTableData
 	double lowerLimit;//跌停
 	double bidprice1;
 	double askprice1;
-
-	std::string date;//日期
-	std::string time;//时间
-
-	std::string gatewayname;
 };
 
 
@@ -102,17 +100,21 @@ public:
 	void setUI();
 	void LoadEngine();
 	void RegEvent();
+
+	//事件回调函数
 	void OnLogUpdate(std::shared_ptr<Event>e);
 	void onAccountUpdate(std::shared_ptr<Event>e);
 	void onPositionUpdate(std::shared_ptr<Event>e);
 	void onPriceTableUpdate(std::shared_ptr<Event>e);
+	//连接信号和槽
 	void ConnectSignalAndSlot();
+	//日志记录
 	void write_log(std::string msg, std::string gateway_name);
 
 	void UpdateSymbolBox(UpdatePriceTableData data);
 
 signals:
-	void UpdateLog(LogData data);
+	void UpdateLogSignal(LogData data);
 	//void LoadStrategySignal(LoadStrategyData data);
 	//void UpdateStrategySignal(UpdateStrategyData data);
 	void UpdateAccountSignal(AccountData data);

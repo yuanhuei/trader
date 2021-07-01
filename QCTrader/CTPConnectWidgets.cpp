@@ -78,6 +78,7 @@ void CTPConnectWidgets::buttonOk_clicked()
 	}
 	file.close();
 	m_mainwindow->m_gatewaymanager->connect("CTP");
+	this->close();
 }
 
 void CTPConnectWidgets::buttonCancel_clicked()

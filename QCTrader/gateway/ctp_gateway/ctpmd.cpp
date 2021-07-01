@@ -29,7 +29,7 @@ void CTPMD::OnFrontDisconnected(int nReason)
 
 void CTPMD::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (pRspInfo->ErrorID == 0)
+	if (IsErrorRspInfo(pRspInfo) == true)
 	{
 		m_ctpgateway->write_error("行情服务器登陆失败", pRspInfo);
 	}
@@ -226,6 +226,6 @@ void CTPMD::close()
 bool CTPMD::IsErrorRspInfo(CThostFtdcRspInfoField* pRspInfo)//已验证没问题
 {
 	// 如果ErrorID != 0, 说明收到了错误的响应
-	bool bResult = ((pRspInfo) && (pRspInfo->ErrorID != 0));
+	bool bResult = ((pRspInfo!=NULL) && (pRspInfo->ErrorID != 0));
 	return bResult;
 }

@@ -22,7 +22,7 @@ void CTPTD::OnFrontConnected()
 {
 	m_connectionStatus = true;
 	m_ctpgateway->write_log("交易服务器连接成功");
-	if (m_authCode.length() == 0)
+	if (m_authCode.length() != 0)
 		authenticate();
 	else
 		login();
@@ -36,8 +36,11 @@ void CTPTD::authenticate()
 	strncpy(req.BrokerID, m_brokerID. c_str(), sizeof(req.BrokerID) - 1);
 	strncpy(req.UserID, m_userID.c_str(), sizeof(req.UserID) - 1);
 	strncpy(req.AuthCode, m_authCode.c_str(), sizeof(req.AuthCode) - 1);
-	if(m_productInfo.length()!=0)
-		strncpy(req.UserProductInfo, m_productInfo.c_str(), sizeof(req.UserProductInfo) - 1);
+	strncpy(req.AppID, m_appID.c_str(), sizeof(req.AppID) - 1);
+	strncpy(req.UserProductInfo, m_productInfo.c_str(), sizeof(req.UserProductInfo) - 1);
+	
+	//if(m_productInfo.length()!=0)
+		//strncpy(req.UserProductInfo, m_productInfo.c_str(), sizeof(req.UserProductInfo) - 1);
 
 	m_tdapi->ReqAuthenticate(&req, m_reqID);
 	
