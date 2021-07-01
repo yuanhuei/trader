@@ -31,10 +31,10 @@
   <property name="windowTitle">
    <string>CTP连接</string>
   </property>
-  <widget class="QPushButton" name="SendOrderButton">
+  <widget class="QPushButton" name="OkButton">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>60</x>
      <y>320</y>
      <width>141</width>
      <height>31</height>
@@ -44,7 +44,7 @@
     <string>确定</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="CancelOrderButton">
+  <widget class="QPushButton" name="CancelButton">
    <property name="geometry">
     <rect>
      <x>250</x>
@@ -117,6 +117,9 @@
       </item>
       <item>
        <widget class="QLineEdit" name="lineEdit_3">
+        <property name="inputMethodHints">
+         <set>Qt::ImhPreferNumbers</set>
+        </property>
         <property name="text">
          <string>9999</string>
         </property>
@@ -217,10 +220,10 @@
  <resources/>
  <connections>
   <connection>
-   <sender>SendOrderButton</sender>
+   <sender>OkButton</sender>
    <signal>clicked()</signal>
    <receiver>CTPConnectWidgets</receiver>
-   <slot>SendOrderbuttonclicked()</slot>
+   <slot>buttonOk_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>148</x>
@@ -233,10 +236,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>CancelOrderButton</sender>
+   <sender>CancelButton</sender>
    <signal>clicked()</signal>
    <receiver>CTPConnectWidgets</receiver>
-   <slot>CancelOrderbutttonclicked()</slot>
+   <slot>buttonCancel_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>335</x>
@@ -250,7 +253,7 @@
   </connection>
  </connections>
  <slots>
-  <slot>SendOrderbuttonclicked()</slot>
-  <slot>CancelOrderbutttonclicked()</slot>
+  <slot>buttonOk_clicked()</slot>
+  <slot>buttonCancel_clicked()</slot>
  </slots>
 </ui>

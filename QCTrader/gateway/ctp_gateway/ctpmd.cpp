@@ -172,7 +172,10 @@ void CTPMD::connect(std::string userID, std::string password, std::string broker
 		}
 		m_mdapi = CThostFtdcMdApi::CreateFtdcMdApi("./temp/CTPmd");
 		m_mdapi->RegisterSpi(this);
-		m_mdapi->RegisterFront((char*)m_address.c_str());
+		std::string tcpaddress = "tcp://" + m_address;
+		char pAddress[40];
+		strcpy(pAddress, tcpaddress.c_str());
+		m_mdapi->RegisterFront(pAddress);
 		m_mdapi->Init();
 	}
 	else

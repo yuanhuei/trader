@@ -5,6 +5,7 @@
 //#include"event_engine/eventengine.h"
 //#include"gateway/gatewaymanager.h"
 #include<qstandarditemmodel.h>
+#include"qcstructs.h"
 
 class EventEngine;
 class Gatewaymanager;
@@ -89,8 +90,7 @@ public:
 	void onPositionUpdate(std::shared_ptr<Event>e);
 	void onPriceTableUpdate(std::shared_ptr<Event>e);
 	void ConnectSignalAndSlot();
-
-
+	void write_log(std::string msg, std::string gateway_name);
 
 signals:
 	void WriteLog(QString msg);

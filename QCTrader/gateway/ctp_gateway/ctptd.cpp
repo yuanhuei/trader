@@ -592,10 +592,14 @@ void CTPTD::connect(std::string userID, std::string password, std::string broker
 		}
 		m_tdapi = CThostFtdcTraderApi::CreateFtdcTraderApi("./temp/CTPtd");
 		m_tdapi->RegisterSpi(this);
-		m_tdapi->RegisterFront((char*)m_address.c_str());
+		std::string tcpaddress = "tcp://" + m_address;
+		char pAddress[40];
+		strcpy(pAddress, tcpaddress.c_str());
+		m_tdapi->RegisterFront(pAddress);
 		m_tdapi->SubscribePublicTopic(THOST_TERT_QUICK);
 		m_tdapi->SubscribePrivateTopic(THOST_TERT_QUICK);
 		m_tdapi->Init();
+	
 	}
 	else
 	{

@@ -61,9 +61,6 @@
     <ClCompile Include="risk_manager\riskmanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="jstradergui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="portfolio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -161,9 +158,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="jstradergui.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="ReadOnlyDelegate.h">
       <Filter>Header Files</Filter>
     </QtMoc>

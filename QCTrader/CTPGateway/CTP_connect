@@ -1,5 +1,8 @@
-userid=037836
-password=460531277
+username=108758
+password=yh197687
 brokerid=9999
-mdaddress=tcp://180.168.146.187:10010
-tdaddress=tcp://180.168.146.187:10000
+tdipaddress=180.168.146.187:10201
+mdipaddress=180.168.146.187:10211
+productname=simnow_client_test
+authcode=0000000000000000
+productinfo=

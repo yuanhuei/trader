@@ -250,3 +250,12 @@ void MainWindow::UpdateLogTable(QString str)
 
 
 }
+
+void MainWindow::write_log(std::string msg,std::string gateway_name)
+{
+	std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
+	e->gatewayname = gateway_name;
+	e->msg = msg;
+	
+	m_eventengine->Put(e);
+}

@@ -1,5 +1,5 @@
 #include "QCTrader.h"
-#include "jstradergui.h"
+//#include "jstradergui.h"
 #include <QtWidgets/QApplication>
 #include"MainWindow.h"
 
