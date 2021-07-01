@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
 	ui.setupUi(this);
 	setWindowState(Qt::WindowMaximized);//设置窗口最大化
-
+	setUI();
 	LoadEngine();
 	ConnectSignalAndSlot();
 }
@@ -19,15 +19,32 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::menu_exit()
+void  MainWindow::setUI()
 {
-	this->close();
-}
+	//设置资金表
+	m_AccountModel = new QStandardItemModel;
+	QStringList accountheader;
+	accountheader << str2qstr_new("接口名") << str2qstr_new("账户ID") << str2qstr_new("昨结") << str2qstr_new("净值") << str2qstr_new("可用") << str2qstr_new("手续费") << str2qstr_new("保证金") << str2qstr_new("平仓盈亏") << str2qstr_new("持仓盈亏");
+	m_AccountModel->setHorizontalHeaderLabels(accountheader);
+	ui.tableView_2->setModel(m_AccountModel);
+	ui.tableView_2->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	ui.tableView_2->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	ui.tableView_2->setSelectionBehavior(QAbstractItemView::SelectRows);  //单击选择一行  
+	ui.tableView_2->setSelectionMode(QAbstractItemView::SingleSelection); //设置只能选择一行，不能多行选中  
+	ui.tableView_2->setAlternatingRowColors(true);
 
-void MainWindow::menu_ctp_connect()
-{
-	CTPConnectWidgets* e= new CTPConnectWidgets(this);
-	e->show();
+	//设置持仓表
+	m_PositionModel = new QStandardItemModel;
+	QStringList positionheader;
+	positionheader << str2qstr_new("接口名") << str2qstr_new("合约") << str2qstr_new("方向") << str2qstr_new("仓位") << str2qstr_new("昨仓") << str2qstr_new("冻结资金") << str2qstr_new("持仓价");
+	m_PositionModel->setHorizontalHeaderLabels(positionheader);
+	//QTableView* PositionView = new QTableView;
+	ui.tableView_3->setModel(m_PositionModel);
+	ui.tableView_3->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	ui.tableView_3->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	ui.tableView_3->setSelectionBehavior(QAbstractItemView::SelectRows);  //单击选择一行  
+	ui.tableView_3->setSelectionMode(QAbstractItemView::SingleSelection); //设置只能选择一行，不能多行选中  
+	ui.tableView_3->setAlternatingRowColors(true);
 
 }
 
@@ -48,7 +65,7 @@ void MainWindow::LoadEngine()
 
 void MainWindow::RegEvent()
 {
-	m_eventengine->RegEvent(EVENT_LOG, std::bind(&MainWindow::OnLogUpdate, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_LOG,std::bind(&MainWindow::OnLogUpdate, this, std::placeholders::_1));
 	m_eventengine->RegEvent(EVENT_ACCOUNT, std::bind(&MainWindow::onAccountUpdate, this, std::placeholders::_1));
 	m_eventengine->RegEvent(EVENT_POSITION, std::bind(&MainWindow::onPositionUpdate, this, std::placeholders::_1));
 	//m_eventengine->RegEvent(EVENT_LOADSTRATEGY, std::bind(&MainWindow::onStrategyLoaded, this, std::placeholders::_1));
@@ -57,12 +74,52 @@ void MainWindow::RegEvent()
 	m_eventengine->RegEvent(EVENT_TICK, std::bind(&MainWindow::onPriceTableUpdate, this, std::placeholders::_1));
 }
 
+void MainWindow::ConnectSignalAndSlot()
+{
+	//信号和槽函数
+	//qRegisterMetaType<LoadStrategyData>("LoadStrategyData");//注册到元系统中
+	//qRegisterMetaType<UpdateStrategyData>("UpdateStrategyData");//注册到元系统中
+	qRegisterMetaType<PositionData>("PositionData");//注册到元系统中
+	qRegisterMetaType<AccountData>("AccountData");//注册到元系统中
+	//qRegisterMetaType<PortfolioData>("PortfolioData");//注册到元系统中
+	qRegisterMetaType<std::string>("std::string");//注册到元系统中
+
+	connect(this, SIGNAL(UpdateLog(LogData)), this, SLOT(UpdateLogTable(LogData)));
+	connect(this, SIGNAL(UpdatePositionSignal(PositionData)), this, SLOT(UpdatePositionBox(PositionData)), Qt::QueuedConnection);
+	connect(this, SIGNAL(UpdateAccountSignal(AccountData)), this, SLOT(UpdateAccountBox(AccountData)), Qt::QueuedConnection);
+
+	//connect(this, SIGNAL(LoadStrategySignal(LoadStrategyData)), this, SLOT(CreateStrategyBox(LoadStrategyData)), Qt::QueuedConnection);
+	//connect(this, SIGNAL(UpdateStrategySignal(UpdateStrategyData)), this, SLOT(UpdateStrategyBox(UpdateStrategyData)), Qt::QueuedConnection); 
+	//connect(this, SIGNAL(UpdatePortfolioSignal(PortfolioData)), this, SLOT(UpdatePortfolioBox(PortfolioData)), Qt::QueuedConnection);
+}
+
+//点击菜单退出后的槽函数
+void MainWindow::menu_exit()
+{
+	this->close();
+}
+
+//点击菜单CTP连接 的槽函数 弹出对话框
+void MainWindow::menu_ctp_connect()
+{
+	CTPConnectWidgets* e = new CTPConnectWidgets(this);
+	e->show();
+
+}
+
+//EVENT_LOG事件的处理函数，发送UpdateLog信号给窗口
 void MainWindow::OnLogUpdate(std::shared_ptr<Event>e)
 {
 	std::shared_ptr<Event_Log> elog = std::static_pointer_cast<Event_Log>(e);
-	std::string msg = "接口名:" + elog->gatewayname + "时间:" + elog->logTime + "信息:" + elog->msg;
-	emit WriteLog(str2qstr_new(msg));
+	//std::string msg = "接口名:" + elog->gatewayname + "时间:" + elog->logTime + "信息:" + elog->msg;
+	LogData  logdata;
+	logdata.gatewayname = elog->gatewayname;
+	logdata.msg = elog->msg;
+	logdata.logTime = elog->logTime;
+	emit UpdateLog(logdata);
 }
+
+
 
 void MainWindow::onAccountUpdate(std::shared_ptr<Event>e)
 {
@@ -114,28 +171,25 @@ void MainWindow::onPriceTableUpdate(std::shared_ptr<Event>e)
 	emit UpdatePriceTableSignal(data);
 }
 
-void MainWindow::ConnectSignalAndSlot()
-{
-	//信号和槽函数
-	//qRegisterMetaType<LoadStrategyData>("LoadStrategyData");//注册到元系统中
-	//qRegisterMetaType<UpdateStrategyData>("UpdateStrategyData");//注册到元系统中
-	qRegisterMetaType<PositionData>("PositionData");//注册到元系统中
-	qRegisterMetaType<AccountData>("AccountData");//注册到元系统中
-	//qRegisterMetaType<PortfolioData>("PortfolioData");//注册到元系统中
-	qRegisterMetaType<std::string>("std::string");//注册到元系统中
 
-	connect(this, SIGNAL(WriteLog(QString)), this, SLOT(UpdateLogTable(QString)));
-	connect(this, SIGNAL(UpdatePositionSignal(PositionData)), this, SLOT(UpdatePositionBox(PositionData)), Qt::QueuedConnection);
-	connect(this, SIGNAL(UpdateAccountSignal(AccountData)), this, SLOT(UpdateAccountBox(AccountData)), Qt::QueuedConnection);
-
-	//connect(this, SIGNAL(LoadStrategySignal(LoadStrategyData)), this, SLOT(CreateStrategyBox(LoadStrategyData)), Qt::QueuedConnection);
-    //connect(this, SIGNAL(UpdateStrategySignal(UpdateStrategyData)), this, SLOT(UpdateStrategyBox(UpdateStrategyData)), Qt::QueuedConnection); 
-	//connect(this, SIGNAL(UpdatePortfolioSignal(PortfolioData)), this, SLOT(UpdatePortfolioBox(PortfolioData)), Qt::QueuedConnection);
-}
-
-
+//更新账户资金表
 void MainWindow::UpdateAccountBox(AccountData data)
 {
+	//第一次插入数据
+	if (m_AccountModel->rowCount() == 0)
+	{
+		m_AccountModel->setItem(0, 0, new QStandardItem(str2qstr_new(data.gatewayname)));
+		m_AccountModel->setItem(0, 1, new QStandardItem(str2qstr_new(data.accountid)));
+		m_AccountModel->setItem(0, 2, new QStandardItem(QString("%1").arg(data.preBalance, 0, 'f', 3)));
+		m_AccountModel->setItem(0, 3, new QStandardItem(QString("%1").arg(data.balance, 0, 'f', 3)));
+		m_AccountModel->setItem(0, 4, new QStandardItem(QString("%1").arg(data.available, 0, 'f', 3)));
+		m_AccountModel->setItem(0, 5, new QStandardItem(QString("%1").arg(data.commission, 0, 'f', 3)));
+		m_AccountModel->setItem(0, 6, new QStandardItem(QString("%1").arg(data.margin, 0, 'f', 3)));
+		m_AccountModel->setItem(0, 7, new QStandardItem(QString("%1").arg(data.closeProfit, 0, 'f', 3)));
+		m_AccountModel->setItem(0, 8, new QStandardItem(QString("%1").arg(data.positionProfit, 0, 'f', 3)));
+		return;
+	}
+	//更新数据，如果已经存在就更新，如果没有就插入
 	for (int i = 0; i < m_AccountModel->rowCount(); i++)
 	{
 		if (m_AccountModel->item(i, 0)->text().toStdString() == data.gatewayname)//判断表格的接口和这个接口是否一样
@@ -166,20 +220,10 @@ void MainWindow::UpdateAccountBox(AccountData data)
 			break;
 		}
 	}
-	if (m_AccountModel->rowCount() == 0)
-	{
-		m_AccountModel->setItem(0, 0, new QStandardItem(str2qstr_new(data.gatewayname)));
-		m_AccountModel->setItem(0, 1, new QStandardItem(str2qstr_new(data.accountid)));
-		m_AccountModel->setItem(0, 2, new QStandardItem(QString("%1").arg(data.preBalance, 0, 'f', 3)));
-		m_AccountModel->setItem(0, 3, new QStandardItem(QString("%1").arg(data.balance, 0, 'f', 3)));
-		m_AccountModel->setItem(0, 4, new QStandardItem(QString("%1").arg(data.available, 0, 'f', 3)));
-		m_AccountModel->setItem(0, 5, new QStandardItem(QString("%1").arg(data.commission, 0, 'f', 3)));
-		m_AccountModel->setItem(0, 6, new QStandardItem(QString("%1").arg(data.margin, 0, 'f', 3)));
-		m_AccountModel->setItem(0, 7, new QStandardItem(QString("%1").arg(data.closeProfit, 0, 'f', 3)));
-		m_AccountModel->setItem(0, 8, new QStandardItem(QString("%1").arg(data.positionProfit, 0, 'f', 3)));
-	}
+
 }
 
+//更新持仓表
 void MainWindow::UpdatePositionBox(PositionData data)
 {
 	std::string direction = "";
@@ -244,12 +288,33 @@ void MainWindow::UpdatePositionBox(PositionData data)
 	}
 }
 
-
-void MainWindow::UpdateLogTable(QString str)
+//更新日志窗口
+void MainWindow::UpdateLogTable(LogData data)
 {
+	int rowCount = ui.tableWidget->rowCount();
+	ui.tableWidget->insertRow(rowCount);
+	ui.tableWidget->setItem(rowCount, 0, new QTableWidgetItem(QString::fromStdString(data.logTime)));
+	ui.tableWidget->setItem(rowCount, 1, new QTableWidgetItem(QString::fromStdString(data.msg)));
+	ui.tableWidget->setItem(rowCount, 3, new QTableWidgetItem(QString::fromStdString(data.gatewayname)));
+}
+
+
+void MainWindow::UpdateTickTable(UpdatePriceTableData data)
+{
+	std::string strSymbol = ui.lineEdit->text().toStdString();
+	if (data.symbol == strSymbol)
+	{
+		ui.label_7->setText(QString::fromStdString((std::to_string(data.lastprice))));//设置最新价
+		ui.label_2->setText(QString::fromStdString((std::to_string(data.bidprice1))));//设置卖一价
+		ui.label_3->setText(QString::fromStdString((std::to_string(data.askprice1))));//设置卖一价
+		ui.label_5->setText(QString::fromStdString((std::to_string(data.upperLimit))));//设置涨停价
+		ui.label_9->setText(QString::fromStdString((std::to_string(data.lowerLimit))));//设置跌停价
+
+	}
 
 
 }
+
 
 void MainWindow::write_log(std::string msg,std::string gateway_name)
 {
@@ -258,4 +323,16 @@ void MainWindow::write_log(std::string msg,std::string gateway_name)
 	e->msg = msg;
 	
 	m_eventengine->Put(e);
+}
+
+
+void MainWindow::symbol_ReturnPressed()
+{
+
+	SubscribeReq req;
+	req.symbol = ui.lineEdit->text().toStdString();
+	if(req.symbol.length()>0)
+		m_gatewaymanager->subscribe(req,"CTP");
+
+
 }

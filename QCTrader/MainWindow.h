@@ -74,6 +74,14 @@ struct PortfolioData
 	std::vector<int>strategyrows;
 };
 
+struct LogData
+{
+	std::string msg;//log信息
+	std::string gatewayname; //接口名
+	std::string logTime;//时间
+
+};
+
 
 class MainWindow : public QMainWindow
 {
@@ -83,6 +91,7 @@ public:
 	MainWindow(QWidget *parent = Q_NULLPTR);
 	~MainWindow();
 
+	void setUI();
 	void LoadEngine();
 	void RegEvent();
 	void OnLogUpdate(std::shared_ptr<Event>e);
@@ -93,7 +102,7 @@ public:
 	void write_log(std::string msg, std::string gateway_name);
 
 signals:
-	void WriteLog(QString msg);
+	void UpdateLog(LogData data);
 	//void LoadStrategySignal(LoadStrategyData data);
 	//void UpdateStrategySignal(UpdateStrategyData data);
 	void UpdateAccountSignal(AccountData data);
@@ -108,9 +117,11 @@ private:
 private slots:
 	void menu_ctp_connect();
 	void menu_exit();
+	void symbol_ReturnPressed();
 	void UpdateAccountBox(AccountData data);
 	void UpdatePositionBox(PositionData data);
-	void UpdateLogTable(QString str);
+	void UpdateLogTable(LogData data);
+	void UpdateTickTable(UpdatePriceTableData data);
 
 public:
 	//各种引擎管理器指针

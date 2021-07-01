@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1309</width>
+    <width>1271</width>
     <height>580</height>
    </rect>
   </property>
@@ -661,80 +661,8 @@
             </property>
            </column>
           </widget>
-          <widget class="QTableWidget" name="tableWidget_2">
-           <column>
-            <property name="text">
-             <string>资金</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>余额</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>冻结</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>可用</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>接口</string>
-            </property>
-           </column>
-          </widget>
-          <widget class="QTableWidget" name="tableWidget_3">
-           <column>
-            <property name="text">
-             <string>持仓</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>交易所</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>方向</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>数量</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>昨仓</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>冻结</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>均价</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>盈亏</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>接口</string>
-            </property>
-           </column>
-          </widget>
+          <widget class="QTableView" name="tableView_2"/>
+          <widget class="QTableView" name="tableView_3"/>
          </widget>
         </item>
        </layout>
@@ -748,7 +676,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1309</width>
+     <width>1271</width>
      <height>23</height>
     </rect>
    </property>
@@ -847,9 +775,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>lineEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>symbol_ReturnPressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>215</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>8</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>menu_ctp_connect()</slot>
   <slot>menu_exit()</slot>
+  <slot>symbol_ReturnPressed()</slot>
  </slots>
 </ui>

@@ -100,6 +100,9 @@
     <ClCompile Include="gateway\ctp_gateway\ctpgateway.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="jstradergui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="event_engine\eventengine.h">
@@ -156,6 +159,9 @@
     <ClInclude Include="Debug\uic\ui_ctp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Debug\uic\ui_MainWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="ReadOnlyDelegate.h">
@@ -171,6 +177,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="MainWindow.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="jstradergui.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
