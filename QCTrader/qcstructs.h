@@ -12,6 +12,8 @@
 #define PRICETYPE_MARKETPRICE "pricetypemarket"
 #define PRICETYPE_FAK "FAK"
 #define PRICETYPE_FOK "FOK"
+#define PRICETYPE_STOP "STOP"
+#define PRICETYPE_REQUEST "REQUEST_PRICE"
 
 #define DIRECTION_NONE "directionnone"
 #define DIRECTION_LONG "directionlong"

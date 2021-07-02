@@ -28,7 +28,43 @@ struct UpdatePriceTableData
 	double askprice1;
 };
 
+struct UpdateOrderTableData
+{
 
+	//编号相关
+	std::string symbol;
+	std::string exchange;
+	std::string orderID;//订单编号
+	std::string gatewayname;
+	//报单相关
+	std::string direction;//方向
+	std::string offset;//开平方向
+	double price; //报单价格
+	double totalVolume;//报单总量
+	double tradedVolume;//成交数量
+	std::string status;//报单状态
+
+	std::string orderTime;//发单时间
+	std::string cancelTime;//撤单时间
+
+	int frontID;//前置机编号
+};
+
+struct UpdateTradeTableData
+{
+	//代码编号
+	std::string symbol;
+	std::string exchange;
+	std::string tradeID;   //交易编号
+	std::string orderID;  //订单编号
+	std::string gatewayname;
+	//成交相关
+	std::string direction;//方向
+	std::string offset; //成交开平仓
+	double price;//成交价格
+	double volume;//成交量
+	std::string tradeTime;//成交时间
+};
 
 struct UpdateStrategyData
 {
@@ -106,6 +142,9 @@ public:
 	void onAccountUpdate(std::shared_ptr<Event>e);
 	void onPositionUpdate(std::shared_ptr<Event>e);
 	void onPriceTableUpdate(std::shared_ptr<Event>e);
+	void onOrderTableUpdate(std::shared_ptr<Event>e);
+	void onTradeTableUpdate(std::shared_ptr<Event>e);
+
 	//连接信号和槽
 	void ConnectSignalAndSlot();
 	//日志记录
@@ -121,6 +160,8 @@ signals:
 	void UpdatePositionSignal(PositionData  data);
 	//void UpdatePortfolioSignal(PortfolioData data);
 	void UpdatePriceTableSignal(UpdatePriceTableData data);
+	void UpdateOrderTableSignal(UpdateOrderTableData data);
+	void UpdateTradeTableSignal(UpdateTradeTableData data);
 	//void UpdatePortfolioWinning(QString winning);
 
 private:
@@ -130,10 +171,14 @@ private slots:
 	void menu_ctp_connect();
 	void menu_exit();
 	void symbol_ReturnPressed();
+	void SendOrder_clicked();
+
 	void UpdateAccountBox(AccountData data);
 	void UpdatePositionBox(PositionData data);
 	void UpdateLogTable(LogData data);
 	void UpdateTickTable(UpdatePriceTableData data);
+	void UpdateOrderTable(UpdateOrderTableData data);
+	void UpdateTradeTable(UpdateTradeTableData data);
 
 public:
 	//各种引擎管理器指针
@@ -147,4 +192,6 @@ public:
 	QStandardItemModel* m_AccountModel;
 	QStandardItemModel* m_PositionModel;
 	QStandardItemModel* m_SymbolSubscribedTableModel;
+	QStandardItemModel* m_OrderSubmitTableModel;
+	QStandardItemModel* m_TradeSubmitTableModel;
 };

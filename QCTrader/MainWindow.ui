@@ -427,130 +427,8 @@
                <enum>Qt::Vertical</enum>
               </property>
               <widget class="QTableView" name="tableView_4"/>
-              <widget class="QTableWidget" name="tableWidget_5">
-               <column>
-                <property name="text">
-                 <string>委托号</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>来源</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>代码</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>交易所</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>类型</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>方向</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>开平</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>价格</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>总数量</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>已成交</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>状态</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>时间</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>接口</string>
-                </property>
-               </column>
-              </widget>
-              <widget class="QTableWidget" name="tableWidget_6">
-               <column>
-                <property name="text">
-                 <string>成交号</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>委托号</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>代码</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>交易所</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>方向</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>开平</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>价格</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>数量</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>时间</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>接口</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string/>
-                </property>
-               </column>
-              </widget>
+              <widget class="QTableView" name="tableView_5"/>
+              <widget class="QTableView" name="tableView_6"/>
              </widget>
             </item>
            </layout>
@@ -725,10 +603,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>SendOrder_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>96</x>
+     <y>397</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>406</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>menu_ctp_connect()</slot>
   <slot>menu_exit()</slot>
   <slot>symbol_ReturnPressed()</slot>
+  <slot>SendOrder_clicked()</slot>
  </slots>
 </ui>

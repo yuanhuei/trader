@@ -52,10 +52,7 @@ void CTPMD::OnRspUserLogout(CThostFtdcUserLogoutField* pUserLogout, CThostFtdcRs
 	}
 	else
 	{
-		std::shared_ptr<Event_Error>e = std::make_shared<Event_Error>();
-		e->errorMsg = pRspInfo->ErrorMsg;
-		e->errorID = pRspInfo->ErrorID;
-		e->gatewayname = m_gatewayname;
+
 		m_ctpgateway->write_error("行情服务器登出出错",pRspInfo);
 	}
 }
@@ -69,7 +66,7 @@ void CTPMD::OnRspError(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bI
 
 void CTPMD::OnRspSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificInstrument, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (pRspInfo != NULL && pRspInfo->ErrorID != 0)
+	if (pRspInfo != NULL && pRspInfo->ErrorID == 0)
 	{
 		m_ctpgateway->write_log("行情订阅成功");
 		//插入到已订阅合约合集中

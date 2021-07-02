@@ -73,6 +73,33 @@ void  MainWindow::setUI()
 	ui.tableView_4->setSelectionMode(QAbstractItemView::SingleSelection); //设置只能选择一行，不能多行选中  
 	ui.tableView_4->setAlternatingRowColors(true);
 
+	//设置委托订单表
+	m_OrderSubmitTableModel = new QStandardItemModel;
+	QStringList ordersubmitheader;
+	ordersubmitheader << str2qstr_new("委托号") << str2qstr_new("来源") << str2qstr_new("合约代码") << str2qstr_new("交易所") << str2qstr_new("方向") << str2qstr_new("开平") << str2qstr_new("价格") << str2qstr_new("总数量") << str2qstr_new("已成交") << str2qstr_new("状态")<< str2qstr_new("时间")<< str2qstr_new("接口");
+	m_OrderSubmitTableModel->setHorizontalHeaderLabels(ordersubmitheader);
+	//QTableView* PositionView = new QTableView;
+	ui.tableView_5->setModel(m_SymbolSubscribedTableModel);
+	ui.tableView_5->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	ui.tableView_5->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	ui.tableView_5->setSelectionBehavior(QAbstractItemView::SelectRows);  //单击选择一行  
+	ui.tableView_5->setSelectionMode(QAbstractItemView::SingleSelection); //设置只能选择一行，不能多行选中  
+	ui.tableView_5->setAlternatingRowColors(true);
+
+	//设置委托订单表
+	m_TradeSubmitTableModel = new QStandardItemModel;
+	QStringList Tradesubmitheader;
+	Tradesubmitheader << str2qstr_new("成交号") << str2qstr_new("委托号") << str2qstr_new("合约代码") << str2qstr_new("交易所")<< str2qstr_new("方向") << str2qstr_new("开平") << str2qstr_new("价格") << str2qstr_new("数量") << str2qstr_new("时间")<< str2qstr_new("接口");
+	m_TradeSubmitTableModel->setHorizontalHeaderLabels(Tradesubmitheader);
+	//QTableView* PositionView = new QTableView;
+	ui.tableView_6->setModel(m_TradeSubmitTableModel);
+	ui.tableView_6->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	ui.tableView_6->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	ui.tableView_6->setSelectionBehavior(QAbstractItemView::SelectRows);  //单击选择一行  
+	ui.tableView_6->setSelectionMode(QAbstractItemView::SingleSelection); //设置只能选择一行，不能多行选中  
+	ui.tableView_6->setAlternatingRowColors(true);
+
+
 }
 
 
@@ -97,6 +124,8 @@ void MainWindow::RegEvent()
 	m_eventengine->RegEvent(EVENT_ACCOUNT, std::bind(&MainWindow::onAccountUpdate, this, std::placeholders::_1));
 	m_eventengine->RegEvent(EVENT_POSITION, std::bind(&MainWindow::onPositionUpdate, this, std::placeholders::_1));
 	m_eventengine->RegEvent(EVENT_TICK, std::bind(&MainWindow::onPriceTableUpdate, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_ORDER, std::bind(&MainWindow::onOrderTableUpdate, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_TRADE, std::bind(&MainWindow::onTradeTableUpdate, this, std::placeholders::_1));
 
 	//m_eventengine->RegEvent(EVENT_LOADSTRATEGY, std::bind(&MainWindow::onStrategyLoaded, this, std::placeholders::_1));
 	//m_eventengine->RegEvent(EVENT_UPDATESTRATEGY, std::bind(&MainWindow::onStrategyUpdate, this, std::placeholders::_1));
@@ -115,11 +144,16 @@ void MainWindow::ConnectSignalAndSlot()
 	qRegisterMetaType<std::string>("std::string");//注册到元系统中
 	qRegisterMetaType<LogData>("LogData");//注册到元系统中 UpdatePriceTableData
 	qRegisterMetaType<UpdatePriceTableData>("UpdatePriceTableData");
+	qRegisterMetaType<UpdateOrderTableData>("UpdateOrderTableData");
+	qRegisterMetaType<UpdateTradeTableData>("UpdateTradeTableData");
+
 
 	connect(this, SIGNAL(UpdateLogSignal(LogData)), this, SLOT(UpdateLogTable(LogData)));
 	connect(this, SIGNAL(UpdatePositionSignal(PositionData)), this, SLOT(UpdatePositionBox(PositionData)), Qt::QueuedConnection);
 	connect(this, SIGNAL(UpdateAccountSignal(AccountData)), this, SLOT(UpdateAccountBox(AccountData)), Qt::QueuedConnection);
 	connect(this, SIGNAL(UpdatePriceTableSignal(UpdatePriceTableData)), this, SLOT(UpdateTickTable(UpdatePriceTableData)), Qt::QueuedConnection);
+	connect(this, SIGNAL(UpdateOrDerTableSignal(UpdateOrderTableData)), this, SLOT(UpdateOrderTable(UpdateOrderTableData)), Qt::QueuedConnection);
+	connect(this, SIGNAL(UpdateTradeTableSignal(UpdateTradeTableData)), this, SLOT(UpdateTradeTable(UpdateTradeTableData)), Qt::QueuedConnection);
 
 	//connect(this, SIGNAL(LoadStrategySignal(LoadStrategyData)), this, SLOT(CreateStrategyBox(LoadStrategyData)), Qt::QueuedConnection);
 	//connect(this, SIGNAL(UpdateStrategySignal(UpdateStrategyData)), this, SLOT(UpdateStrategyBox(UpdateStrategyData)), Qt::QueuedConnection); 
@@ -179,22 +213,67 @@ void MainWindow::onPositionUpdate(std::shared_ptr<Event>e)
 
 void MainWindow::onPriceTableUpdate(std::shared_ptr<Event>e)
 {
+	return;
 	std::shared_ptr<Event_Tick> eTick = std::static_pointer_cast<Event_Tick>(e);
 	UpdatePriceTableData data;
 	data.askprice1 = 1;// eTick->askprice1;
-	data.bidprice1 = 1;// eTick->bidprice1;
+	/*data.bidprice1 = 1;// eTick->bidprice1;
 	data.date = "2000";// eTick->date;
 	data.lastprice = 1;// eTick->lastprice;
 	data.lowerLimit = 1;// eTick->lowerLimit;
 	data.openInterest = 1;// eTick->openInterest;
 	data.symbol ="eb2110";// eTick->symbol;
 	data.time = "17:22:22";// eTick->time;
-	data.upperLimit = 1;// eTick->upperLimit;
+	//data.upperLimit = 1;// eTick->upperLimit;
 	//data.exchange = "DCN";// eTick->exchange;
 	//data.gatewayname = "CTP";// eTick->gatewayname;
+	*/
 
 	emit UpdatePriceTableSignal(data);
 }
+
+void MainWindow::onOrderTableUpdate(std::shared_ptr<Event>e)
+{
+	UpdateOrderTableData data;
+	std::shared_ptr<Event_Order> eTick = std::static_pointer_cast<Event_Order>(e);
+	data.cancelTime = eTick->cancelTime;
+	data.direction = eTick->direction;
+	data.exchange = eTick->exchange;
+	data.frontID = eTick->frontID;
+	data.gatewayname = eTick->gatewayname;
+	data.offset = eTick->offset;
+	data.orderID = eTick->orderID;
+	data.orderTime = eTick->orderTime;
+	data.price = eTick->price;
+	data.status = eTick->status;
+	data.symbol = eTick->symbol;
+	data.totalVolume = eTick->totalVolume;
+	data.tradedVolume = eTick->tradedVolume;
+
+
+	emit UpdateOrderTableSignal(data);
+
+}
+
+void MainWindow::onTradeTableUpdate(std::shared_ptr<Event>e)
+{
+	UpdateTradeTableData data;
+	std::shared_ptr<Event_Trade> eTick = std::static_pointer_cast<Event_Trade>(e);
+	data.tradeID = eTick->tradeID;
+	data.direction = eTick->direction;
+	data.exchange = eTick->exchange;
+	data.gatewayname = eTick->gatewayname;
+	data.offset = eTick->offset;
+	data.orderID = eTick->orderID;
+	data.tradeTime = eTick->tradeTime;
+	data.price = eTick->price;
+	data.symbol = eTick->symbol;
+	data.volume = eTick->volume;
+
+
+	emit UpdateTradeTableSignal(data);
+}
+
 
 //////////////////////////////////////槽函数部分 //////////////////////////////
 // 
@@ -222,6 +301,135 @@ void MainWindow::symbol_ReturnPressed()
 	if (req.symbol.length() > 0)
 		m_gatewaymanager->subscribe(req, "CTP");
 
+
+}
+
+void MainWindow::SendOrder_clicked()
+{
+	OrderReq req;
+
+	req.exchange = ui.comboBox->currentText().toStdString();
+	req.symbol = ui.lineEdit->text().toStdString();
+
+	int direction = ui.comboBox_2->currentIndex();// currentText().toStdString();
+	if (direction == 0)
+		req.direction = DIRECTION_LONG;
+	else if (direction ==1 )
+		req.direction = DIRECTION_SHORT;
+	else
+		req.direction = DIRECTION_UNKNOWN;
+
+	int offset = ui.comboBox_3->currentIndex();// Text().toStdString();
+	if (offset == 0)
+		req.offset = OFFSET_OPEN;
+	else if (offset == 1)
+		req.offset = OFFSET_CLOSE;
+	else if (offset == 2)
+		req.offset = OFFSET_CLOSETODAY;
+	else if (offset == 3)
+		req.offset = OFFSET_CLOSEYESTERDAY;
+	else
+		req.offset = OFFSET_NONE;
+
+	int  pricetype = ui.comboBox_5->currentIndex();
+	if (pricetype == 0)
+		req.priceType = PRICETYPE_LIMITPRICE;
+	else if (pricetype == 1)
+		req.priceType = PRICETYPE_MARKETPRICE;
+	else if (pricetype == 2)
+		req.priceType = PRICETYPE_STOP;
+	else if (pricetype == 3)
+		req.priceType = PRICETYPE_FAK;
+	else if (pricetype == 4)
+		req.priceType = PRICETYPE_FOK;
+	else
+		req.priceType = PRICETYPE_REQUEST;
+
+	req.price = ui.lineEdit_2->text().toDouble();
+	req.volume = ui.lineEdit_3->text().toDouble();
+	std::string gatewayname = ui.comboBox_6->currentText().toStdString();
+
+	std::string orderRef;
+	orderRef = m_gatewaymanager->sendOrder(req, gatewayname);
+	
+	this->write_log("订单发送,编号为:" + orderRef,"CTP");
+}
+void MainWindow::UpdateOrderTable(UpdateOrderTableData data)
+{
+	//ordersubmitheader << str2qstr_new("委托号") << str2qstr_new("来源") << str2qstr_new("合约代码") << str2qstr_new("交易所")<< str2qstr_new("方向") << str2qstr_new("开平") << str2qstr_new("价格") << str2qstr_new("总数量") << str2qstr_new("已成交") << str2qstr_new("状态") << str2qstr_new("发单时间") << str2qstr_new("撤单时间")<< str2qstr_new("接口");
+		//更新数据，如果已经存在就更新，如果没有就插入
+	for (int i = 0; i < m_OrderSubmitTableModel->rowCount(); i++)
+	{
+		if (m_OrderSubmitTableModel->item(i, 0)->text().toStdString() == data.symbol)//判断是否是一个合约，是就更新数据
+		{
+			m_OrderSubmitTableModel->setItem(i, 0, new QStandardItem(str2qstr_new(data.orderID)));
+			m_OrderSubmitTableModel->setItem(i, 1, new QStandardItem(QString::number(data.frontID)));
+			m_OrderSubmitTableModel->setItem(i, 2, new QStandardItem(str2qstr_new(data.symbol)));
+			m_OrderSubmitTableModel->setItem(i, 3, new QStandardItem(str2qstr_new(data.exchange)));
+			m_OrderSubmitTableModel->setItem(i, 4, new QStandardItem(str2qstr_new(data.direction)));
+			m_OrderSubmitTableModel->setItem(i, 5, new QStandardItem(str2qstr_new(data.offset)));
+			m_OrderSubmitTableModel->setItem(i, 6, new QStandardItem(QString::number(data.price)));
+			m_OrderSubmitTableModel->setItem(i, 7, new QStandardItem(QString::number(data.totalVolume)));
+			m_OrderSubmitTableModel->setItem(i, 8, new QStandardItem(QString::number(data.tradedVolume)));
+			m_OrderSubmitTableModel->setItem(i, 9, new QStandardItem(str2qstr_new(data.status)));
+			m_OrderSubmitTableModel->setItem(i, 10, new QStandardItem(str2qstr_new(data.orderTime)));
+			m_OrderSubmitTableModel->setItem(i, 11, new QStandardItem(str2qstr_new(data.cancelTime)));
+			m_OrderSubmitTableModel->setItem(i, 12, new QStandardItem(str2qstr_new(data.gatewayname)));
+			return;
+		}
+	}
+
+	//没有找到就插入一个
+	int i = m_OrderSubmitTableModel->rowCount();
+	m_OrderSubmitTableModel->setItem(i, 0, new QStandardItem(str2qstr_new(data.orderID)));
+	m_OrderSubmitTableModel->setItem(i, 1, new QStandardItem(QString::number(data.frontID)));
+	m_OrderSubmitTableModel->setItem(i, 2, new QStandardItem(str2qstr_new(data.symbol)));
+	m_OrderSubmitTableModel->setItem(i, 3, new QStandardItem(str2qstr_new(data.exchange)));
+	m_OrderSubmitTableModel->setItem(i, 4, new QStandardItem(str2qstr_new(data.direction)));
+	m_OrderSubmitTableModel->setItem(i, 5, new QStandardItem(str2qstr_new(data.offset)));
+	m_OrderSubmitTableModel->setItem(i, 6, new QStandardItem(QString::number(data.price)));
+	m_OrderSubmitTableModel->setItem(i, 7, new QStandardItem(QString::number(data.totalVolume)));
+	m_OrderSubmitTableModel->setItem(i, 8, new QStandardItem(QString::number(data.tradedVolume)));
+	m_OrderSubmitTableModel->setItem(i, 9, new QStandardItem(str2qstr_new(data.status)));
+	m_OrderSubmitTableModel->setItem(i, 10, new QStandardItem(str2qstr_new(data.orderTime)));
+	m_OrderSubmitTableModel->setItem(i, 11, new QStandardItem(str2qstr_new(data.cancelTime)));
+	m_OrderSubmitTableModel->setItem(i, 12, new QStandardItem(str2qstr_new(data.gatewayname)));
+}
+
+
+void MainWindow::UpdateTradeTable(UpdateTradeTableData data)
+{
+	//ordersubmitheader << str2qstr_new("成交号") << str2qstr_new("委托号") << str2qstr_new("合约代码") << str2qstr_new("交易所")<< str2qstr_new("方向") << str2qstr_new("开平") << str2qstr_new("价格") << str2qstr_new("数量") << str2qstr_new("时间")<< str2qstr_new("接口");
+	//更新数据，如果已经存在就更新，如果没有就插入
+	for (int i = 0; i < m_TradeSubmitTableModel->rowCount(); i++)
+	{
+		if (m_TradeSubmitTableModel->item(i, 0)->text().toStdString() == data.symbol)//判断是否是一个合约，是就更新数据
+		{
+			m_TradeSubmitTableModel->setItem(i, 0, new QStandardItem(str2qstr_new(data.tradeID)));
+			m_TradeSubmitTableModel->setItem(i, 1, new QStandardItem(str2qstr_new(data.orderID)));
+			m_TradeSubmitTableModel->setItem(i, 2, new QStandardItem(str2qstr_new(data.symbol)));
+			m_TradeSubmitTableModel->setItem(i, 3, new QStandardItem(str2qstr_new(data.exchange)));
+			m_TradeSubmitTableModel->setItem(i, 4, new QStandardItem(str2qstr_new(data.direction)));
+			m_TradeSubmitTableModel->setItem(i, 5, new QStandardItem(str2qstr_new(data.offset)));
+			m_TradeSubmitTableModel->setItem(i, 6, new QStandardItem(QString::number(data.price)));
+			m_TradeSubmitTableModel->setItem(i, 7, new QStandardItem(QString::number(data.volume)));
+			m_TradeSubmitTableModel->setItem(i, 8, new QStandardItem(str2qstr_new(data.tradeTime)));
+			m_TradeSubmitTableModel->setItem(i, 9, new QStandardItem(str2qstr_new(data.gatewayname)));
+			return;
+		}
+	}
+	//没有找到就插入一个
+	int i = m_TradeSubmitTableModel->rowCount();
+	m_TradeSubmitTableModel->setItem(i, 0, new QStandardItem(str2qstr_new(data.tradeID)));
+	m_TradeSubmitTableModel->setItem(i, 1, new QStandardItem(str2qstr_new(data.orderID)));
+	m_TradeSubmitTableModel->setItem(i, 2, new QStandardItem(str2qstr_new(data.symbol)));
+	m_TradeSubmitTableModel->setItem(i, 3, new QStandardItem(str2qstr_new(data.exchange)));
+	m_TradeSubmitTableModel->setItem(i, 4, new QStandardItem(str2qstr_new(data.direction)));
+	m_TradeSubmitTableModel->setItem(i, 5, new QStandardItem(str2qstr_new(data.offset)));
+	m_TradeSubmitTableModel->setItem(i, 6, new QStandardItem(QString::number(data.price)));
+	m_TradeSubmitTableModel->setItem(i, 7, new QStandardItem(QString::number(data.volume)));
+	m_TradeSubmitTableModel->setItem(i, 8, new QStandardItem(str2qstr_new(data.tradeTime)));
+	m_TradeSubmitTableModel->setItem(i, 9, new QStandardItem(str2qstr_new(data.gatewayname)));
 
 }
 
@@ -255,9 +463,9 @@ void MainWindow::UpdateSymbolBox(UpdatePriceTableData data)
 
 
 	//更新数据，如果已经存在就更新，如果没有就插入
-	for (int i = 0; i < m_AccountModel->rowCount(); i++)
+	for (int i = 0; i < m_SymbolSubscribedTableModel->rowCount(); i++)
 	{
-		if (m_AccountModel->item(i, 0)->text().toStdString() == data.symbol)//判断是否是一个合约，是就更新数据
+		if (m_SymbolSubscribedTableModel->item(i, 0)->text().toStdString() == data.symbol)//判断是否是一个合约，是就更新数据
 		{
 			m_SymbolSubscribedTableModel->setItem(i, 0, new QStandardItem(str2qstr_new(data.symbol)));
 			m_SymbolSubscribedTableModel->setItem(i, 1, new QStandardItem(str2qstr_new(data.exchange)));
