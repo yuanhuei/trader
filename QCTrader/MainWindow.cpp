@@ -181,17 +181,17 @@ void MainWindow::onPriceTableUpdate(std::shared_ptr<Event>e)
 {
 	std::shared_ptr<Event_Tick> eTick = std::static_pointer_cast<Event_Tick>(e);
 	UpdatePriceTableData data;
-	data.askprice1 = eTick->askprice1;
-	data.bidprice1 = eTick->bidprice1;
-	data.date = eTick->date;
-	data.lastprice = eTick->lastprice;
-	data.lowerLimit = eTick->lowerLimit;
-	data.openInterest = eTick->openInterest;
-	data.symbol = eTick->symbol;
-	data.time = eTick->time;
-	data.upperLimit = eTick->upperLimit;
-	//data.exchange = eTick->exchange;
-	//data.gatewayname = eTick->gatewayname;
+	data.askprice1 = 1;// eTick->askprice1;
+	data.bidprice1 = 1;// eTick->bidprice1;
+	data.date = "2000";// eTick->date;
+	data.lastprice = 1;// eTick->lastprice;
+	data.lowerLimit = 1;// eTick->lowerLimit;
+	data.openInterest = 1;// eTick->openInterest;
+	data.symbol ="eb2110";// eTick->symbol;
+	data.time = "17:22:22";// eTick->time;
+	data.upperLimit = 1;// eTick->upperLimit;
+	//data.exchange = "DCN";// eTick->exchange;
+	//data.gatewayname = "CTP";// eTick->gatewayname;
 
 	emit UpdatePriceTableSignal(data);
 }
@@ -229,6 +229,8 @@ void MainWindow::symbol_ReturnPressed()
 // //更新价格显示以及合约订阅表
 void MainWindow::UpdateTickTable(UpdatePriceTableData data)
 {
+	data.exchange = "DCN";// eTick->exchange;
+	data.gatewayname = "CTP";// eTick->gatewayname;
 	std::string strSymbol = ui.lineEdit->text().toStdString();
 	if (data.symbol == strSymbol)
 	{
@@ -248,25 +250,10 @@ void MainWindow::UpdateTickTable(UpdatePriceTableData data)
 //更新行情订阅表
 void MainWindow::UpdateSymbolBox(UpdatePriceTableData data)
 {
-	//第一次插入数据
-	if (m_SymbolSubscribedTableModel->rowCount() == 0)
-	{
+
 		//	表列表 << str2qstr_new("合约代码") << str2qstr_new("交易所") << str2qstr_new("最新价") << str2qstr_new("持仓量") << str2qstr_new("涨停") << str2qstr_new("跌停") << str2qstr_new("买一价") << str2qstr_new("卖一价")<< str2qstr_new("时间") << str2qstr_new("接口");
 
-		m_SymbolSubscribedTableModel->setItem(0, 0, new QStandardItem(str2qstr_new(data.symbol)));
-		m_SymbolSubscribedTableModel->setItem(0, 1, new QStandardItem(str2qstr_new(data.exchange)));
-		m_SymbolSubscribedTableModel->setItem(0, 2, new QStandardItem(QString::fromStdString((std::to_string(data.lastprice)))));
-		m_SymbolSubscribedTableModel->setItem(0, 3, new QStandardItem(QString::fromStdString((std::to_string(data.openInterest)))));
-		m_SymbolSubscribedTableModel->setItem(0, 4, new QStandardItem(QString::fromStdString((std::to_string(data.upperLimit)))));
-		m_SymbolSubscribedTableModel->setItem(0, 5, new QStandardItem(QString::fromStdString((std::to_string(data.lowerLimit)))));
-		m_SymbolSubscribedTableModel->setItem(0, 6, new QStandardItem(QString::fromStdString((std::to_string(data.askprice1)))));
-		m_SymbolSubscribedTableModel->setItem(0, 7, new QStandardItem(QString::fromStdString((std::to_string(data.bidprice1)))));
-		std::string DateTime = data.date + " " + data.time;
-		m_SymbolSubscribedTableModel->setItem(0, 8, new QStandardItem(QString::fromStdString(DateTime)));
-		m_SymbolSubscribedTableModel->setItem(0, 9, new QStandardItem(QString::fromStdString(data.gatewayname)));
-	
-		return;
-	}
+
 	//更新数据，如果已经存在就更新，如果没有就插入
 	for (int i = 0; i < m_AccountModel->rowCount(); i++)
 	{
@@ -283,47 +270,35 @@ void MainWindow::UpdateSymbolBox(UpdatePriceTableData data)
 			std::string DateTime = data.date + " " + data.time;
 			m_SymbolSubscribedTableModel->setItem(i, 8, new QStandardItem(QString::fromStdString(DateTime)));
 			m_SymbolSubscribedTableModel->setItem(i, 9, new QStandardItem(QString::fromStdString(data.gatewayname)));
-			break;
-		}
-		if (i == m_AccountModel->rowCount() - 1)
-		{
-			//最后一个了还没找到
-			m_SymbolSubscribedTableModel->setItem(i+1, 0, new QStandardItem(str2qstr_new(data.symbol)));
-			m_SymbolSubscribedTableModel->setItem(i + 1, 1, new QStandardItem(str2qstr_new(data.exchange)));
-			m_SymbolSubscribedTableModel->setItem(i + 1, 2, new QStandardItem(QString::fromStdString((std::to_string(data.lastprice)))));
-			m_SymbolSubscribedTableModel->setItem(i + 1, 3, new QStandardItem(QString::fromStdString((std::to_string(data.openInterest)))));
-			m_SymbolSubscribedTableModel->setItem(i + 1, 4, new QStandardItem(QString::fromStdString((std::to_string(data.upperLimit)))));
-			m_SymbolSubscribedTableModel->setItem(i + 1, 5, new QStandardItem(QString::fromStdString((std::to_string(data.lowerLimit)))));
-			m_SymbolSubscribedTableModel->setItem(i + 1, 6, new QStandardItem(QString::fromStdString((std::to_string(data.askprice1)))));
-			m_SymbolSubscribedTableModel->setItem(i + 1, 7, new QStandardItem(QString::fromStdString((std::to_string(data.bidprice1)))));
-			std::string DateTime = data.date + " " + data.time;
-			m_SymbolSubscribedTableModel->setItem(i + 1, 8, new QStandardItem(QString::fromStdString(DateTime)));
-			m_SymbolSubscribedTableModel->setItem(i + 1, 9, new QStandardItem(QString::fromStdString(data.gatewayname)));
-			break;
+			return;
 		}
 	}
+
+
+	//没有找到就插入一个
+	int i = m_SymbolSubscribedTableModel->rowCount();
+	m_SymbolSubscribedTableModel->setItem(i, 0, new QStandardItem(str2qstr_new(data.symbol)));
+	m_SymbolSubscribedTableModel->setItem(i, 1, new QStandardItem(str2qstr_new(data.exchange)));
+	m_SymbolSubscribedTableModel->setItem(i, 2, new QStandardItem(QString::fromStdString((std::to_string(data.lastprice)))));
+	m_SymbolSubscribedTableModel->setItem(i, 3, new QStandardItem(QString::fromStdString((std::to_string(data.openInterest)))));
+	m_SymbolSubscribedTableModel->setItem(i, 4, new QStandardItem(QString::fromStdString((std::to_string(data.upperLimit)))));
+	m_SymbolSubscribedTableModel->setItem(i, 5, new QStandardItem(QString::fromStdString((std::to_string(data.lowerLimit)))));
+	m_SymbolSubscribedTableModel->setItem(i, 6, new QStandardItem(QString::fromStdString((std::to_string(data.askprice1)))));
+	m_SymbolSubscribedTableModel->setItem(i, 7, new QStandardItem(QString::fromStdString((std::to_string(data.bidprice1)))));
+	std::string DateTime = data.date + " " + data.time;
+	m_SymbolSubscribedTableModel->setItem(i, 8, new QStandardItem(QString::fromStdString(DateTime)));
+	m_SymbolSubscribedTableModel->setItem(i, 9, new QStandardItem(QString::fromStdString(data.gatewayname)));
+
+	
 
 }
 
 //更新账户资金表
 void MainWindow::UpdateAccountBox(AccountData data)
 {
-	//第一次插入数据
-	if (m_AccountModel->rowCount() == 0)
-	{
-		//	accountheader << str2qstr_new("接口名") << str2qstr_new("账户ID") << str2qstr_new("昨结") << str2qstr_new("净值") << str2qstr_new("可用") << str2qstr_new("手续费") << str2qstr_new("保证金") << str2qstr_new("平仓盈亏") << str2qstr_new("持仓盈亏");
 
-		m_AccountModel->setItem(0, 0, new QStandardItem(str2qstr_new(data.gatewayname)));
-		m_AccountModel->setItem(0, 1, new QStandardItem(str2qstr_new(data.accountid)));
-		m_AccountModel->setItem(0, 2, new QStandardItem(QString("%1").arg(data.preBalance, 0, 'f', 3)));
-		m_AccountModel->setItem(0, 3, new QStandardItem(QString("%1").arg(data.balance, 0, 'f', 3)));
-		m_AccountModel->setItem(0, 4, new QStandardItem(QString("%1").arg(data.available, 0, 'f', 3)));
-		m_AccountModel->setItem(0, 5, new QStandardItem(QString("%1").arg(data.commission, 0, 'f', 3)));
-		m_AccountModel->setItem(0, 6, new QStandardItem(QString("%1").arg(data.margin, 0, 'f', 3)));
-		m_AccountModel->setItem(0, 7, new QStandardItem(QString("%1").arg(data.closeProfit, 0, 'f', 3)));
-		m_AccountModel->setItem(0, 8, new QStandardItem(QString("%1").arg(data.positionProfit, 0, 'f', 3)));
-		return;
-	}
+//	accountheader << str2qstr_new("接口名") << str2qstr_new("账户ID") << str2qstr_new("昨结") << str2qstr_new("净值") << str2qstr_new("可用") << str2qstr_new("手续费") << str2qstr_new("保证金") << str2qstr_new("平仓盈亏") << str2qstr_new("持仓盈亏");
+
 	//更新数据，如果已经存在就更新，如果没有就插入
 	for (int i = 0; i < m_AccountModel->rowCount(); i++)
 	{
@@ -338,23 +313,23 @@ void MainWindow::UpdateAccountBox(AccountData data)
 			m_AccountModel->setItem(i, 6, new QStandardItem(QString("%1").arg(data.margin, 0, 'f', 3)));
 			m_AccountModel->setItem(i, 7, new QStandardItem(QString("%1").arg(data.closeProfit, 0, 'f', 3)));
 			m_AccountModel->setItem(i, 8, new QStandardItem(QString("%1").arg(data.positionProfit, 0, 'f', 3)));
-			break;
-		}
-		if (i == m_AccountModel->rowCount() - 1)
-		{
-			//最后一个了还没找到
-			m_AccountModel->setItem(i + 1, 0, new QStandardItem(str2qstr_new(data.gatewayname)));
-			m_AccountModel->setItem(i + 1, 1, new QStandardItem(str2qstr_new(data.accountid)));
-			m_AccountModel->setItem(i + 1, 2, new QStandardItem(QString("%1").arg(data.preBalance, 0, 'f', 3)));
-			m_AccountModel->setItem(i + 1, 3, new QStandardItem(QString("%1").arg(data.balance, 0, 'f', 3)));
-			m_AccountModel->setItem(i + 1, 4, new QStandardItem(QString("%1").arg(data.available, 0, 'f', 3)));
-			m_AccountModel->setItem(i + 1, 5, new QStandardItem(QString("%1").arg(data.commission, 0, 'f', 3)));
-			m_AccountModel->setItem(i + 1, 6, new QStandardItem(QString("%1").arg(data.margin, 0, 'f', 3)));
-			m_AccountModel->setItem(i + 1, 7, new QStandardItem(QString("%1").arg(data.closeProfit, 0, 'f', 3)));
-			m_AccountModel->setItem(i + 1, 8, new QStandardItem(QString("%1").arg(data.positionProfit, 0, 'f', 3)));
-			break;
+			return;
 		}
 	}
+
+	//最后一个了还没找到就插入一个
+	int i = m_AccountModel->rowCount();
+	m_AccountModel->setItem(i, 0, new QStandardItem(str2qstr_new(data.gatewayname)));
+	m_AccountModel->setItem(i, 1, new QStandardItem(str2qstr_new(data.accountid)));
+	m_AccountModel->setItem(i, 2, new QStandardItem(QString("%1").arg(data.preBalance, 0, 'f', 3)));
+	m_AccountModel->setItem(i, 3, new QStandardItem(QString("%1").arg(data.balance, 0, 'f', 3)));
+	m_AccountModel->setItem(i, 4, new QStandardItem(QString("%1").arg(data.available, 0, 'f', 3)));
+	m_AccountModel->setItem(i, 5, new QStandardItem(QString("%1").arg(data.commission, 0, 'f', 3)));
+	m_AccountModel->setItem(i, 6, new QStandardItem(QString("%1").arg(data.margin, 0, 'f', 3)));
+	m_AccountModel->setItem(i, 7, new QStandardItem(QString("%1").arg(data.closeProfit, 0, 'f', 3)));
+	m_AccountModel->setItem(i, 8, new QStandardItem(QString("%1").arg(data.positionProfit, 0, 'f', 3)));
+
+	
 
 }
 
@@ -383,46 +358,21 @@ void MainWindow::UpdatePositionBox(PositionData data)
 			m_PositionModel->setItem(i, 4, new QStandardItem(QString("%1").arg(data.ydPosition, 0, 'f', 3)));
 			m_PositionModel->setItem(i, 5, new QStandardItem(QString("%1").arg(data.frozen, 0, 'f', 3)));
 			m_PositionModel->setItem(i, 6, new QStandardItem(QString("%1").arg(data.price, 0, 'f', 3)));
-			break;
+			return;
 		}
-		if (i == m_PositionModel->rowCount() - 1)
-		{
-			//最后一个了还没找到
-			m_PositionModel->setItem(i + 1, 0, new QStandardItem(str2qstr_new(data.gatewayname)));
-			m_PositionModel->setItem(i + 1, 1, new QStandardItem(str2qstr_new(data.symbol)));
-			if (data.direction == DIRECTION_SHORT)
-			{
-				m_PositionModel->setItem(i + 1, 2, new QStandardItem(str2qstr_new("空")));
-			}
-			else if (data.direction == DIRECTION_LONG)
-			{
-				m_PositionModel->setItem(i + 1, 2, new QStandardItem(str2qstr_new("多")));
-			};
-			m_PositionModel->setItem(i + 1, 3, new QStandardItem(QString("%1").arg(data.position, 0, 'f', 3)));
-			m_PositionModel->setItem(i + 1, 4, new QStandardItem(QString("%1").arg(data.ydPosition, 0, 'f', 3)));
-			m_PositionModel->setItem(i + 1, 5, new QStandardItem(QString("%1").arg(data.frozen, 0, 'f', 3)));
-			m_PositionModel->setItem(i + 1, 6, new QStandardItem(QString("%1").arg(data.price, 0, 'f', 3)));
-			break;
-		}
-	}
-	if (m_PositionModel->rowCount() == 0)
-	{
-		m_PositionModel->setItem(0, 0, new QStandardItem(str2qstr_new(data.gatewayname)));
-		m_PositionModel->setItem(0, 1, new QStandardItem(str2qstr_new(data.symbol)));
-		if (data.direction == DIRECTION_SHORT)
-		{
-			m_PositionModel->setItem(0, 2, new QStandardItem(str2qstr_new("空")));
-		}
-		else if (data.direction == DIRECTION_LONG)
-		{
-			m_PositionModel->setItem(0, 2, new QStandardItem(str2qstr_new("多")));
-		}
-		m_PositionModel->setItem(0, 3, new QStandardItem(QString("%1").arg(data.position, 0, 'f', 3)));
-		m_PositionModel->setItem(0, 4, new QStandardItem(QString("%1").arg(data.ydPosition, 0, 'f', 3)));
-		m_PositionModel->setItem(0, 5, new QStandardItem(QString("%1").arg(data.frozen, 0, 'f', 3)));
-		m_PositionModel->setItem(0, 6, new QStandardItem(QString("%1").arg(data.price, 0, 'f', 3)));
 
 	}
+	//找不到就插入一行
+	int i = m_PositionModel->rowCount();
+	m_PositionModel->setItem(i, 0, new QStandardItem(str2qstr_new(data.gatewayname)));
+	m_PositionModel->setItem(i, 1, new QStandardItem(str2qstr_new(data.symbol)));
+	m_PositionModel->setItem(i, 2, new QStandardItem(str2qstr_new(direction)));
+	m_PositionModel->setItem(i, 3, new QStandardItem(QString("%1").arg(data.position, 0, 'f', 3)));
+	m_PositionModel->setItem(i, 4, new QStandardItem(QString("%1").arg(data.ydPosition, 0, 'f', 3)));
+	m_PositionModel->setItem(i, 5, new QStandardItem(QString("%1").arg(data.frozen, 0, 'f', 3)));
+	m_PositionModel->setItem(i, 6, new QStandardItem(QString("%1").arg(data.price, 0, 'f', 3)));
+
+	
 }
 
 //更新日志窗口
