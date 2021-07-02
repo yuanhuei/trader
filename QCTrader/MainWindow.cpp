@@ -35,6 +35,14 @@ void  MainWindow::setUI()
 {
 
 	setWindowState(Qt::WindowMaximized);//设置窗口最大化
+	setWindowTitle("QCTrade");
+
+	/*
+	QPalette pal(this->palette());
+	pal.setColor(QPalette::Background, Qt::black); //设置背景黑色
+	this->setAutoFillBackground(true);
+	this->setPalette(pal);
+	*/
 	//设置资金表
 	m_AccountModel = new QStandardItemModel;
 	QStringList accountheader;
@@ -79,7 +87,7 @@ void  MainWindow::setUI()
 	ordersubmitheader << str2qstr_new("委托号") << str2qstr_new("来源") << str2qstr_new("合约代码") << str2qstr_new("交易所") << str2qstr_new("方向") << str2qstr_new("开平") << str2qstr_new("价格") << str2qstr_new("总数量") << str2qstr_new("已成交") << str2qstr_new("状态")<< str2qstr_new("时间")<< str2qstr_new("接口");
 	m_OrderSubmitTableModel->setHorizontalHeaderLabels(ordersubmitheader);
 	//QTableView* PositionView = new QTableView;
-	ui.tableView_5->setModel(m_SymbolSubscribedTableModel);
+	ui.tableView_5->setModel(m_OrderSubmitTableModel);
 	ui.tableView_5->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	ui.tableView_5->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	ui.tableView_5->setSelectionBehavior(QAbstractItemView::SelectRows);  //单击选择一行  
