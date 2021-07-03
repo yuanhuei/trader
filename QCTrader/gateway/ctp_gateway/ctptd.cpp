@@ -702,6 +702,14 @@ std::string CTPTD::sendOrder(OrderReq& req)
 	}
 
 	int i = m_tdapi->ReqOrderInsert(&myreq, m_reqID);
+	if (i == 0)
+		m_ctpgateway->write_log("订单发送成功");
+	else if(i==-1)
+		m_ctpgateway->write_log("订单发送,网络连接失败");
+	else if(i==-2)
+		m_ctpgateway->write_log("订单发送,未处理请求超过许可数");
+	else if(i==-3)
+		m_ctpgateway->write_log("订单发送,每秒发送请求数超过许可数");
 	return std::to_string(m_orderRef);
 }
 //取消订单

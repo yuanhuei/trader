@@ -9,7 +9,7 @@
 
 class EventEngine;
 class Gatewaymanager;
-
+#pragma pack(1)
 struct UpdatePriceTableData
 {
 	std::string symbol;
@@ -27,7 +27,7 @@ struct UpdatePriceTableData
 	double bidprice1;
 	double askprice1;
 };
-
+#pragma pack()
 struct UpdateOrderTableData
 {
 

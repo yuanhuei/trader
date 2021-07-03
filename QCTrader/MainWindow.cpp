@@ -221,23 +221,25 @@ void MainWindow::onPositionUpdate(std::shared_ptr<Event>e)
 
 void MainWindow::onPriceTableUpdate(std::shared_ptr<Event>e)
 {
-	return;
-	std::shared_ptr<Event_Tick> eTick = std::static_pointer_cast<Event_Tick>(e);
-	UpdatePriceTableData data;
-	data.askprice1 = 1;// eTick->askprice1;
-	/*data.bidprice1 = 1;// eTick->bidprice1;
-	data.date = "2000";// eTick->date;
-	data.lastprice = 1;// eTick->lastprice;
-	data.lowerLimit = 1;// eTick->lowerLimit;
-	data.openInterest = 1;// eTick->openInterest;
-	data.symbol ="eb2110";// eTick->symbol;
-	data.time = "17:22:22";// eTick->time;
-	//data.upperLimit = 1;// eTick->upperLimit;
-	//data.exchange = "DCN";// eTick->exchange;
-	//data.gatewayname = "CTP";// eTick->gatewayname;
-	*/
+	
+	/**/std::shared_ptr<Event_Tick> eTick = std::static_pointer_cast<Event_Tick>(e);
+	//UpdatePriceTableData data;
+	std::shared_ptr<UpdatePriceTableData> data= std::make_shared< UpdatePriceTableData>();
+	data->askprice1 = eTick->askprice1;
+	data->bidprice1 = eTick->bidprice1;
+	data->date = eTick->date;
+	data->lastprice = eTick->lastprice;
+	data->lowerLimit =eTick->lowerLimit;
+	data->openInterest = eTick->openInterest;
+	data->symbol =eTick->symbol;
+	data->time = eTick->time;
+	data->upperLimit = eTick->upperLimit;
+	data->exchange = eTick->exchange;
+	data->gatewayname = eTick->gatewayname;
+	
+	
 
-	emit UpdatePriceTableSignal(data);
+	emit UpdatePriceTableSignal(*data);
 }
 
 void MainWindow::onOrderTableUpdate(std::shared_ptr<Event>e)
@@ -360,7 +362,7 @@ void MainWindow::SendOrder_clicked()
 	std::string orderRef;
 	orderRef = m_gatewaymanager->sendOrder(req, gatewayname);
 	
-	this->write_log("订单发送,编号为:" + orderRef,"CTP");
+	this->write_log("订单发送,编号为:" + orderRef, gatewayname);
 }
 void MainWindow::UpdateOrderTable(UpdateOrderTableData data)
 {
@@ -445,8 +447,19 @@ void MainWindow::UpdateTradeTable(UpdateTradeTableData data)
 // //更新价格显示以及合约订阅表
 void MainWindow::UpdateTickTable(UpdatePriceTableData data)
 {
-	data.exchange = "DCN";// eTick->exchange;
-	data.gatewayname = "CTP";// eTick->gatewayname;
+	//data.exchange = "DCN";// eTick->exchange;
+	//data.gatewayname = "CTP";// eTick->gatewayname;
+	/*data.askprice1 = 1;
+	data.bidprice1 =1;
+	data.date ="2010-1-1";
+	data.lastprice = 1;
+	data.lowerLimit =1;
+	data.openInterest =1;
+	data.symbol ="l2109";
+	data.time = "21:21:21";
+//	data.upperLimit =1;
+	data.exchange ="DCN";
+	data.gatewayname = "CTP";*/
 	std::string strSymbol = ui.lineEdit->text().toStdString();
 	if (data.symbol == strSymbol)
 	{
@@ -598,7 +611,7 @@ void MainWindow::UpdateLogTable(LogData data)
 	ui.tableWidget->insertRow(rowCount);
 	ui.tableWidget->setItem(rowCount, 0, new QTableWidgetItem(str2qstr_new(data.logTime)));
 	ui.tableWidget->setItem(rowCount, 1, new QTableWidgetItem(str2qstr_new(data.msg)));
-	ui.tableWidget->setItem(rowCount, 3, new QTableWidgetItem(str2qstr_new(data.gatewayname)));
+	ui.tableWidget->setItem(rowCount, 2, new QTableWidgetItem(str2qstr_new(data.gatewayname)));
 }
 
 

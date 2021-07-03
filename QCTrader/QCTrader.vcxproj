@@ -97,6 +97,7 @@
     <ClCompile Include="..\include\MongoCxx.cpp" />
     <ClCompile Include="AlgorithmOrder.cpp" />
     <ClCompile Include="ClickTableView.cpp" />
+    <ClCompile Include="CTAStrategyManager.cpp" />
     <ClCompile Include="CTPConnectWidgets.cpp" />
     <ClCompile Include="gateway\ctp_gateway\ctpgateway.cpp" />
     <ClCompile Include="gateway\ctp_gateway\ctpmd.cpp" />
@@ -110,6 +111,7 @@
     <ClCompile Include="SpinBoxDelegate.cpp" />
     <ClCompile Include="utility.cpp" />
     <QtRcc Include="QCTrader.qrc" />
+    <QtUic Include="CTAStrategyManager.ui" />
     <QtUic Include="CTPConnectWidgets.ui" />
     <QtUic Include="MainWindow.ui" />
     <QtUic Include="QCTrader.ui" />
@@ -126,6 +128,8 @@
   <ItemGroup>
     <QtMoc Include="MainWindow.h" />
     <QtMoc Include="jstradergui.h" />
+    <QtMoc Include="CTAStrategyManager.h" />
+    <ClInclude Include="Debug\uic\ui_CTAStrategyManager.h" />
     <ClInclude Include="Debug\uic\ui_MainWindow.h" />
     <ClInclude Include="utility.h" />
     <QtMoc Include="ClickTableView.h" />

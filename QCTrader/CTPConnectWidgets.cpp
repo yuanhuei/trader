@@ -61,7 +61,7 @@ void CTPConnectWidgets::buttonOk_clicked()
 	file.open("./CTPGateway/CTP_connect");
 	if (!file)
 	{
-		m_mainwindow->write_log("打开文件失败", "ctp");
+		m_mainwindow->write_log("打开文件失败", "CTP");
 	}
 	else
 	{

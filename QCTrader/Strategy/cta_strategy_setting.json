@@ -1,0 +1,27 @@
+{
+
+        "strategy_name": "MyBollingStrategy",
+        "vt_symbol": "FG2109.INE",
+        "setting": {
+            "class_name": "MyBollingStrategy",
+            "bollWindow5min": 26,
+            "bollWindow15min": 26,
+            "bollWindow30min": 52,
+            "entryDev": 2,
+            "initDays": 15,
+            "fixedSize": 1,
+            "DayTrendStatus": "panzhen"
+        }
+
+}
+
+{
+	"strategy": "oneminutebreak.dll",
+	"symbol": ["rb1710"],
+	"param": [{
+		"gatewayname": "CTP",
+		"name": "oneminutebreak_rb",
+		"slippage_rb": "1",
+		"rb1710": "0.000045"
+	}
+}
