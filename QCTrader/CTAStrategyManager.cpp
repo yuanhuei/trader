@@ -42,7 +42,17 @@ void CTAStrategyManager::ReadFileJson()
 		//std::string sex = root["sex"].asString();
 
 
-		//读取子节点信息  
+		//读取子节点信息 
+		std::map<std::string, float> settingMap;
+		Json::Value::Members members;
+		members = root["setting"].getMemberNames();
+		//std::vector<std::string> settingKeys= root["setting"].getMemberNames();
+		for (Json::Value::Members::iterator iterMember = members.begin(); iterMember != members.end(); iterMember++)   // 遍历每个key
+		{
+			std::string strKey = *iterMember;
+			settingMap.insert(strKey, root["setting"][strKey.c_str()].asFloat());
+
+		}
 		std::string friend_name = root["setting"]["friend_name"].asString();
 		int friend_age = root["friends"]["friend_age"].asInt();
 		std::string friend_sex = root["friends"]["friend_sex"].asString();
