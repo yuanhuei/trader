@@ -9,6 +9,7 @@
 
 class EventEngine;
 class Gatewaymanager;
+class riskmanager;
 #pragma pack(1)
 struct UpdatePriceTableData
 {
@@ -187,8 +188,8 @@ public:
 	//各种引擎管理器指针
 	EventEngine* m_eventengine;//事件驱动引擎
 	Gatewaymanager* m_gatewaymanager;//接口管理器
-	//riskmanager* m_riskmanager;//风险管理器
-	//CTAmanager* m_ctamanager;//cta管理器
+	riskmanager* m_riskmanager;//风险管理器
+	CtaEngine* m_ctaEngine;//cta管理器
 
 
     //model

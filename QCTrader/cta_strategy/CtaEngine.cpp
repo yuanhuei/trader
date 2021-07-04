@@ -1,5 +1,6 @@
 
 #include"CtaEngine.h"
+#include"Strategies/turtlebreak.h"
 
 
 typedef StrategyTemplate* (*Dllfun)(CtaEngine*);
@@ -100,6 +101,7 @@ void CtaEngine::loadStrategy(std::string strStrategyName,std::string strSymbolNa
 				}
 				*/
 				//插入策略中
+		StrategyTemplate* strategy_ptr;
 		if (strStrategyName.find(".dll"))//策略通过DLL文件提供
 		{
 			std::string strategy = "./Strategy/" + strStrategyName;
@@ -122,75 +124,77 @@ void CtaEngine::loadStrategy(std::string strStrategyName,std::string strSymbolNa
 				FreeLibrary(his);
 				return;
 			}
-			StrategyTemplate* strategy_ptr = dll(this);
+			strategy_ptr = dll(this);
 		}
 		else
 		{
-			StrategyTemplate* strategy_ptr=
+			if (strStrategyName == "turtlebreak")
+				strategy_ptr = new turtlebreak(this);
 
 		}
-			/*
-			m_tickstrategymtx.lock();
-			for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
+		/*
+		m_tickstrategymtx.lock();
+		for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
+		{
+			if (m_tickstrategymap.find(*iter) == m_tickstrategymap.end())
 			{
-				if (m_tickstrategymap.find(*iter) == m_tickstrategymap.end())
-				{
-					//没有
-					std::vector<StrategyTemplate*>strategy_v;
-					strategy_v.push_back(strategy_ptr);
-					m_tickstrategymap.insert(std::pair<std::string, std::vector<StrategyTemplate*>>(*iter, strategy_v));
-				}
-				else
-				{
-					m_tickstrategymap[*iter].push_back(strategy_ptr);
-				}
-			}
-			m_tickstrategymtx.unlock();
-			*/
-			//赋值参数
-			for (std::map<std::string, float>::iterator it = settingMap.begin(); it != settingMap.end(); it++)
-			{
-				//遍历parameter
-				std::string value = std::to_string(it->second);
-				strategy_ptr->checkparam(it->first.c_str(), value.c_str());
-			}
-			//插入pos_map
-			strategy_ptr->checkSymbol(strSymbolName.c_str());
-			/*
-			for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
-			{
-				strategy_ptr->checkSymbol((*iter).c_str());
-			}
-			*/
-			if (strategy_ptr->getparam("name") == "Null")
-			{
-				this->writeCtaLog("策略中有一个没有给策略起名！", strategy_ptr->gatewayname);
+				//没有
+				std::vector<StrategyTemplate*>strategy_v;
+				strategy_v.push_back(strategy_ptr);
+				m_tickstrategymap.insert(std::pair<std::string, std::vector<StrategyTemplate*>>(*iter, strategy_v));
 			}
 			else
 			{
-				strategy_ptr->putEvent();
-				strategy_ptr->putGUI();
+				m_tickstrategymap[*iter].push_back(strategy_ptr);
 			}
-			std::string strName = strStrategyName + "__" + strSymbolName;
-			//m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strategy_ptr->getparam("name"), strategy_ptr));//策略名和策略
-			m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strName, strategy_ptr));//策略名和策略
+		}
+		m_tickstrategymtx.unlock();
+		*/
+		//赋值参数
+		for (std::map<std::string, float>::iterator it = settingMap.begin(); it != settingMap.end(); it++)
+		{
+			//遍历parameter
+			std::string value = std::to_string(it->second);
+			strategy_ptr->checkparam(it->first.c_str(), value.c_str());
+		}
+		//插入pos_map
+		strategy_ptr->checkSymbol(strSymbolName.c_str());
+		/*
+		for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
+		{
+			strategy_ptr->checkSymbol((*iter).c_str());
+		}
+		*/
+		if (strategy_ptr->getparam("name") == "Null")
+		{
+			this->writeCtaLog("策略中有一个没有给策略起名！", strategy_ptr->gatewayname);
+		}
+		else
+		{
+			strategy_ptr->putEvent();
+			strategy_ptr->putGUI();
+		}
+		//插入策略map,key是策略名+合约名，值是之前new出来的指向策略对象的指针
+		std::string strName = strStrategyName + "__" + strSymbolName;
+		//m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strategy_ptr->getparam("name"), strategy_ptr));//策略名和策略
+		m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strName, strategy_ptr));//策略名和策略
 
-			dllmap.insert(std::pair<std::string, HINSTANCE>(strategy_ptr->getparam("name"), his));//策略名
+		dllmap.insert(std::pair<std::string, HINSTANCE>(strategy_ptr->getparam("name"), his));//策略名
 
-			//订阅合约
-			//for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
-			//{
-			std::shared_ptr<Event_Contract>contract = m_gatewaymanager->getContract(strSymbolName);
-			SubscribeReq req;
-			req.symbol = contract->symbol;
-			req.exchange = contract->exchange;
-			/*if (strategy_ptr->getparam("currency") != "Null" && strategy_ptr->getparam("productClass") != "Null")
-			{
-				req.currency = strategy_ptr->getparam("currency");
-				req.productClass = strategy_ptr->getparam("productClass");
-			}*/
-			m_gatewaymanager->subscribe(req, "CTP");// strategy_ptr->getparam("gatewayname"));
-			//}
+		//订阅合约
+		//for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
+		//{
+		std::shared_ptr<Event_Contract>contract = m_gatewaymanager->getContract(strSymbolName);
+		SubscribeReq req;
+		req.symbol = contract->symbol;
+		req.exchange = contract->exchange;
+		/*if (strategy_ptr->getparam("currency") != "Null" && strategy_ptr->getparam("productClass") != "Null")
+		{
+			req.currency = strategy_ptr->getparam("currency");
+			req.productClass = strategy_ptr->getparam("productClass");
+		}*/
+		m_gatewaymanager->subscribe(req, "CTP");// strategy_ptr->getparam("gatewayname"));
+		//}
 			
 	}
 	else

@@ -6,6 +6,8 @@
 #include"CTAStrategyManager.h"
 #include"qwidget.h"
 #include<qglobal.h>
+#include"./cta_strategy/CtaEngine.h"
+#include"risk_manager/riskmanager.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -120,9 +122,9 @@ void MainWindow::LoadEngine()
 
 	m_gatewaymanager = new Gatewaymanager(m_eventengine);//接口管理器
 
-	//m_riskmanager = new riskmanager(m_eventengine); //风险管理器
+	m_riskmanager = new riskmanager(m_eventengine); //风险管理器
 
-	//m_ctamanager = new CTAmanager(m_gatewaymanager, m_eventengine, m_riskmanager);//cta管理器
+	m_ctaEngine = new CtaEngine(m_gatewaymanager, m_eventengine, m_riskmanager);//cta管理器
 
 	RegEvent();
 	ConnectSignalAndSlot();

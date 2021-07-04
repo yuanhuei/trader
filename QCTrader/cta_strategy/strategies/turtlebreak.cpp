@@ -1,10 +1,10 @@
 #include"turtlebreak.h"
-
+#include"../CtaEngine.h"
 
 /*
 海龟交易法则：50周期通道，25周期卖出通道，每日加仓最多两次，一共加仓最多6次
-*/
-StrategyTemplate* CreateStrategy(CTAAPI *ctamanager)
+
+StrategyTemplate* CreateStrategy(CTAEngine *ctamanager)
 {
 	//创建策略
 	StrategyTemplate *strategy = new turtlebreak(ctamanager);
@@ -26,9 +26,9 @@ int ReleaseStrategy()//多品种要删除多次对象
 	}
 	return 0;
 }
+*/
 
-
-turtlebreak::turtlebreak(CTAAPI *ctamanager) :StrategyTemplate(ctamanager)
+turtlebreak::turtlebreak(CtaEngine* ctamanager) :StrategyTemplate(ctamanager)
 {
 	//基本参数
 	m_ctamanager = ctamanager;

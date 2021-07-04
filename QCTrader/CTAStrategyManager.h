@@ -3,6 +3,7 @@
 #include <QWidget>
 #include "ui_CTAStrategyManager.h"
 #include"mainwindow.h"
+class CtaEngine;
 
 class CTAStrategyManager : public QWidget
 {
@@ -23,6 +24,7 @@ private:
 	std::map<std::string, std::map<std::string, float>> m_strategyConfigInfo_map;
 
 	QStandardItemModel* m_StrategyConf;
+	CtaEngine* m_ctaEngine;
 private slots:
 	void addStrategy_clicked();
 	void initStrategy_clicked();

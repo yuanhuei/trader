@@ -1,14 +1,10 @@
 #ifndef TURTLEBREAK_H
 #define TURTLEBREAK_H
-#ifdef TURTLEBREAK_EXPORTS
-#define TURTLEBREAK_API __declspec(dllexport)
-#else
-#define TURTLEBREAK_API __declspec(dllimport)
-#endif
-#include"StrategyTemplate.h"
-extern "C" TURTLEBREAK_API StrategyTemplate * CreateStrategy(CTAAPI *ctamanager);//创建策略
-extern "C" TURTLEBREAK_API int ReleaseStrategy();//释放策略
-std::vector<StrategyTemplate*>g_turtlebreak_v;//全局指针
+
+#include"..\StrategyTemplate.h"
+//extern "C" TURTLEBREAK_API StrategyTemplate * CreateStrategy(CTAAPI *ctamanager);//创建策略
+//extern "C" TURTLEBREAK_API int ReleaseStrategy();//释放策略
+//std::vector<StrategyTemplate*>g_turtlebreak_v;//全局指针
 
 #include<vector>
 #include<algorithm>
@@ -16,10 +12,10 @@ std::vector<StrategyTemplate*>g_turtlebreak_v;//全局指针
 #include"talib.h"
 #include"libbson-1.0\bson.h"
 #include"libmongoc-1.0\mongoc.h"
-class TURTLEBREAK_API turtlebreak : public StrategyTemplate
+class  turtlebreak : public StrategyTemplate
 {
 public:
-	turtlebreak(CTAAPI *ctamanager);
+	turtlebreak(CtaEngine *ctamanager);
 	~turtlebreak();
 
 	void onInit();

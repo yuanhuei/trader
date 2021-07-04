@@ -6,6 +6,8 @@
 #include <fstream>  
 #include"utility.h"
 #include<qnamespace.h>
+#include"./cta_strategy/StrategyTemplate.h"
+#include"./cta_strategy/CtaEngine.h"
 
 CTAStrategyManager::CTAStrategyManager(QWidget* parent)
 	: QWidget(parent, Qt::WindowMinMaxButtonsHint)
@@ -15,6 +17,7 @@ CTAStrategyManager::CTAStrategyManager(QWidget* parent)
 	setWindowFlags(Qt::Window);
 	ui.setupUi(this);
 	m_mainwindow = (MainWindow*)parent;
+	m_ctaEngine = m_mainwindow->m_ctaEngine;
 	setUI();
 
 }
@@ -135,39 +138,65 @@ void CTAStrategyManager::addStrategy_clicked()
 
 }
 
+//策略初始化
 void CTAStrategyManager::initStrategy_clicked()
 {
+	//获得在策略表中 当前选取的策略和合约
 	int row = ui.tableView->currentIndex().row();
 	QModelIndex index = m_StrategyConf->index(row, 0);
 	std::string strStrategyName = m_StrategyConf->data(index).toString().toStdString();
 	index = m_StrategyConf->index(row, 1);
 	std::string strSymbolName = m_StrategyConf->data(index).toString().toStdString();
 
+	m_ctaEngine->initStrategy(strStrategyName + "__" + strSymbolName);//策略名加合约名确定一个策略实例对象
+
 }
 
 void CTAStrategyManager::StrategyTable_clicked()
 {
 	//int m_StrategyTableRowSelected = ui.tableView->currentIndex().row();
+	//获得在策略表中 当前选取的策略和合约
 
 }
+//策略启动
 void CTAStrategyManager::startStrategy_cliced()
 {
+	//获得在策略表中 当前选取的策略和合约
+	int row = ui.tableView->currentIndex().row();
+	QModelIndex index = m_StrategyConf->index(row, 0);
+	std::string strStrategyName = m_StrategyConf->data(index).toString().toStdString();
+	index = m_StrategyConf->index(row, 1);
+	std::string strSymbolName = m_StrategyConf->data(index).toString().toStdString();
 
+	m_ctaEngine->startStrategy(strStrategyName + "__" + strSymbolName);
 
 }
+//策略停止
 void CTAStrategyManager::stopStragegy_clicked()
 {
+	//获得在策略表中 当前选取的策略和合约
+	int row = ui.tableView->currentIndex().row();
+	QModelIndex index = m_StrategyConf->index(row, 0);
+	std::string strStrategyName = m_StrategyConf->data(index).toString().toStdString();
+	index = m_StrategyConf->index(row, 1);
+	std::string strSymbolName = m_StrategyConf->data(index).toString().toStdString();
 
+	m_ctaEngine->stopStrategy(strStrategyName + "__" + strSymbolName);
 }
+//启动所有策略
 void CTAStrategyManager::startAllStrategy_clicked()
 {
-
+	m_ctaEngine->startallStrategy();
 }
-void CTAStrategyManager::stopAllStrategy_clicked() {
-
+//停止所有策略
+void CTAStrategyManager::stopAllStrategy_clicked() 
+{
+	m_ctaEngine->stopallStrategy();
 }
-void CTAStrategyManager::clearLog() {
-
+//清理日志窗口
+void CTAStrategyManager::clearLog()
+{
+	ui.tableWidget_3->clear();
 }
 
 //更新日志窗口
