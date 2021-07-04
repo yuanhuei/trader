@@ -13,11 +13,16 @@ public:
 	~CTAStrategyManager();
 private:
 	void setUI();
-	void ReadFileJson();
+	void ReadStrategyConfFileJson();
+	//void pushLogToCTAStrategyWindow(std::string msg);
+	void UpdateLogTable(std::string msg);
 
 private:
 	Ui::CTAStrategyManager ui;
 	MainWindow* m_mainwindow;
+	std::map<std::string, std::map<std::string, float>> m_strategyConfigInfo_map;
+
+	QStandardItemModel* m_StrategyConf;
 private slots:
 	void addStrategy_clicked();
 	void initStrategy_clicked();

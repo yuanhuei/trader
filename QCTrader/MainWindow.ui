@@ -619,11 +619,45 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionCTP</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_CTAStrategy()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>635</x>
+     <y>289</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCTP_2</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_CTABacktest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>635</x>
+     <y>289</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>menu_ctp_connect()</slot>
   <slot>menu_exit()</slot>
   <slot>symbol_ReturnPressed()</slot>
   <slot>SendOrder_clicked()</slot>
+  <slot>menu_CTAStrategy()</slot>
+  <slot>menu_CTABacktest()</slot>
  </slots>
 </ui>

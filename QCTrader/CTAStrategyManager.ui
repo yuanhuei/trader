@@ -189,7 +189,23 @@
           </layout>
          </widget>
          <widget class="QTableView" name="tableView_2"/>
-         <widget class="QTableView" name="tableView_3"/>
+         <widget class="QTableWidget" name="tableWidget_3">
+          <column>
+           <property name="text">
+            <string>时间</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>信息</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>接口</string>
+           </property>
+          </column>
+         </widget>
         </widget>
        </item>
       </layout>

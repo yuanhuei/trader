@@ -3,6 +3,9 @@
 #include"event_engine/eventengine.h"
 #include"gateway/gatewaymanager.h"
 #include"utility.h"
+#include"CTAStrategyManager.h"
+#include"qwidget.h"
+#include<qglobal.h>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -626,4 +629,15 @@ void MainWindow::write_log(std::string msg, std::string gateway_name)
 	e->msg = msg;
 
 	m_eventengine->Put(e);
+}
+
+void MainWindow::menu_CTAStrategy()
+{
+	CTAStrategyManager* ctaStrategyDailog = new CTAStrategyManager(this);
+	ctaStrategyDailog->show();
+}
+void MainWindow::menu_CTABacktest()
+{
+
+
 }

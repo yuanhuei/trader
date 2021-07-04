@@ -1,27 +1,29 @@
+[
 {
 
         "strategy_name": "MyBollingStrategy",
         "vt_symbol": "FG2109.INE",
+        "class_name": "MyBollingStrategy",
         "setting": {
-            "class_name": "MyBollingStrategy",
+            
             "bollWindow5min": 26,
             "bollWindow15min": 26,
             "bollWindow30min": 52,
             "entryDev": 2,
             "initDays": 15,
             "fixedSize": 1,
-            "DayTrendStatus": "panzhen"
+            "DayTrendStatus": 1
         }
 
-}
-
+},
 {
-	"strategy": "oneminutebreak.dll",
-	"symbol": ["rb1710"],
-	"param": [{
-		"gatewayname": "CTP",
-		"name": "oneminutebreak_rb",
-		"slippage_rb": "1",
-		"rb1710": "0.000045"
+	"strategy_name": "oneminutebreak.dll",
+	"vt_symbol": "rb1710",
+	"setting": {
+		"gatewayname": 1,
+		"name": 1,
+		"slippage_rb": 1,
+		"rb1710": 0.000045
 	}
 }
+]

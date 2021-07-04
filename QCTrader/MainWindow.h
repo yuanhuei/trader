@@ -170,8 +170,11 @@ private:
 private slots:
 	void menu_ctp_connect();
 	void menu_exit();
+	void menu_CTAStrategy();
+	void menu_CTABacktest();
 	void symbol_ReturnPressed();
 	void SendOrder_clicked();
+
 
 	void UpdateAccountBox(AccountData data);
 	void UpdatePositionBox(PositionData data);

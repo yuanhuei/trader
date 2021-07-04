@@ -60,7 +60,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\include;..\include\libbson-1.0;..\include\libmongoc-1.0;..;$(ProjectDir);.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\include\libbson-1.0;..\include\libmongoc-1.0;..;$(ProjectDir);.\jsoncpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>../lib;../bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -103,6 +103,9 @@
     <ClCompile Include="gateway\ctp_gateway\ctpmd.cpp" />
     <ClCompile Include="gateway\ctp_gateway\ctptd.cpp" />
     <ClCompile Include="json11.cpp" />
+    <ClCompile Include="jsoncpp\src\json_reader.cpp" />
+    <ClCompile Include="jsoncpp\src\json_value.cpp" />
+    <ClCompile Include="jsoncpp\src\json_writer.cpp" />
     <ClCompile Include="jstradergui.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="portfolio.cpp" />
