@@ -67,7 +67,7 @@ public:
 
 
 	//主程序调用所需函数
-	void loadStrategy(std::string strStrategyName, std::string strSymbolName, std::map<std::string, float>settingMap);
+	void loadStrategy(std::string strStrategyName, std::string strSymbolName, std::string strClassName, std::map<std::string, float>settingMap);
 	void initStrategy(std::string name);												//初始化
 	void startStrategy(std::string name);												//开始策略
 	void stopStrategy(std::string name);												//停止策略

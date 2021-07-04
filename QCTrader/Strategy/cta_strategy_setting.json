@@ -19,6 +19,7 @@
 {
 	"strategy_name": "oneminutebreak.dll",
 	"vt_symbol": "rb1710",
+                "class_name": "minturtle",
 	"setting": {
 		"gatewayname": 1,
 		"name": 1,

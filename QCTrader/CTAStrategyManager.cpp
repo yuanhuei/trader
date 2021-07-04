@@ -7,7 +7,7 @@
 #include"utility.h"
 #include<qnamespace.h>
 
-CTAStrategyManager::CTAStrategyManager(QWidget *parent)
+CTAStrategyManager::CTAStrategyManager(QWidget* parent)
 	: QWidget(parent, Qt::WindowMinMaxButtonsHint)
 {
 	//setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
@@ -29,7 +29,7 @@ void CTAStrategyManager::ReadStrategyConfFileJson()
 	Json::Value root;
 
 	//从文件中读取，保证当前文件有demo.json文件  
-	std::ifstream in("./Strategy/cta_strategy_setting.json",std::ios::binary);
+	std::ifstream in("./Strategy/cta_strategy_setting.json", std::ios::binary);
 
 	if (!in.is_open())
 	{
@@ -43,9 +43,15 @@ void CTAStrategyManager::ReadStrategyConfFileJson()
 		for (int i = 0; i < root.size(); i++)
 		{
 			//读取策略名称和合约名称
-			
-			std::string name = root[i]["strategy_name"].asString();
+
+			std::string StrategyName = root[i]["strategy_name"].asString();
 			std::string vt_symbol = root[i]["vt_symbol"].asString();
+			std::string ClassName = root[i]["vt_symbol"].asString();
+			if ((StrategyName.length() < 1|| vt_symbol.length())< 1 || ClassName.length() < 1)
+			{
+				this->UpdateLogTable("配置文件策略信息不全");
+				return;
+			}
 
 			//读取策略配置信息 
 			std::map<std::string, float> settingMap;
@@ -69,7 +75,7 @@ void CTAStrategyManager::ReadStrategyConfFileJson()
 
 			}
 			//插入到策略配置map中
-			m_strategyConfigInfo_map.insert({ name +"__"+vt_symbol,settingMap});
+			m_strategyConfigInfo_map.insert({ StrategyName +"__"+vt_symbol,settingMap+"__"+ ClassName });
 		}
 
 	}
@@ -85,8 +91,10 @@ void CTAStrategyManager::ReadStrategyConfFileJson()
 
 void CTAStrategyManager::setUI()
 {
-	//ui.comboBox->addItem();
+	//读取策略配置文件
 	ReadStrategyConfFileJson();
+
+	//根据读取的策略文件内容，初始化combobox控件的可选择列表
 	std::map<std::string, std::map<std::string, float>>::iterator it;
 	for (it = m_strategyConfigInfo_map.begin(); it != m_strategyConfigInfo_map.end(); it++)
 	{
