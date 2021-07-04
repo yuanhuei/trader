@@ -69,7 +69,7 @@ void CTAStrategyManager::ReadStrategyConfFileJson()
 
 			}
 			//插入到策略配置map中
-			m_strategyConfigInfo_map.insert({ name +"_"+vt_symbol,settingMap});
+			m_strategyConfigInfo_map.insert({ name +"__"+vt_symbol,settingMap});
 		}
 
 	}
@@ -109,12 +109,12 @@ void CTAStrategyManager::setUI()
 }
 void CTAStrategyManager::addStrategy_clicked()
 {
-	QString strCurrentStrategy = ui.comboBox->currentText().section("[_]", 0, 0);
-	QString strCurrentSymbol = ui.comboBox->currentText().section("[_]", 1, 1);
+	QString strCurrentStrategy = ui.comboBox->currentText().section("__", 0, 0);
+	QString strCurrentSymbol = ui.comboBox->currentText().section("__", 1, 1);
 
 	for (int i = 0; i < m_StrategyConf->rowCount(); i++)
 	{
-		QString str = m_StrategyConf->item(i, 0)->text() + "_" + m_StrategyConf->item(i, 1)->text();
+		QString str = m_StrategyConf->item(i, 0)->text() + "__" + m_StrategyConf->item(i, 1)->text();
 		if (str == ui.comboBox->currentText())//判断策略已经加入，就返回
 			return;
 		
@@ -129,6 +129,17 @@ void CTAStrategyManager::addStrategy_clicked()
 
 void CTAStrategyManager::initStrategy_clicked()
 {
+	int row = ui.tableView->currentIndex().row();
+	QModelIndex index = m_StrategyConf->index(row, 0);
+	std::string strStrategyName = m_StrategyConf->data(index).toString().toStdString();
+	index = m_StrategyConf->index(row, 1);
+	std::string strSymbolName = m_StrategyConf->data(index).toString().toStdString();
+
+}
+
+void CTAStrategyManager::StrategyTable_clicked()
+{
+	//int m_StrategyTableRowSelected = ui.tableView->currentIndex().row();
 
 }
 void CTAStrategyManager::startStrategy_cliced()

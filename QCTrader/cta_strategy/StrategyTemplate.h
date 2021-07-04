@@ -17,7 +17,7 @@
 
 class algorithmOrder;
 class MongoCxx;
-class CTAmanager;
+class CtaEngine;
 
 
 class StrategyData
@@ -38,7 +38,7 @@ private:
 class StrategyTemplate
 {
 public:
-	StrategyTemplate(CTAmanager* ctamanager);
+	StrategyTemplate(CtaEngine* ctamanager);
 	~StrategyTemplate();
 	/******************************策略参数和变量*********************************************/
 	//基本参数

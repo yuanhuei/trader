@@ -1,6 +1,7 @@
 #pragma once
-#ifndef CTAMANAGER_H
-#define CTAMANAGER_H
+#pragma once
+#ifndef CTAENGINE_H
+#define CTAENGINE_H
 
 #include"json11.hpp"
 #include"utils.hpp"
@@ -31,7 +32,7 @@ class StrategyTemplate;
 //class mongoc_client_pool_t;
 class Portfolio;
 
-//typedef StrategyTemplate* (*Dllfun)(CTAmanager*);
+//typedef StrategyTemplate* (*Dllfun)(CtaEngine*);
 //typedef int(*Release)();
 /*******************************************/
 class PositionBuffer//用来缓存持仓
@@ -49,12 +50,12 @@ public:
 	double shortydposition = 0;
 };
 
-class CTAmanager 
+class CtaEngine
 {
 public:
 	//CTA管理器
-	CTAmanager(Gatewaymanager* gatewaymanager, EventEngine* eventengine, riskmanager* riskmanager);
-	~CTAmanager();
+	CtaEngine(Gatewaymanager* gatewaymanager, EventEngine* eventengine, riskmanager* riskmanager);
+	~CtaEngine();
 
 	//策略所需函数
 	std::vector<std::string> sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy);
@@ -66,7 +67,7 @@ public:
 
 
 	//主程序调用所需函数
-	void loadStrategy();																//加载策略
+	void loadStrategy(std::string strStrategyName, std::string strSymbolName, std::map<std::string, float>settingMap);
 	void initStrategy(std::string name);												//初始化
 	void startStrategy(std::string name);												//开始策略
 	void stopStrategy(std::string name);												//停止策略

@@ -31,6 +31,7 @@ private slots:
 	void startAllStrategy_clicked();
 	void stopAllStrategy_clicked();
 	void clearLog();
+	void StrategyTable_clicked();
 
 
 };

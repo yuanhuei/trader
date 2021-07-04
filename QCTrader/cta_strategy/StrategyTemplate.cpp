@@ -1,6 +1,7 @@
 #include"StrategyTemplate.h"
+#include"CtaEngine.h"
 
-StrategyTemplate::StrategyTemplate(CTAmanager*ctamanager)
+StrategyTemplate::StrategyTemplate(CtaEngine*ctamanager)
 {
 	m_ctamanager = ctamanager;
 	tickDbName = "";
