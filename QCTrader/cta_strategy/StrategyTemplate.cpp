@@ -1,9 +1,9 @@
 #include"StrategyTemplate.h"
 #include"CtaEngine.h"
 
-StrategyTemplate::StrategyTemplate(CtaEngine*ctamanager)
+StrategyTemplate::StrategyTemplate(CtaEngine*ctaEngine)
 {
-	m_ctamanager = ctamanager;
+	m_ctaEngine = ctaEngine;
 	tickDbName = "";
 	BarDbName = "";
 	gatewayname = "";
@@ -13,7 +13,7 @@ StrategyTemplate::StrategyTemplate(CtaEngine*ctamanager)
 	unitLimit = 2;
 	m_strategydata = new StrategyData();
 	m_algorithm = new algorithmOrder(unitLimit, TradingMode, this);
-	m_MongoCxx = new MongoCxx(ctamanager->m_pool);
+	m_MongoCxx = new MongoCxx(m_ctaEngine->m_pool);
 }
 
 StrategyTemplate::~StrategyTemplate()
@@ -34,7 +34,7 @@ void StrategyTemplate::onInit()
 {
 	//默认使用bar 需要使用tick自己修改
 	std::string strategyname = getparam("name");
-	m_ctamanager->writeCtaLog("策略初始化" + strategyname, gatewayname);
+	m_ctaEngine->writeCtaLog("策略初始化" + strategyname, gatewayname);
 	std::vector<std::string>symbol_v = Utils::split(m_strategydata->getparam("symbol"), ",");
 	if (trademode == BAR_MODE)
 	{
@@ -87,7 +87,7 @@ void StrategyTemplate::onInit()
 void StrategyTemplate::onStart()
 {
 	std::string strategyname = getparam("name");
-	m_ctamanager->writeCtaLog("策略开始" + strategyname, gatewayname);
+	m_ctaEngine->writeCtaLog("策略开始" + strategyname, gatewayname);
 	trading = true;
 	putEvent();
 }
@@ -95,7 +95,7 @@ void StrategyTemplate::onStart()
 void StrategyTemplate::onStop()
 {
 	std::string strategyname = getparam("name");
-	m_ctamanager->writeCtaLog("策略停止" + strategyname, gatewayname);
+	m_ctaEngine->writeCtaLog("策略停止" + strategyname, gatewayname);
 	trading = false;
 	putEvent();
 	savepostomongo();
@@ -154,7 +154,7 @@ std::vector<std::string> StrategyTemplate::sendOrder(std::string symbol, std::st
 	std::vector<std::string>orderIDv;
 	if (trading == true)
 	{
-		orderIDv = m_ctamanager->sendOrder(symbol, orderType, price, volume, this);
+		orderIDv = m_ctaEngine->sendOrder(symbol, orderType, price, volume, this);
 		for (std::vector<std::string>::iterator it = orderIDv.begin(); it != orderIDv.end(); it++)
 		{
 			m_orderlistmtx.lock();
@@ -180,17 +180,17 @@ void StrategyTemplate::cancelallorder()
 //撤交易所的单
 void StrategyTemplate::cancelOrder(std::string orderID, std::string gatewayname)
 {
-	m_ctamanager->cancelOrder(orderID, gatewayname);
+	m_ctaEngine->cancelOrder(orderID, gatewayname);
 }
 
 //读取历史数据
 std::vector<TickData>StrategyTemplate::loadTick(std::string symbol, int days)
 {
-	return m_ctamanager->loadTick(BarDbName, symbol, days);
+	return m_ctaEngine->loadTick(BarDbName, symbol, days);
 }
 std::vector<BarData>StrategyTemplate::loadBar(std::string symbol, int days)
 {
-	return m_ctamanager->loadBar(BarDbName, symbol, days);
+	return m_ctaEngine->loadBar(BarDbName, symbol, days);
 }
 
 //获取参数的值
@@ -215,7 +215,7 @@ void StrategyTemplate::putEvent()
 	e->parammap = m_strategydata->getallparam();
 	e->varmap = m_strategydata->getallvar();
 	e->strategyname = m_strategydata->getparam("name");
-	m_ctamanager->PutEvent(e);
+	m_ctaEngine->PutEvent(e);
 }
 
 void StrategyTemplate::putGUI()
@@ -225,7 +225,7 @@ void StrategyTemplate::putGUI()
 	e->parammap = m_strategydata->getallparam();
 	e->varmap = m_strategydata->getallvar();
 	e->strategyname = m_strategydata->getparam("name");
-	m_ctamanager->PutEvent(e);
+	m_ctaEngine->PutEvent(e);
 }
 
 void StrategyTemplate::checkSymbol(const char* symbolname)

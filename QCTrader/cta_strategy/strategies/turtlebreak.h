@@ -64,5 +64,7 @@ public:
 	double lastprice;				//更新界面
 	//更新界面
 	void putEvent();
+
+	CtaEngine* m_ctamanager;
 };
 #endif

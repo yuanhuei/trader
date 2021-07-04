@@ -102,10 +102,11 @@ void CtaEngine::loadStrategy(std::string strStrategyName,std::string strSymbolNa
 				*/
 				//插入策略中
 		StrategyTemplate* strategy_ptr;
+		HINSTANCE his;
 		if (strStrategyName.find(".dll"))//策略通过DLL文件提供
 		{
 			std::string strategy = "./Strategy/" + strStrategyName;
-			HINSTANCE his = LoadLibraryA(strategy.c_str());//加载一个策略
+			his = LoadLibraryA(strategy.c_str());//加载一个策略
 			if (his == NULL)
 			{
 				//没有加载进来DLL

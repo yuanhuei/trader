@@ -98,6 +98,8 @@
     <ClCompile Include="AlgorithmOrder.cpp" />
     <ClCompile Include="ClickTableView.cpp" />
     <ClCompile Include="CTAStrategyManager.cpp" />
+    <ClCompile Include="cta_strategy\CtaEngine.cpp" />
+    <ClCompile Include="cta_strategy\strategies\turtlebreak.cpp" />
     <ClCompile Include="CTPConnectWidgets.cpp" />
     <ClCompile Include="gateway\ctp_gateway\ctpgateway.cpp" />
     <ClCompile Include="gateway\ctp_gateway\ctpmd.cpp" />
@@ -106,7 +108,6 @@
     <ClCompile Include="jsoncpp\src\json_reader.cpp" />
     <ClCompile Include="jsoncpp\src\json_value.cpp" />
     <ClCompile Include="jsoncpp\src\json_writer.cpp" />
-    <ClCompile Include="jstradergui.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="portfolio.cpp" />
     <ClCompile Include="ReadOnlyDelegate.cpp" />
@@ -119,7 +120,6 @@
     <QtUic Include="MainWindow.ui" />
     <QtUic Include="QCTrader.ui" />
     <QtMoc Include="QCTrader.h" />
-    <ClCompile Include="cta_strategy\ctamanager.cpp" />
     <ClCompile Include="cta_strategy\StrategyTemplate.cpp" />
     <ClCompile Include="event_engine\eventengine.cpp" />
     <ClCompile Include="gateway\gatewaymanager.cpp" />
@@ -130,15 +130,15 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="MainWindow.h" />
-    <QtMoc Include="jstradergui.h" />
     <QtMoc Include="CTAStrategyManager.h" />
+    <ClInclude Include="cta_strategy\CtaEngine.h" />
+    <ClInclude Include="cta_strategy\strategies\turtlebreak.h" />
     <ClInclude Include="Debug\uic\ui_CTAStrategyManager.h" />
     <ClInclude Include="Debug\uic\ui_MainWindow.h" />
     <ClInclude Include="utility.h" />
     <QtMoc Include="ClickTableView.h" />
     <ClInclude Include="..\include\MongoCxx.h" />
     <ClInclude Include="AlgorithmOrder.h" />
-    <ClInclude Include="cta_strategy\ctamanager.h" />
     <ClInclude Include="cta_strategy\StrategyTemplate.h" />
     <QtMoc Include="CTPConnectWidgets.h" />
     <ClInclude Include="Debug\uic\ui_ctp.h" />

@@ -49,9 +49,6 @@
     <ClCompile Include="gateway\qcgateway.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cta_strategy\ctamanager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cta_strategy\StrategyTemplate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -100,9 +97,6 @@
     <ClCompile Include="gateway\ctp_gateway\ctpgateway.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="jstradergui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CTAStrategyManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -113,6 +107,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="jsoncpp\src\json_writer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cta_strategy\CtaEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cta_strategy\strategies\turtlebreak.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -133,9 +133,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="qcstructs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cta_strategy\ctamanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cta_strategy\StrategyTemplate.h">
@@ -177,6 +174,12 @@
     <ClInclude Include="Debug\uic\ui_CTAStrategyManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cta_strategy\CtaEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cta_strategy\strategies\turtlebreak.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="ReadOnlyDelegate.h">
@@ -192,9 +195,6 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="MainWindow.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="jstradergui.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="CTAStrategyManager.h">

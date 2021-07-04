@@ -10,6 +10,7 @@
 class EventEngine;
 class Gatewaymanager;
 class riskmanager;
+class CtaEngine;
 #pragma pack(1)
 struct UpdatePriceTableData
 {

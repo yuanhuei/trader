@@ -15,6 +15,11 @@ CTAStrategyManager::CTAStrategyManager(QWidget* parent)
 	//setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
 	//setWindowModality(Qt::NonModal);
 	setWindowFlags(Qt::Window);
+
+	setWindowFlags(Qt::CustomizeWindowHint |
+		Qt::WindowMinimizeButtonHint |
+		Qt::WindowMaximizeButtonHint);
+
 	ui.setupUi(this);
 	m_mainwindow = (MainWindow*)parent;
 	m_ctaEngine = m_mainwindow->m_ctaEngine;
@@ -78,7 +83,7 @@ void CTAStrategyManager::ReadStrategyConfFileJson()
 
 			}
 			//插入到策略配置map中
-			m_strategyConfigInfo_map.insert({ StrategyName +"__"+vt_symbol,settingMap+"__"+ ClassName });
+			m_strategyConfigInfo_map[ StrategyName +"__"+vt_symbol + "__" + ClassName]=settingMap;
 		}
 
 	}
