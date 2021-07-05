@@ -1,5 +1,7 @@
 #include"StrategyTemplate.h"
 #include"CtaEngine.h"
+#include<cstdlib>
+#include<string>
 
 StrategyTemplate::StrategyTemplate(CtaEngine*ctaEngine,std::string strategyName, std::string symbol)
 {
@@ -53,6 +55,9 @@ void StrategyTemplate::changeposmap(std::string symbol, double pos)
 //初始化
 void StrategyTemplate::onInit()
 {
+	//配置表和变量表中的值都是字符串，需要改为数字，并给变量赋值，需要在自己写的策略的onInit()里面写一下，这里改仓位的
+	m_Pos = std::stoi(m_strategydata->getvar("pos"));
+
 	//默认使用bar 需要使用tick自己修改
 	std::string strategyname = m_strategyName;
 	m_ctaEngine->writeCtaLog("策略初始化" + strategyname, gatewayname);
@@ -95,7 +100,7 @@ void StrategyTemplate::onInit()
 			onTick(*it);
 		}
 	}
-	loadposfrommongo();  //读取持仓
+	//loadposfrommongo();  //读取持仓
 	std::map<std::string, double>map = getposmap();
 	for (std::map<std::string, double>::iterator iter = map.begin(); iter != map.end(); iter++)
 	{
@@ -251,7 +256,7 @@ void StrategyTemplate::putEvent()
 	std::shared_ptr<Event_UpdateStrategy>e = std::make_shared<Event_UpdateStrategy>();
 	e->parammap = m_strategydata->getallparam();
 	e->varmap = m_strategydata->getallvar();
-	e->strategyname = m_strategydata->m_strategyName;
+	e->strategyname =m_strategyName;
 	m_ctaEngine->PutEvent(e);
 }
 
@@ -261,7 +266,7 @@ void StrategyTemplate::putGUI()
 	std::shared_ptr<Event_LoadStrategy>e = std::make_shared<Event_LoadStrategy>();
 	e->parammap = m_strategydata->getallparam();
 	e->varmap = m_strategydata->getallvar();
-	e->strategyname = m_strategydata->m_strategyName;
+	e->strategyname = m_strategyName;
 	m_ctaEngine->PutEvent(e);
 }
 
@@ -276,7 +281,7 @@ void StrategyTemplate::savepostomongo()
 	//需要update
 	bson_t *query;
 	bson_t *update;
-	query = BCON_NEW("strategyname", BCON_UTF8(m_strategydata->m_strategyName.c_str()));
+	query = BCON_NEW("strategyname", BCON_UTF8(m_strategyName.c_str()));
 	std::map<std::string, double>map = getposmap();
 	for (std::map<std::string, double>::iterator it = map.begin(); it != map.end(); it++)
 	{
@@ -293,7 +298,7 @@ void StrategyTemplate::loadposfrommongo()
 
 	bson_init(&query);
 
-	m_MongoCxx->append_utf8(&query, "strategyname", m_strategydata->m_strategyName.c_str());
+	m_MongoCxx->append_utf8(&query, "strategyname", m_strategyName.c_str());
 
 	result = m_MongoCxx->findData(&query, "StrategyPos", "pos");
 
