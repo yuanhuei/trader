@@ -64,7 +64,8 @@ public:
 
 	bool IsFlowControl(int iResult);
 
-	void connect(std::string userID, std::string password, std::string brokerID, std::string address,std::string authcode, std::string appid, std::string productinfo);
+	void connect(std::string userID, std::string password, std::string brokerID, std::string address,std::string authcode="", std::string appid="", std::string productinfo="");
+	//void connect(std::string userID, std::string password, std::string brokerID, std::string address);
 
 	void login();
 

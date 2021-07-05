@@ -27,8 +27,13 @@ public:
 	//连接状态
 	std::atomic_bool ctpmdconnected;
 	std::atomic_bool ctptdconnected;
+
 	//主动函数
-	void connect();											//连接
+	//配置文件连接
+	void connect();											
+	//对话框输入参数连接
+	void connect(std::string userID, std::string password, std::string brokerID, std::string mdaddress, std::string tdaddress, std::string authcode, std::string appid, std::string productinfo);
+
 	void subscribe(SubscribeReq& subscribeReq);				//订阅
 	std::string sendOrder(OrderReq& req);					//报单
 	void cancelOrder(CancelOrderReq& req);					//撤单

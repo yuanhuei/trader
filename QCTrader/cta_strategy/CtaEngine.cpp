@@ -1,7 +1,8 @@
 
 #include"CtaEngine.h"
 #include"Strategies/turtlebreak.h"
-
+#include <json/json.h>
+#include<qstring.h>
 
 typedef StrategyTemplate* (*Dllfun)(CtaEngine*);
 typedef int(*Release)();
@@ -19,11 +20,13 @@ CtaEngine::CtaEngine(Gatewaymanager* gatewaymanager, EventEngine* eventengine, r
 	// 创建客户端池
 	m_pool = mongoc_client_pool_new(m_uri);							//3
 
+	//加载策略
+	loadStrategy();
 	registerEvent();
 
 	m_portfolio = new Portfolio(eventengine, gatewaymanager);
 
-	is_LoadStrategy = false;
+	//is_LoadStrategy = false;
 }
 CtaEngine::~CtaEngine()
 {
@@ -39,169 +42,337 @@ CtaEngine::~CtaEngine()
 	delete m_portfolio;
 }
 /******************外部调用***************************/
-
-//加载策略
-void CtaEngine::loadStrategy(std::string strStrategyName,std::string strSymbolName,std::string strClassName,std::map<std::string, float>settingMap)
+void CtaEngine::ReadStrategyConfFileJson()
 {
-	if (is_LoadStrategy == false)
+	Json::Reader reader;
+	Json::Value root;
+
+	//从文件中读取，保证当前文件有demo.json文件  
+	std::ifstream in("./Strategy/cta_strategy_setting.json", std::ios::binary);
+
+	if (!in.is_open())
 	{
-		is_LoadStrategy = true;
-		//从文件夹底下获取所有策略文件 用windowsAPI加载DLL
-		/*
-		if (_access("./Strategy", 0) != -1)
+		this->writeCtaLog("打开策略配置文件失败");
+		return;
+	}
+
+	if (reader.parse(in, root))
+	{
+		this->writeCtaLog("打开策略配置文件成功");
+		for (int i = 0; i < root.size(); i++)
 		{
-			std::filebuf in;
-			if (!in.open("./Strategy/strategysetting.json", std::ios::in))
-			{
-				std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-				e->msg = "无法读取本地配置文件";
-				m_eventengine->Put(e);
-				return;
-			}
-			std::istream iss(&in);
-			std::istreambuf_iterator<char> eos;
-			std::string s(std::istreambuf_iterator<char>(iss), eos);
-			std::string err;
+			//读取策略名称和合约名称
 
-			auto json = json11::Json::parse(s, err);
-			if (!err.empty()) {
-				in.close();
+			std::string StrategyName = root[i]["strategy_name"].asString();
+			std::string vt_symbol = root[i]["vt_symbol"].asString();
+			std::string ClassName = root[i]["class_name"].asString();
+			if ((StrategyName.length() < 1 || vt_symbol.length()) < 1 || ClassName.length() < 1)
+			{
+				this->writeCtaLog("配置文件策略信息不全");
 				return;
 			}
 
-			json11::Json::array jsonarray = json.array_items();
-			for (int i = 0; i < jsonarray.size(); i++)
+			//读取策略配置信息 
+			std::map<std::string, float> settingMap;
+			Json::Value::Members members;
+			members = root[i]["setting"].getMemberNames();
+			//std::vector<std::string> settingKeys= root["setting"].getMemberNames();
+			for (Json::Value::Members::iterator iterMember = members.begin(); iterMember != members.end(); iterMember++)   // 遍历每个key
 			{
-				std::string strategy = "./Strategy/" + jsonarray[i]["strategy"].string_value();
-				std::vector<std::string>symbol_v;//临时存储配置文件交易的合约
-				json11::Json::array array_symbol = jsonarray[i]["symbol"].array_items();
-				for (int j = 0; j < array_symbol.size(); j++)
+				std::string strKey = *iterMember;
+				float fValue = root[i]["setting"][strKey.c_str()].asFloat();
+				/*
+				if (root[i]["setting"][strKey.c_str()].isString())
 				{
-					//将合约列表插入symbol_v中
-					symbol_v.push_back(array_symbol[j].string_value());
+					fValue = root[i]["setting"][strKey.c_str()].asString();
 				}
-				json11::Json::array array_ = jsonarray[i]["param"].array_items();
-				std::map<std::string, std::string>tmpparammap;
-				for (int j = 0; j < array_.size(); j++)
-				{
-					//遍历参数
-					json11::Json::object obj = array_[j].object_items();
-					for (json11::Json::object::iterator it = obj.begin(); it != obj.end(); it++)
-					{
-						auto t = it->first;//参数
-						auto tt = it->second;//值
-						tmpparammap.insert(std::pair<std::string, std::string>(t, tt.string_value()));
-					}
-					std::string symbol = "";//临时的symbol
-					for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
-					{
-						symbol += (*iter + ",");
-					}
-					tmpparammap.insert(std::pair<std::string, std::string>("symbol", symbol));
-				}
+				else
+					fValue = root[i]["setting"][strKey.c_str()].asFloat();
 				*/
-				//插入策略中
-		StrategyTemplate* strategy_ptr;
-		HINSTANCE his;
-		if (strStrategyName.find(".dll"))//策略通过DLL文件提供
-		{
-			std::string strategy = "./Strategy/" + strStrategyName;
-			his = LoadLibraryA(strategy.c_str());//加载一个策略
-			if (his == NULL)
-			{
-				//没有加载进来DLL
-				std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-				e->msg = "无法读取策略" + strategy;
-				m_eventengine->Put(e);
-				return;
-			}
-			Dllfun dll = (Dllfun)GetProcAddress(his, "CreateStrategy");//创建策略
-			if (dll == NULL)
-			{
-				//没有加载进来DLL
-				std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-				e->msg = "无法创建策略函数" + strategy;
-				m_eventengine->Put(e);
-				FreeLibrary(his);
-				return;
-			}
-			strategy_ptr = dll(this);
-		}
-		else
-		{
-			if (strStrategyName == "turtlebreak")
-				strategy_ptr = new turtlebreak(this);
+				//if(fValue.ist)
+				settingMap.insert({ strKey,  fValue });
 
-		}
-		/*
-		m_tickstrategymtx.lock();
-		for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
-		{
-			if (m_tickstrategymap.find(*iter) == m_tickstrategymap.end())
-			{
-				//没有
-				std::vector<StrategyTemplate*>strategy_v;
-				strategy_v.push_back(strategy_ptr);
-				m_tickstrategymap.insert(std::pair<std::string, std::vector<StrategyTemplate*>>(*iter, strategy_v));
 			}
-			else
-			{
-				m_tickstrategymap[*iter].push_back(strategy_ptr);
-			}
+			//插入到策略配置map中
+			m_strategyConfigInfo_map[StrategyName + "__" + vt_symbol + "__" + ClassName] = settingMap;
 		}
-		m_tickstrategymtx.unlock();
-		*/
-		//赋值参数
-		for (std::map<std::string, float>::iterator it = settingMap.begin(); it != settingMap.end(); it++)
-		{
-			//遍历parameter
-			std::string value = std::to_string(it->second);
-			strategy_ptr->checkparam(it->first.c_str(), value.c_str());
-		}
-		//插入pos_map
-		strategy_ptr->checkSymbol(strSymbolName.c_str());
-		/*
-		for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
-		{
-			strategy_ptr->checkSymbol((*iter).c_str());
-		}
-		*/
-		if (strategy_ptr->getparam("name") == "Null")
-		{
-			this->writeCtaLog("策略中有一个没有给策略起名！", strategy_ptr->gatewayname);
-		}
-		else
-		{
-			strategy_ptr->putEvent();
-			strategy_ptr->putGUI();
-		}
-		//插入策略map,key是策略名+合约名，值是之前new出来的指向策略对象的指针
-		std::string strName = strStrategyName + "__" + strSymbolName;
-		//m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strategy_ptr->getparam("name"), strategy_ptr));//策略名和策略
-		m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strName, strategy_ptr));//策略名和策略
 
-		dllmap.insert(std::pair<std::string, HINSTANCE>(strategy_ptr->getparam("name"), his));//策略名
-
-		//订阅合约
-		//for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
-		//{
-		std::shared_ptr<Event_Contract>contract = m_gatewaymanager->getContract(strSymbolName);
-		SubscribeReq req;
-		req.symbol = contract->symbol;
-		req.exchange = contract->exchange;
-		/*if (strategy_ptr->getparam("currency") != "Null" && strategy_ptr->getparam("productClass") != "Null")
-		{
-			req.currency = strategy_ptr->getparam("currency");
-			req.productClass = strategy_ptr->getparam("productClass");
-		}*/
-		m_gatewaymanager->subscribe(req, "CTP");// strategy_ptr->getparam("gatewayname"));
-		//}
-			
 	}
 	else
 	{
-		writeCtaLog("已经加载过策略，请勿重复加载！", "jstradergui");
+		this->writeCtaLog("解析策略配置文件失败");
 	}
+
+	in.close();
+}
+//读取策略数据文件
+void CtaEngine::ReadStrategyDataJson()
+{
+	Json::Reader reader;
+	Json::Value root;
+
+	//从文件中读取，保证当前文件有demo.json文件  
+	std::ifstream in("./Strategy/cta_strategy_data.json", std::ios::binary);
+
+	if (!in.is_open())
+	{
+		this->writeCtaLog("打开策略数据文件失败");
+		return;
+	}
+
+	if (reader.parse(in, root))
+	{
+		this->writeCtaLog("打开策略数据文件成功");
+		for (int i = 0; i < root.size(); i++)
+		{
+			//读取策略名称和合约名称
+
+			std::string StrategyName = root[i]["strategy_name"].asString();
+			std::string vt_symbol = root[i]["vt_symbol"].asString();
+			std::string ClassName = root[i]["class_name"].asString();
+			if ((StrategyName.length() < 1 || vt_symbol.length()) < 1 || ClassName.length() < 1)
+			{
+				this->writeCtaLog("策略数据文件信息不全");
+				return;
+			}
+
+			//读取策略数据信息 
+			std::map<std::string, float> settingMap;
+			Json::Value::Members members;
+			members = root[i]["setting"].getMemberNames();
+			//std::vector<std::string> settingKeys= root["setting"].getMemberNames();
+			for (Json::Value::Members::iterator iterMember = members.begin(); iterMember != members.end(); iterMember++)   // 遍历每个key
+			{
+				std::string strKey = *iterMember;
+				float fValue = root[i]["setting"][strKey.c_str()].asFloat();
+				/*
+				if (root[i]["setting"][strKey.c_str()].isString())
+				{
+					fValue = root[i]["setting"][strKey.c_str()].asString();
+				}
+				else
+					fValue = root[i]["setting"][strKey.c_str()].asFloat();
+				*/
+				//if(fValue.ist)
+				settingMap.insert({ strKey,  fValue });
+
+			}
+			//插入到策略数据map中
+			m_strategyData_map[StrategyName + "__" + vt_symbol] = settingMap;
+		}
+
+	}
+	else
+	{
+	this->writeCtaLog("解析策略数据文件失败");
+	}
+
+	in.close();
+}
+
+//加载策略
+void CtaEngine::loadStrategy()
+{
+
+	//读取策略配置文件（存放策略配置参数，包括策略名，合约，类名还有配置参数
+	ReadStrategyConfFileJson();
+	//读取策略数据文件（存放策略变量,例如仓位）
+	ReadStrategyDataJson();
+
+	if (m_strategyConfigInfo_map.size() == 0)
+	{
+		this->writeCtaLog("无策略在配置文件中");
+		return;
+
+	}
+	else//根据策略配置文件生成策略集,加载策略配置和策略数据
+	{
+		std::map<std::string, std::map<std::string, float>>::iterator it;
+		for (it = m_strategyConfigInfo_map.begin(); it != m_strategyConfigInfo_map.end(); it++)
+		{
+			QString strStrategy = QString::fromStdString(it->first).section("__", 0, 0);
+			QString strSymbol = QString::fromStdString(it->first).section("__", 1, 1);
+			QString strClassname = QString::fromStdString(it->first).section("__", 2, 2);
+			std::string strStrategyName = strStrategy.toStdString();
+			std::string strSymbolName = strSymbol.toStdString();
+			std::string strClassName = strClassname.toStdString();
+			std::map<std::string, float>settingMap = it->second;
+
+			//生成策略
+			StrategyTemplate* strategy_ptr;
+			HINSTANCE his;
+			if (strStrategyName.find(".dll"))//策略通过DLL文件提供
+			{
+				std::string strategy = "./Strategy/" + strStrategyName;//策略DLL文件
+				his = LoadLibraryA(strategy.c_str());//加载一个策略
+				if (his == NULL)
+				{
+					//没有加载进来DLL
+					std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
+					e->msg = "无法读取策略" + strategy;
+					m_eventengine->Put(e);
+
+					return;
+				}
+				Dllfun dll = (Dllfun)GetProcAddress(his, "CreateStrategy");//创建策略
+				if (dll == NULL)
+				{
+					//没有加载进来DLL
+					std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
+					e->msg = "无法创建策略函数" + strategy;
+					m_eventengine->Put(e);
+					FreeLibrary(his);
+					return;
+				}
+				strategy_ptr = dll(this);
+			}
+			else//通过在源代码中提供的策略
+			{
+				if (strStrategyName == "turtlebreak")
+					strategy_ptr = new turtlebreak(this);
+
+			}
+
+			m_tickstrategymtx.lock();
+			//for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
+			//{
+			//更新m_tickstrategymap数据
+			if (m_tickstrategymap.find(strSymbolName) == m_tickstrategymap.end())
+			{
+				//没有合约存在map中，创建一个
+				std::vector<StrategyTemplate*>strategy_v;
+				strategy_v.push_back(strategy_ptr);
+				m_tickstrategymap.insert(std::pair<std::string, std::vector<StrategyTemplate*>>(strSymbolName, strategy_v));
+			}
+			else//已经有合约在其中，加入其中
+			{
+				m_tickstrategymap[strSymbolName].push_back(strategy_ptr);
+			}
+			//}
+			m_tickstrategymtx.unlock();
+
+			//赋值参数
+			for (std::map<std::string, float>::iterator it = settingMap.begin(); it != settingMap.end(); it++)
+			{
+				//遍历parameter
+				std::string value = std::to_string(it->second);
+				strategy_ptr->updateParam(it->first.c_str(), value.c_str());
+			}
+			//赋值变量
+			for (std::map<std::string, std::map<std::string, float>>::iterator it = m_strategyData_map.begin(); it != m_strategyData_map.end(); it++)
+			{
+				std::string str = it->first;
+				if (str == (strStrategyName + "__" + strSymbolName))//找到对应的策略合约
+				{
+					std::map<std::string, float>varMap = it->second;//变量map
+					for (std::map<std::string, float>::iterator it = varMap.begin(); it != varMap.end(); it++)
+					{
+						//遍历var
+						std::string value = std::to_string(it->second);
+						strategy_ptr->updateVar(it->first.c_str(), value.c_str());
+					}
+				}
+
+			}
+			//插入pos_map
+			strategy_ptr->checkSymbol(strSymbolName.c_str());
+			/*
+			for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
+			{
+				strategy_ptr->checkSymbol((*iter).c_str());
+			}
+			
+			if (strategy_ptr->getparam("name") == "Null")
+			{
+				this->writeCtaLog("策略中有一个没有给策略起名！", strategy_ptr->gatewayname);
+			}
+			else
+			{*/
+			strategy_ptr->putEvent();
+			strategy_ptr->putGUI();
+		
+			//插入策略map,key是策略名+合约名，值是之前new出来的指向策略对象的指针
+			std::string strName = strStrategyName + "__" + strSymbolName;
+			//m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strategy_ptr->getparam("name"), strategy_ptr));//策略名和策略
+			m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strName, strategy_ptr));//策略名和策略
+
+			dllmap.insert(std::pair<std::string, HINSTANCE>(strategy_ptr->getparam("name"), his));//策略名
+
+			//订阅合约
+			//for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
+			//{
+			std::shared_ptr<Event_Contract>contract = m_gatewaymanager->getContract(strSymbolName);
+			SubscribeReq req;
+			req.symbol = contract->symbol;
+			req.exchange = contract->exchange;
+			/*if (strategy_ptr->getparam("currency") != "Null" && strategy_ptr->getparam("productClass") != "Null")
+			{
+				req.currency = strategy_ptr->getparam("currency");
+				req.productClass = strategy_ptr->getparam("productClass");
+			}*/
+			m_gatewaymanager->subscribe(req, "CTP");// strategy_ptr->getparam("gatewayname"));
+			//}
+
+
+		}
+
+
+	}
+	//从文件夹底下获取所有策略文件 用windowsAPI加载DLL
+	/*
+	if (_access("./Strategy", 0) != -1)
+	{
+		std::filebuf in;
+		if (!in.open("./Strategy/strategysetting.json", std::ios::in))
+		{
+			std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
+			e->msg = "无法读取本地配置文件";
+			m_eventengine->Put(e);
+			return;
+		}
+		std::istream iss(&in);
+		std::istreambuf_iterator<char> eos;
+		std::string s(std::istreambuf_iterator<char>(iss), eos);
+		std::string err;
+
+		auto json = json11::Json::parse(s, err);
+		if (!err.empty()) {
+			in.close();
+			return;
+		}
+
+		json11::Json::array jsonarray = json.array_items();
+		for (int i = 0; i < jsonarray.size(); i++)
+		{
+			std::string strategy = "./Strategy/" + jsonarray[i]["strategy"].string_value();
+			std::vector<std::string>symbol_v;//临时存储配置文件交易的合约
+			json11::Json::array array_symbol = jsonarray[i]["symbol"].array_items();
+			for (int j = 0; j < array_symbol.size(); j++)
+			{
+				//将合约列表插入symbol_v中
+				symbol_v.push_back(array_symbol[j].string_value());
+			}
+			json11::Json::array array_ = jsonarray[i]["param"].array_items();
+			std::map<std::string, std::string>tmpparammap;
+			for (int j = 0; j < array_.size(); j++)
+			{
+				//遍历参数
+				json11::Json::object obj = array_[j].object_items();
+				for (json11::Json::object::iterator it = obj.begin(); it != obj.end(); it++)
+				{
+					auto t = it->first;//参数
+					auto tt = it->second;//值
+					tmpparammap.insert(std::pair<std::string, std::string>(t, tt.string_value()));
+				}
+				std::string symbol = "";//临时的symbol
+				for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
+				{
+					symbol += (*iter + ",");
+				}
+				tmpparammap.insert(std::pair<std::string, std::string>("symbol", symbol));
+			}
+			*/
+
 }
 //初始化
 void CtaEngine::initStrategy(std::string name)
@@ -307,7 +478,7 @@ void CtaEngine::startallStrategy()
 		}
 		else
 		{
-			this->writeCtaLog("策略还没初始化你就想启动?", temp->gatewayname);
+			this->writeCtaLog("策略未初始化", temp->gatewayname);
 		}
 	}
 	m_strategymtx.unlock();
@@ -544,7 +715,7 @@ void CtaEngine::processPositionEvent(std::shared_ptr<Event>e)
 	}
 	m_tickstrategymtx.unlock();
 }
-
+/*
 void CtaEngine::showLog(std::shared_ptr<Event>e)
 {
 	std::shared_ptr<Event_Log> elog = std::static_pointer_cast<Event_Log>(e);
@@ -563,7 +734,7 @@ void CtaEngine::showLog(std::shared_ptr<Event>e)
 		m_tickstrategymtx.unlock();
 	}
 }
-
+*/
 void CtaEngine::autoConnect(std::shared_ptr<Event>e)
 {
 	auto nowtime2 = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -600,7 +771,7 @@ void CtaEngine::registerEvent()
 	m_eventengine->RegEvent(EVENT_TRADE, std::bind(&CtaEngine::processTradeEvent, this, std::placeholders::_1));
 	m_eventengine->RegEvent(EVENT_POSITION, std::bind(&CtaEngine::processPositionEvent, this, std::placeholders::_1));
 	m_eventengine->RegEvent(EVENT_TIMER, std::bind(&CtaEngine::autoConnect, this, std::placeholders::_1));
-	m_eventengine->RegEvent(EVENT_LOG, std::bind(&CtaEngine::showLog, this, std::placeholders::_1));
+	//m_eventengine->RegEvent(EVENT_LOG, std::bind(&CtaEngine::showLog, this, std::placeholders::_1));
 }
 /******************策略调用***************************/
 
@@ -820,7 +991,7 @@ void CtaEngine::cancelOrder(std::string orderID, std::string gatewayname)
 	}
 }
 
-void CtaEngine::writeCtaLog(std::string msg, std::string gatewayname)
+void CtaEngine::writeCtaLog(std::string msg, std::string gatewayname="CTP")
 {
 	std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
 	e->msg = msg;

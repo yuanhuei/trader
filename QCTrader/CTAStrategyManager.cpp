@@ -23,7 +23,7 @@ CTAStrategyManager::CTAStrategyManager(QWidget* parent)
 	ui.setupUi(this);
 	m_mainwindow = (MainWindow*)parent;
 	m_ctaEngine = m_mainwindow->m_ctaEngine;
-	setUI();
+	InitUI();
 
 }
 
@@ -41,13 +41,13 @@ void CTAStrategyManager::ReadStrategyConfFileJson()
 
 	if (!in.is_open())
 	{
-		this->UpdateLogTable("打开策略配置文件失败");
+		this->pushLogData("打开策略配置文件失败");
 		return;
 	}
 
 	if (reader.parse(in, root))
 	{
-		this->UpdateLogTable("打开策略配置文件成功");
+		this->pushLogData("打开策略配置文件成功");
 		for (int i = 0; i < root.size(); i++)
 		{
 			//读取策略名称和合约名称
@@ -57,7 +57,7 @@ void CTAStrategyManager::ReadStrategyConfFileJson()
 			std::string ClassName = root[i]["vt_symbol"].asString();
 			if ((StrategyName.length() < 1|| vt_symbol.length())< 1 || ClassName.length() < 1)
 			{
-				this->UpdateLogTable("配置文件策略信息不全");
+				this->pushLogData("配置文件策略信息不全");
 				return;
 			}
 
@@ -89,7 +89,7 @@ void CTAStrategyManager::ReadStrategyConfFileJson()
 	}
 	else
 	{
-		this->UpdateLogTable("解析策略配置文件失败");
+		this->pushLogData("解析策略配置文件失败");
 	}
 
 	in.close();
@@ -97,22 +97,17 @@ void CTAStrategyManager::ReadStrategyConfFileJson()
 
 
 
-void CTAStrategyManager::setUI()
+void CTAStrategyManager::InitUI()
 {
 	//读取策略配置文件
 	ReadStrategyConfFileJson();
 
-	//根据读取的策略文件内容，初始化combobox控件的可选择列表
-	std::map<std::string, std::map<std::string, float>>::iterator it;
-	for (it = m_strategyConfigInfo_map.begin(); it != m_strategyConfigInfo_map.end(); it++)
-	{
-		ui.comboBox->addItem(QString::fromStdString(it->first));
-	}
+
 
 	//设置策略配置表
 	m_StrategyConf = new QStandardItemModel;
 	QStringList StrategyConfHeader;
-	StrategyConfHeader << str2qstr_new("策略名") << str2qstr_new("合约") << str2qstr_new("状态");
+	StrategyConfHeader << str2qstr_new("策略名") << str2qstr_new("合约") << str2qstr_new("策略类名")<< str2qstr_new("状态");
 	m_StrategyConf->setHorizontalHeaderLabels(StrategyConfHeader);
 	ui.tableView->setModel(m_StrategyConf);
 	ui.tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -121,6 +116,26 @@ void CTAStrategyManager::setUI()
 	ui.tableView->setSelectionMode(QAbstractItemView::SingleSelection); //设置只能选择一行，不能多行选中  
 	ui.tableView->setAlternatingRowColors(true);
 
+	//根据读取的策略文件内容，填入策略表
+	std::map<std::string, std::map<std::string, float>>::iterator it;
+	int i = 0;
+	for (it = m_strategyConfigInfo_map.begin(); it != m_strategyConfigInfo_map.end(); it++)
+	{
+		QString strStrategy = QString::fromStdString(it->first).section("__",0,0);
+		QString strSymbol = QString::fromStdString(it->first).section("__", 1, 1);
+		QString strClassname = QString::fromStdString(it->first).section("__", 2, 2);
+		
+		m_StrategyConf->setItem(i, 0, new QStandardItem(strStrategy));
+		m_StrategyConf->setItem(i, 1, new QStandardItem(strSymbol));
+		m_StrategyConf->setItem(i, 2, new QStandardItem(strClassname));
+		m_StrategyConf->setItem(i, 3, new QStandardItem(str2qstr_new("未初始化")));
+		i++;
+
+
+		ui.comboBox->addItem(strStrategy+" "+ strSymbol);
+
+	}
+	ui.pushButton->setDisabled(true);//暂时不用
 
 }
 void CTAStrategyManager::addStrategy_clicked()
@@ -205,15 +220,26 @@ void CTAStrategyManager::clearLog()
 }
 
 //更新日志窗口
-void CTAStrategyManager::UpdateLogTable(std::string msg)
+void CTAStrategyManager::UpdateLogTable(LogData data)
 {
-	LogData data;
-	data.gatewayname = "CTP";
-	data.msg = msg;
-	data.logTime= Utils::getCurrentSystemTime();
+	//LogData data;
+	//data.gatewayname = "CTP";
+	//data.msg = msg;
+	//data.logTime= Utils::getCurrentSystemTime();
 	int rowCount = ui.tableWidget_3->rowCount();
 	ui.tableWidget_3->insertRow(rowCount);
 	ui.tableWidget_3->setItem(rowCount, 0, new QTableWidgetItem(str2qstr_new(data.logTime)));
 	ui.tableWidget_3->setItem(rowCount, 1, new QTableWidgetItem(str2qstr_new(data.msg)));
 	ui.tableWidget_3->setItem(rowCount, 2, new QTableWidgetItem(str2qstr_new(data.gatewayname)));
+}
+
+void CTAStrategyManager::pushLogData(std::string msg)
+{
+	
+	LogData data;
+	data.gatewayname = "CTP";
+	data.msg = msg;
+	data.logTime= Utils::getCurrentSystemTime();
+	this->UpdateLogTable(data);
+
 }

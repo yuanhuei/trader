@@ -617,6 +617,9 @@ void MainWindow::UpdateLogTable(LogData data)
 	ui.tableWidget->setItem(rowCount, 0, new QTableWidgetItem(str2qstr_new(data.logTime)));
 	ui.tableWidget->setItem(rowCount, 1, new QTableWidgetItem(str2qstr_new(data.msg)));
 	ui.tableWidget->setItem(rowCount, 2, new QTableWidgetItem(str2qstr_new(data.gatewayname)));
+
+	if (m_ctaStrategyDailog != NULL)
+		m_ctaStrategyDailog->UpdateLogTable(data);
 }
 
 
@@ -635,7 +638,8 @@ void MainWindow::write_log(std::string msg, std::string gateway_name)
 
 void MainWindow::menu_CTAStrategy()
 {
-	CTAStrategyManager* ctaStrategyDailog = new CTAStrategyManager(this);
+	if(m_ctaStrategyDailog==NULL)
+		CTAStrategyManager* m_ctaStrategyDailog = new CTAStrategyManager(this);
 	ctaStrategyDailog->show();
 }
 void MainWindow::menu_CTABacktest()

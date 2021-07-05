@@ -67,7 +67,7 @@ public:
 
 
 	//主程序调用所需函数
-	void loadStrategy(std::string strStrategyName, std::string strSymbolName, std::string strClassName, std::map<std::string, float>settingMap);
+	void loadStrategy();
 	void initStrategy(std::string name);												//初始化
 	void startStrategy(std::string name);												//开始策略
 	void stopStrategy(std::string name);												//停止策略
@@ -78,12 +78,15 @@ public:
 
 	//交易留底
 	void savetraderecord(std::string strategyname, std::shared_ptr<Event_Trade>etrade);
+
+	void ReadStrategyConfFileJson();
+	void ReadStrategyDataJson();
 private:
 	EventEngine* m_eventengine;
 	Gatewaymanager* m_gatewaymanager;
 	riskmanager* m_riskmanager;
 
-	bool is_LoadStrategy;
+	//bool is_LoadStrategy;
 
 	//缓存  和   变量锁   多线程安全
 	//key 是OrderID  value 是策略对象 用途是为了保证这个单是这个策略发出去的  成交回报计算持仓正确加载对应的策略上，以防多个策略交易同一个合约出现BUG
@@ -91,10 +94,13 @@ private:
 	//key 合约名 value 持仓对象   用来缓存每一个合约的今仓昨仓是多少
 	std::map<std::string, PositionBuffer>m_symbolpositionbuffer;	std::mutex m_symbolpositionmtx;
 
-	//key 合约名，value 策略指针(实例)vector  用来把不同的合约tick推送到每一个策略对象
+	//key 合约名（带交易所名称的例如l2109.INE)，value 策略指针(实例)vector  用在接受到tick数据时候，快速的推送到每一个策略对象
 	std::map<std::string, std::vector<StrategyTemplate*>>m_tickstrategymap;	std::mutex m_tickstrategymtx;
-	//key 策略名, value 为策略指针    用来把界面选中的策略名 对应的的策略对象启动
+	//key 策略名+合约名, value 为策略指针    用来把界面选中的策略名 对应的的策略对象启动
 	std::map<std::string, StrategyTemplate*>m_strategymap;			std::mutex m_strategymtx;
+
+	std::map<std::string, std::map<std::string, float>> m_strategyConfigInfo_map;
+	std::map<std::string, std::map<std::string, float>> m_strategyData_map;
 
 	//处理函数
 	void procecssTickEvent(std::shared_ptr<Event>e);
@@ -109,7 +115,7 @@ private:
 	std::map<std::string, HINSTANCE>dllmap;//存放策略dll容器
 
 	//自动重连
-	void showLog(std::shared_ptr<Event>e);
+	//void showLog(std::shared_ptr<Event>e);
 	std::atomic_bool m_connectstatus;
 	void autoConnect(std::shared_ptr<Event>e);
 

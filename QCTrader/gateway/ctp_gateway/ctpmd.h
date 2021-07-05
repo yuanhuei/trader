@@ -67,13 +67,16 @@ private:
 	CTPGateway* m_ctpgateway;
 	std::string m_gatewayname;
 	std::atomic_int m_reqID;
+
 	std::atomic_bool m_connectionStatus;
 	std::atomic_bool m_loginStatus;
+
 	std::string m_userID;							//账号密码 经纪商地址例如9999 1080 服务器地址tcp://xxx.xxx.xxx.xxx
 	std::string m_password;
 	std::string m_brokerID;
 	std::string m_address;
-	std::set<std::string>m_subscribedSymbols;		//暂时未读取，只存储，还不需要加锁
+
+	std::set<std::string>m_subscribedSymbols;		//订阅成功的合约  暂时未读取，只存储，还不需要加锁
 
 	//过滤非交易时间段的错误行情Tick
 	std::set<std::string> m_ninetoeleven;

@@ -25,6 +25,8 @@ class StrategyData
 public:
 	void insertparam(std::string key, std::string value);					//插入参数
 	void insertvar(std::string key, std::string value);						//插入变量
+	void setparam(std::string key, std::string value);//设置参数的值
+	void setvar(std::string key, std::string value);//设置变量的值
 	std::string getparam(std::string);										//获取参数
 	std::string getvar(std::string);										//获取变量
 	std::map<std::string, std::string>getallparam();						//获取所有
@@ -49,6 +51,7 @@ public:
 	std::string trademode;					//交易模式
 	bool inited;							//初始化控制
 	bool trading;							//交易控制
+	int iPos;                                //仓位
 	int initDays;							//加载历史数据的天数
 
 	//算法交易部分变量						默认值，可以不修改在策略实例中调用setlimit函数来重新设置
@@ -66,6 +69,8 @@ public:
 	void cancelallorder();
 	//给参数赋值
 	void checkparam(const char* paramname, const char* paramvalue);
+	void updateParam(const char* paramname, const char* paramvalue);
+	void updateVar(const char* paramname, const char* paramvalue);
 	//给pos赋值
 	void checkSymbol(const char* symbolname);
 	//获取参数的值

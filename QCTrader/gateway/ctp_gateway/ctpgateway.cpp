@@ -66,8 +66,9 @@ void CTPGateway::connect()
 			std::string::size_type pos = line.find("=");//°´ÕÕµÈºÅ·Ö¸ô
 			configmap.insert(std::make_pair(line.substr(0, pos), line.substr(pos + 1, line.size() - 1)));
 		}
-		m_MDSPI->connect(configmap["userid"], configmap["password"], configmap["brokerid"], configmap["mdaddress"]);
-		m_TDSPI->connect(configmap["userid"], configmap["password"], configmap["brokerid"], configmap["tdaddress"]);
+		m_MDSPI->connect(configmap["username"], configmap["password"], configmap["brokerid"], configmap["mdipaddress"]);
+		m_TDSPI->connect(configmap["userR"], configmap["password"], configmap["brokerid"], configmap["tdipaddress"], configmap["authcode"], configmap["productname"], configmap["productinfo"]);
+
 	}
 	else
 	{
@@ -77,6 +78,15 @@ void CTPGateway::connect()
 		this->onLog(e);
 	}
 }
+void CTPGateway::connect(std::string userID, std::string password, std::string brokerID, std::string mdaddress, std::string tdaddress, std::string authcode, std::string appid, std::string productinfo)
+{
+
+	m_MDSPI->connect(userID,password,brokerID,mdaddress);
+	m_TDSPI->connect(userID,password,brokerID,tdaddress,authcode,appid,productinfo);
+
+
+}
+
 
 void CTPGateway::subscribe(SubscribeReq& subscribeReq)
 {

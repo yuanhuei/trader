@@ -11,7 +11,12 @@ StrategyTemplate::StrategyTemplate(CtaEngine*ctaEngine)
 	trading = false;
 	TradingMode = RealMode;
 	unitLimit = 2;
+
 	m_strategydata = new StrategyData();
+	m_strategydata->insertvar("inited", Utils::booltostring(inited));
+	m_strategydata->insertvar("trading", Utils::booltostring(trading));
+	m_strategydata->insertvar("pos", Utils::booltostring(trading));
+
 	m_algorithm = new algorithmOrder(unitLimit, TradingMode, this);
 	m_MongoCxx = new MongoCxx(m_ctaEngine->m_pool);
 }
@@ -104,8 +109,22 @@ void StrategyTemplate::onStop()
 void StrategyTemplate::checkparam(const char* paramname, const char* paramvalue)
 {
 	m_strategydata->insertparam(paramname, paramvalue);
+
 }
 
+//更新参数的值
+void StrategyTemplate::updateParam(const char* paramname, const char* paramvalue)
+{
+
+	m_strategydata->setparam(paramname, paramvalue);
+}
+
+//更新变量的值
+void StrategyTemplate::updateVar(const char* paramname, const char* paramvalue)
+{
+
+	m_strategydata->setvar(paramname, paramvalue);
+}
 //TICK
 void StrategyTemplate::onTick(TickData Tick)
 {
@@ -202,8 +221,8 @@ std::string StrategyTemplate::getparam(std::string paramname)
 //更新参数到界面
 void StrategyTemplate::putEvent()
 {
-	m_strategydata->insertvar("inited", Utils::booltostring(inited));
-	m_strategydata->insertvar("trading", Utils::booltostring(trading));
+
+	/*
 	//更新仓位
 	std::map<std::string, double>map = getposmap();
 	for (std::map<std::string, double>::iterator iter = map.begin(); iter != map.end(); iter++)
@@ -211,6 +230,7 @@ void StrategyTemplate::putEvent()
 		m_strategydata->insertvar(("pos_" + iter->first), Utils::doubletostring(iter->second));
 	}
 	//将参数和变量传递到界面上去
+	*/
 	std::shared_ptr<Event_UpdateStrategy>e = std::make_shared<Event_UpdateStrategy>();
 	e->parammap = m_strategydata->getallparam();
 	e->varmap = m_strategydata->getallvar();
@@ -349,6 +369,31 @@ std::string StrategyData::getparam(std::string key)
 	}
 	m_mtx.unlock();
 	return value;
+}
+
+void StrategyData::setparam(std::string key,std::string value)
+{
+
+	m_mtx.lock();
+	if (m_parammap.find(key) != m_parammap.end())
+	{
+		 m_parammap[key]=value;
+	}
+
+	m_mtx.unlock();
+}
+
+
+void StrategyData::setvar(std::string key,std::string value)
+{
+
+	m_mtx.lock();
+	if (m_varmap.find(key) != m_varmap.end())
+	{
+		m_varmap[key]=value;
+	}
+
+	m_mtx.unlock();
 }
 
 std::string StrategyData::getvar(std::string key)

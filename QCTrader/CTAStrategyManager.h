@@ -13,10 +13,11 @@ public:
 	CTAStrategyManager(QWidget *parent = Q_NULLPTR);
 	~CTAStrategyManager();
 private:
-	void setUI();
+	void InitUI();
 	void ReadStrategyConfFileJson();
 	//void pushLogToCTAStrategyWindow(std::string msg);
-	void UpdateLogTable(std::string msg);
+	void UpdateLogTable(LogData data);
+	void pushLogData(std::string msg);
 
 private:
 	Ui::CTAStrategyManager ui;
