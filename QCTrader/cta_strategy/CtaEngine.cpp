@@ -4,6 +4,9 @@
 #include <json/json.h>
 #include<qstring.h>
 
+#include <iostream>  
+#include <fstream>  
+
 typedef StrategyTemplate* (*Dllfun)(CtaEngine*);
 typedef int(*Release)();
 
@@ -34,11 +37,24 @@ CtaEngine::~CtaEngine()
 	mongoc_uri_destroy(m_uri);
 	mongoc_cleanup();
 
+	std::map<std::string, StrategyTemplate*>::iterator iter;
+	for (iter = m_strategymap.begin(); iter != m_strategymap.end(); iter++)
+	{
+		StrategyTemplate* strP = iter->second;
+		if (strP!=nullptr)
+		{
+			//删除指针
+			delete strP;
+			strP = nullptr;
+		}
+
+	}
+	/*
 	for (std::map<std::string, HINSTANCE>::iterator it = dllmap.begin(); it != dllmap.end(); it++)
 	{
 		Release result = (Release)GetProcAddress(it->second, "ReleaseStrategy");//析构策略
 		result();
-	}
+	}*/
 	delete m_portfolio;
 }
 /******************外部调用***************************/
@@ -158,7 +174,7 @@ void CtaEngine::ReadStrategyDataJson()
 
 			}
 			//插入到策略数据map中
-			m_strategyData_map[StrategyName + "__" + vt_symbol] = settingMap;
+			m_strategyData_map[StrategyName + "__" + vt_symbol + "__" + ClassName] = settingMap;
 		}
 
 	}
@@ -168,6 +184,33 @@ void CtaEngine::ReadStrategyDataJson()
 	}
 
 	in.close();
+}
+//读取策略数据文件
+void CtaEngine::WriteStrategyDataJson(std::map<std::string, std::string>dataMap,std::string fileName)
+{
+
+
+	Json::Value root;
+
+	//根节点属性
+	std::map<std::string, std::string>::iterator iter;
+	for (iter = dataMap.begin(); iter != dataMap.end(); iter++)
+	{
+		std::string varName = iter->first;
+		std::string varValue = iter->second;
+		root[varName] = Json::Value(varValue);
+	}
+	
+	Json::StyledWriter sw;
+
+	//输出到文件
+	std::ofstream os;
+	std::string file = "./Strategy/cta_strategy_setting" + fileName + ".json";
+	os.open(file);
+	os << sw.write(root);
+	os.close();
+
+
 }
 
 //加载策略
@@ -225,33 +268,25 @@ void CtaEngine::loadStrategy()
 					return;
 				}
 				strategy_ptr = dll(this);
+				std::string strName= strStrategyName + "__" + strSymbolName;
+				dllmap.insert(std::pair<std::string, HINSTANCE>(strName, his));
+
 			}
 			else//通过在源代码中提供的策略
 			{
 				if (strStrategyName == "turtlebreak")
-					strategy_ptr = new turtlebreak(this);
+					strategy_ptr = new turtlebreak(this, strStrategyName, strSymbolName);
+				else
+				{
+					this->writeCtaLog("没有策略被创建");
+					return;
+				}
 
 			}
 
-			m_tickstrategymtx.lock();
-			//for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
-			//{
-			//更新m_tickstrategymap数据
-			if (m_tickstrategymap.find(strSymbolName) == m_tickstrategymap.end())
-			{
-				//没有合约存在map中，创建一个
-				std::vector<StrategyTemplate*>strategy_v;
-				strategy_v.push_back(strategy_ptr);
-				m_tickstrategymap.insert(std::pair<std::string, std::vector<StrategyTemplate*>>(strSymbolName, strategy_v));
-			}
-			else//已经有合约在其中，加入其中
-			{
-				m_tickstrategymap[strSymbolName].push_back(strategy_ptr);
-			}
-			//}
-			m_tickstrategymtx.unlock();
 
-			//赋值参数
+
+			//赋值参数,策略中必须生成strategeData,里面包含了配置参数和变量参数，下面是根据配置文件更新。
 			for (std::map<std::string, float>::iterator it = settingMap.begin(); it != settingMap.end(); it++)
 			{
 				//遍历parameter
@@ -275,7 +310,7 @@ void CtaEngine::loadStrategy()
 
 			}
 			//插入pos_map
-			strategy_ptr->checkSymbol(strSymbolName.c_str());
+			//strategy_ptr->checkSymbol(strSymbolName.c_str());
 			/*
 			for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
 			{
@@ -288,15 +323,32 @@ void CtaEngine::loadStrategy()
 			}
 			else
 			{*/
-			strategy_ptr->putEvent();
-			strategy_ptr->putGUI();
-		
-			//插入策略map,key是策略名+合约名，值是之前new出来的指向策略对象的指针
+			//strategy_ptr->putEvent();
+			//strategy_ptr->putGUI();
+			
+			m_tickstrategymtx.lock();
+			//for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
+			//{
+			//更新m_tickstrategymap
+			if (m_tickstrategymap.find(strSymbolName) == m_tickstrategymap.end())
+			{
+				//没有合约存在map中，创建一个
+				std::vector<StrategyTemplate*>strategy_v;
+				strategy_v.push_back(strategy_ptr);
+				m_tickstrategymap.insert(std::pair<std::string, std::vector<StrategyTemplate*>>(strSymbolName, strategy_v));
+			}
+			else//已经有合约在其中，加入其中
+			{
+				m_tickstrategymap[strSymbolName].push_back(strategy_ptr);
+			}
+			//}
+			m_tickstrategymtx.unlock();
+			//插入策略m_strategymap,   key是策略名+合约名，值是之前new出来的 指向策略对象的指针
+			//
 			std::string strName = strStrategyName + "__" + strSymbolName;
 			//m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strategy_ptr->getparam("name"), strategy_ptr));//策略名和策略
 			m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strName, strategy_ptr));//策略名和策略
 
-			dllmap.insert(std::pair<std::string, HINSTANCE>(strategy_ptr->getparam("name"), his));//策略名
 
 			//订阅合约
 			//for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
@@ -305,7 +357,8 @@ void CtaEngine::loadStrategy()
 			SubscribeReq req;
 			req.symbol = contract->symbol;
 			req.exchange = contract->exchange;
-			/*if (strategy_ptr->getparam("currency") != "Null" && strategy_ptr->getparam("productClass") != "Null")
+			/*
+			if (strategy_ptr->getparam("currency") != "Null" && strategy_ptr->getparam("productClass") != "Null")
 			{
 				req.currency = strategy_ptr->getparam("currency");
 				req.productClass = strategy_ptr->getparam("productClass");
@@ -318,60 +371,7 @@ void CtaEngine::loadStrategy()
 
 
 	}
-	//从文件夹底下获取所有策略文件 用windowsAPI加载DLL
-	/*
-	if (_access("./Strategy", 0) != -1)
-	{
-		std::filebuf in;
-		if (!in.open("./Strategy/strategysetting.json", std::ios::in))
-		{
-			std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-			e->msg = "无法读取本地配置文件";
-			m_eventengine->Put(e);
-			return;
-		}
-		std::istream iss(&in);
-		std::istreambuf_iterator<char> eos;
-		std::string s(std::istreambuf_iterator<char>(iss), eos);
-		std::string err;
 
-		auto json = json11::Json::parse(s, err);
-		if (!err.empty()) {
-			in.close();
-			return;
-		}
-
-		json11::Json::array jsonarray = json.array_items();
-		for (int i = 0; i < jsonarray.size(); i++)
-		{
-			std::string strategy = "./Strategy/" + jsonarray[i]["strategy"].string_value();
-			std::vector<std::string>symbol_v;//临时存储配置文件交易的合约
-			json11::Json::array array_symbol = jsonarray[i]["symbol"].array_items();
-			for (int j = 0; j < array_symbol.size(); j++)
-			{
-				//将合约列表插入symbol_v中
-				symbol_v.push_back(array_symbol[j].string_value());
-			}
-			json11::Json::array array_ = jsonarray[i]["param"].array_items();
-			std::map<std::string, std::string>tmpparammap;
-			for (int j = 0; j < array_.size(); j++)
-			{
-				//遍历参数
-				json11::Json::object obj = array_[j].object_items();
-				for (json11::Json::object::iterator it = obj.begin(); it != obj.end(); it++)
-				{
-					auto t = it->first;//参数
-					auto tt = it->second;//值
-					tmpparammap.insert(std::pair<std::string, std::string>(t, tt.string_value()));
-				}
-				std::string symbol = "";//临时的symbol
-				for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
-				{
-					symbol += (*iter + ",");
-				}
-				tmpparammap.insert(std::pair<std::string, std::string>("symbol", symbol));
-			}
-			*/
 
 }
 //初始化
@@ -412,12 +412,12 @@ void CtaEngine::startStrategy(std::string name)
 		}
 		else if (temp->inited == false)
 		{
-			this->writeCtaLog("策略还没初始化你就想启动?", temp->gatewayname);
+			this->writeCtaLog("策略还没初始化");
 		}
 	}
 	else
 	{
-		this->writeCtaLog("策略实例不存在", "");
+		this->writeCtaLog("策略实例不存在");
 	}
 	m_strategymtx.unlock();
 }
@@ -478,7 +478,7 @@ void CtaEngine::startallStrategy()
 		}
 		else
 		{
-			this->writeCtaLog("策略未初始化", temp->gatewayname);
+			this->writeCtaLog("策略未初始化");
 		}
 	}
 	m_strategymtx.unlock();
@@ -493,16 +493,18 @@ void CtaEngine::stopallStrategy()
 		if (temp->trading == true)
 		{
 			temp->onStop();
-			//撤单
-			m_orderStrategymtx.lock();
-			for (std::map<std::string, StrategyTemplate*>::iterator it = m_orderStrategymap.begin(); it != m_orderStrategymap.end(); it++)
-			{
-				cancelOrder(it->first, it->second->gatewayname);
-			}
-			m_orderStrategymtx.unlock();
+
 		}
 	}
 	m_strategymtx.unlock();
+
+	//撤单
+	m_orderStrategymtx.lock();
+	for (std::map<std::string, StrategyTemplate*>::iterator it = m_orderStrategymap.begin(); it != m_orderStrategymap.end(); it++)
+	{
+		cancelOrder(it->first, "CTP");
+	}
+	m_orderStrategymtx.unlock();
 }
 
 /******************处理函数***************************/
@@ -579,24 +581,30 @@ void CtaEngine::processTradeEvent(std::shared_ptr<Event>e)
 
 	m_portfolio->calculate_memory(eTrade, m_orderStrategymap);//计算portfolio
 
+
+	//更新策略内部的pos数据
 	m_orderStrategymtx.lock();
 	if (m_orderStrategymap.find(eTrade->orderID) != m_orderStrategymap.end())
 	{
 		if (eTrade->direction == DIRECTION_LONG)
 		{
-			m_orderStrategymap[eTrade->orderID]->changeposmap(eTrade->symbol, m_orderStrategymap[eTrade->orderID]->getpos(eTrade->symbol) + eTrade->volume);
+			m_orderStrategymap[eTrade->orderID]->setPos( m_orderStrategymap[eTrade->orderID]->getpos() + eTrade->volume);
 		}
 		else
 		{
-			m_orderStrategymap[eTrade->orderID]->changeposmap(eTrade->symbol, m_orderStrategymap[eTrade->orderID]->getpos(eTrade->symbol) - eTrade->volume);
+			m_orderStrategymap[eTrade->orderID]->setPos( m_orderStrategymap[eTrade->orderID]->getpos() - eTrade->volume);
 		}
 		m_orderStrategymap[eTrade->orderID]->onTrade(eTrade);
 
-		savetraderecord(m_orderStrategymap[eTrade->orderID]->getparam("name"), eTrade);
+		//保存交易记录
+		savetraderecord(m_orderStrategymap[eTrade->orderID]->m_strategyName, eTrade);
+		//保存仓位信息到配置文件
+		m_orderStrategymap[eTrade->orderID]->sync_data();
 	}
 	m_orderStrategymtx.unlock();
+	
 
-	//更新持仓
+	//更新持仓m_symbolpositionbuffer
 	m_tickstrategymtx.lock();
 	if (m_tickstrategymap.find(eTrade->symbol) != m_tickstrategymap.end())
 	{
@@ -807,7 +815,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 			m_orderStrategymtx.lock();
 			m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 			m_orderStrategymtx.unlock();
-			writeCtaLog("策略" + Strategy->getparam("name") + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+			writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
 			std::vector<std::string>result;
 			result.push_back(orderID);
 			return result;
@@ -822,7 +830,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 				m_orderStrategymtx.lock();
 				m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 				m_orderStrategymtx.unlock();
-				writeCtaLog("策略" + Strategy->getparam("name") + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+				writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
 				std::vector<std::string>result;
 				result.push_back(orderID);
 				return result;
@@ -839,7 +847,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 					m_orderStrategymtx.lock();
 					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->getparam("name") + "发出委托(只平昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
 					std::vector<std::string>result;
 					result.push_back(orderID);
 					return result;
@@ -851,7 +859,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 					m_orderStrategymtx.lock();
 					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->getparam("name") + "发出委托(只平今)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平今)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
 					std::vector<std::string>result;
 					result.push_back(orderID);
 					return result;
@@ -874,7 +882,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 					m_orderStrategymtx.lock();
 					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->getparam("name") + "发出委托(平今和昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(平今和昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
 					result.push_back(orderID);
 					return result;
 				}
@@ -890,7 +898,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 			m_orderStrategymtx.lock();
 			m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 			m_orderStrategymtx.unlock();
-			writeCtaLog("策略" + Strategy->getparam("name") + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+			writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
 			std::vector<std::string>result;
 			result.push_back(orderID);
 			return result;
@@ -906,7 +914,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 				m_orderStrategymtx.lock();
 				m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 				m_orderStrategymtx.unlock();
-				writeCtaLog("策略" + Strategy->getparam("name") + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+				writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
 				std::vector<std::string>result;
 				result.push_back(orderID);
 				return result;
@@ -923,7 +931,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 					m_orderStrategymtx.lock();
 					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->getparam("name") + "发出委托(只平昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
 					std::vector<std::string>result;
 					result.push_back(orderID);
 					return result;
@@ -936,7 +944,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 					m_orderStrategymtx.lock();
 					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->getparam("name") + "发出委托(只平今)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平今)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
 					std::vector<std::string>result;
 					result.push_back(orderID);
 					return result;
@@ -960,7 +968,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 					m_orderStrategymtx.lock();
 					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->getparam("name") + "发出委托(平今和昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(平今和昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
 					result.push_back(orderID);
 					return result;
 				}

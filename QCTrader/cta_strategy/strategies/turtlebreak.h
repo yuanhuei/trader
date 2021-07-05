@@ -15,7 +15,7 @@
 class  turtlebreak : public StrategyTemplate
 {
 public:
-	turtlebreak(CtaEngine *ctamanager);
+	turtlebreak(CtaEngine *ctamanager, std::string strategyName, std::string symbol);
 	~turtlebreak();
 
 	void onInit();

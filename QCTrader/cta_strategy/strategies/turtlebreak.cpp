@@ -28,7 +28,7 @@ int ReleaseStrategy()//多品种要删除多次对象
 }
 */
 
-turtlebreak::turtlebreak(CtaEngine* ctamanager) :StrategyTemplate(ctamanager)
+turtlebreak::turtlebreak(CtaEngine* ctamanager, std::string strategyName, std::string symbol) :StrategyTemplate(ctamanager)
 {
 	//基本参数
 	m_ctamanager = ctamanager;

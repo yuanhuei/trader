@@ -1,16 +1,21 @@
 #include"StrategyTemplate.h"
 #include"CtaEngine.h"
 
-StrategyTemplate::StrategyTemplate(CtaEngine*ctaEngine)
+StrategyTemplate::StrategyTemplate(CtaEngine*ctaEngine,std::string strategyName, std::string symbol)
 {
 	m_ctaEngine = ctaEngine;
 	tickDbName = "";
 	BarDbName = "";
-	gatewayname = "";
+	gatewayname = "CTP";
 	inited = false;
 	trading = false;
 	TradingMode = RealMode;
 	unitLimit = 2;
+	m_Pos = 0;
+
+	m_strategyName = strategyName;
+	m_symbol = symbol;
+	//m_exchange= symbol_vt
 
 	m_strategydata = new StrategyData();
 	m_strategydata->insertvar("inited", Utils::booltostring(inited));
@@ -23,10 +28,21 @@ StrategyTemplate::StrategyTemplate(CtaEngine*ctaEngine)
 
 StrategyTemplate::~StrategyTemplate()
 {
+	sync_data();
 	delete m_strategydata;
 	delete m_MongoCxx;
 }
 
+void StrategyTemplate::sync_data()
+{
+	std::string strFileName = m_strategyName + "_" + m_symbol;
+	m_ctaEngine->WriteStrategyDataJson(m_strategydata->getallvar(), strFileName);
+}
+void StrategyTemplate::setPos(int pos)
+{
+	m_Pos = pos;
+	m_strategydata->setvar("pos", std::to_string(pos));//变量表中的pos也需要更新
+}
 void StrategyTemplate::changeposmap(std::string symbol, double pos)
 {
 	m_Pos_mapmtx.lock();
@@ -38,7 +54,7 @@ void StrategyTemplate::changeposmap(std::string symbol, double pos)
 void StrategyTemplate::onInit()
 {
 	//默认使用bar 需要使用tick自己修改
-	std::string strategyname = getparam("name");
+	std::string strategyname = m_strategyName;
 	m_ctaEngine->writeCtaLog("策略初始化" + strategyname, gatewayname);
 	std::vector<std::string>symbol_v = Utils::split(m_strategydata->getparam("symbol"), ",");
 	if (trademode == BAR_MODE)
@@ -91,7 +107,7 @@ void StrategyTemplate::onInit()
 //开始 
 void StrategyTemplate::onStart()
 {
-	std::string strategyname = getparam("name");
+	std::string strategyname = m_strategyName;
 	m_ctaEngine->writeCtaLog("策略开始" + strategyname, gatewayname);
 	trading = true;
 	putEvent();
@@ -99,11 +115,12 @@ void StrategyTemplate::onStart()
 //停止
 void StrategyTemplate::onStop()
 {
-	std::string strategyname = getparam("name");
+	std::string strategyname = m_strategyName;
 	m_ctaEngine->writeCtaLog("策略停止" + strategyname, gatewayname);
 	trading = false;
 	putEvent();
-	savepostomongo();
+	//savepostomongo();
+	sync_data();
 }
 //给参数赋值
 void StrategyTemplate::checkparam(const char* paramname, const char* paramvalue)
@@ -234,7 +251,7 @@ void StrategyTemplate::putEvent()
 	std::shared_ptr<Event_UpdateStrategy>e = std::make_shared<Event_UpdateStrategy>();
 	e->parammap = m_strategydata->getallparam();
 	e->varmap = m_strategydata->getallvar();
-	e->strategyname = m_strategydata->getparam("name");
+	e->strategyname = m_strategydata->m_strategyName;
 	m_ctaEngine->PutEvent(e);
 }
 
@@ -244,7 +261,7 @@ void StrategyTemplate::putGUI()
 	std::shared_ptr<Event_LoadStrategy>e = std::make_shared<Event_LoadStrategy>();
 	e->parammap = m_strategydata->getallparam();
 	e->varmap = m_strategydata->getallvar();
-	e->strategyname = m_strategydata->getparam("name");
+	e->strategyname = m_strategydata->m_strategyName;
 	m_ctaEngine->PutEvent(e);
 }
 
@@ -259,7 +276,7 @@ void StrategyTemplate::savepostomongo()
 	//需要update
 	bson_t *query;
 	bson_t *update;
-	query = BCON_NEW("strategyname", BCON_UTF8(m_strategydata->getparam("name").c_str()));
+	query = BCON_NEW("strategyname", BCON_UTF8(m_strategydata->m_strategyName.c_str()));
 	std::map<std::string, double>map = getposmap();
 	for (std::map<std::string, double>::iterator it = map.begin(); it != map.end(); it++)
 	{
@@ -276,7 +293,7 @@ void StrategyTemplate::loadposfrommongo()
 
 	bson_init(&query);
 
-	m_MongoCxx->append_utf8(&query, "strategyname", m_strategydata->getparam("name").c_str());
+	m_MongoCxx->append_utf8(&query, "strategyname", m_strategydata->m_strategyName.c_str());
 
 	result = m_MongoCxx->findData(&query, "StrategyPos", "pos");
 
@@ -304,6 +321,11 @@ void StrategyTemplate::loadposfrommongo()
 	}
 }
 
+int StrategyTemplate::getpos()
+{
+	return m_Pos;
+
+}
 double StrategyTemplate::getpos(std::string symbol)
 {
 	double position;

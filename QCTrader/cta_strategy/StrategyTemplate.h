@@ -33,14 +33,15 @@ public:
 	std::map<std::string, std::string>getallvar();							//获取所有
 private:
 	std::mutex m_mtx;					//变量锁
-	std::map<std::string, std::string>m_parammap;//参数列表
+	//下面两个表的值都是string格式，在写策略的时候一般参数是数值，所以需要自己做一下转换
+	std::map<std::string, std::string>m_parammap;//参数列表 
 	std::map<std::string, std::string>m_varmap;//变量列表
 };
 
 class StrategyTemplate
 {
 public:
-	StrategyTemplate(CtaEngine* ctaEngine);
+	StrategyTemplate(CtaEngine* ctaEngine,std::string strategyName,std::string symbol);
 	~StrategyTemplate();
 	/******************************策略参数和变量*********************************************/
 	//基本参数
@@ -48,10 +49,14 @@ public:
 	std::string tickDbName;					//tick数据库名
 	std::string BarDbName;					//Bar数据库名
 	//基础变量
+	std::string m_symbol;					//交易的合约
+	std::string m_exchange;						//合约交易所
+	std::string m_strategyName;             //策略名称
+
 	std::string trademode;					//交易模式
 	bool inited;							//初始化控制
 	bool trading;							//交易控制
-	int iPos;                                //仓位
+	int m_Pos;                                //仓位
 	int initDays;							//加载历史数据的天数
 
 	//算法交易部分变量						默认值，可以不修改在策略实例中调用setlimit函数来重新设置
@@ -69,6 +74,7 @@ public:
 	void cancelallorder();
 	//给参数赋值
 	void checkparam(const char* paramname, const char* paramvalue);
+	//更新参数和变量的值
 	void updateParam(const char* paramname, const char* paramvalue);
 	void updateVar(const char* paramname, const char* paramvalue);
 	//给pos赋值
@@ -80,7 +86,10 @@ public:
 	//更新参数到界面
 	virtual void putEvent();
 	//tradeevent更新持仓
+	void setPos(int pos);
 	void changeposmap(std::string symbol, double pos);
+
+	void sync_data();//将变量数据保存到json文件,一般在停止策略，交易单成功，退出时保存
 	/*******************************实现策略主要函数**************************************************/
 	//TICK
 	virtual void onTick(TickData Tick);
@@ -107,6 +116,7 @@ public:
 
 	//算法交易
 	double getpos(std::string symbol);							//给算法交易模块获取持仓外部接口
+	int getpos();
 	std::map<std::string, double>getposmap();					//获取全部持仓，给算法交易设置用
 
 	//提供给backtestengine的外部接口

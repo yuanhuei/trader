@@ -167,8 +167,10 @@ void CTAStrategyManager::initStrategy_clicked()
 	std::string strStrategyName = m_StrategyConf->data(index).toString().toStdString();
 	index = m_StrategyConf->index(row, 1);
 	std::string strSymbolName = m_StrategyConf->data(index).toString().toStdString();
+	index = m_StrategyConf->index(row, 2);
+	std::string strClassName = m_StrategyConf->data(index).toString().toStdString();
 
-	m_ctaEngine->initStrategy(strStrategyName + "__" + strSymbolName);//策略名加合约名确定一个策略实例对象
+	m_ctaEngine->initStrategy(strStrategyName + "__" + strSymbolName+"__"+ strClassName);//策略名加合约名加策略类名确定一个策略实例对象
 
 }
 
@@ -187,8 +189,10 @@ void CTAStrategyManager::startStrategy_cliced()
 	std::string strStrategyName = m_StrategyConf->data(index).toString().toStdString();
 	index = m_StrategyConf->index(row, 1);
 	std::string strSymbolName = m_StrategyConf->data(index).toString().toStdString();
+	index = m_StrategyConf->index(row, 2);
+	std::string strClassName = m_StrategyConf->data(index).toString().toStdString();
 
-	m_ctaEngine->startStrategy(strStrategyName + "__" + strSymbolName);
+	m_ctaEngine->startStrategy(strStrategyName + "__" + strSymbolName + "__" + strClassName);
 
 }
 //策略停止
@@ -200,8 +204,10 @@ void CTAStrategyManager::stopStragegy_clicked()
 	std::string strStrategyName = m_StrategyConf->data(index).toString().toStdString();
 	index = m_StrategyConf->index(row, 1);
 	std::string strSymbolName = m_StrategyConf->data(index).toString().toStdString();
+	index = m_StrategyConf->index(row, 2);
+	std::string strClassName = m_StrategyConf->data(index).toString().toStdString();
 
-	m_ctaEngine->stopStrategy(strStrategyName + "__" + strSymbolName);
+	m_ctaEngine->stopStrategy(strStrategyName + "__" + strSymbolName + "__" + strClassName);
 }
 //启动所有策略
 void CTAStrategyManager::startAllStrategy_clicked()
