@@ -78,8 +78,24 @@ void BarGenerator::updateTick(TickData* tickData)
         if(tickData->highPrice>m_lastTick->highPrice)
             m_Bar->high=std::max(m_Bar->high, tickData->highPrice);
 
+        m_Bar->low = std::min(m_Bar->low, tickData->lastprice);
+        if (tickData->lowPrice < m_lastTick->lowerLimit)
+            m_Bar->low = std::min(m_Bar->low, tickData->lowerLimit);
+
+        m_Bar->close = tickData->lastprice;
+        m_Bar->openInterest = tickData->openInterest;
 
     }
+
+    if (m_lastTick != NULL)
+    {
+        double volume_change = tickData->volume - m_lastTick->volume;
+        m_Bar->volume= m_Bar->volume+std::max(volume_change, 0.0);
+
+    }
+    else
+        m_lastTick = new TickData();
+    *m_lastTick = *tickData;
 
 }
 void BarGenerator::updateBar(BarData* barData)
