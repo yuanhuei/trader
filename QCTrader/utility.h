@@ -37,18 +37,19 @@ public:
 private:
 
     BarData*  m_Bar; //当前的一分钟bar
+    BarData* m_windowBar;//合成的x分钟的bar
     ON_FUNC m_onBar_Func;
     ON_FUNC m_onWindowBar_FUNC;
 
+    bool m_bWindowFinished = false;//barwindow 是否合成完成
     Interval m_interval;
     int interval_count = 0;
 
     int m_iWindow;
-    BarData m_windowBar;
     
 
     TickData* m_lastTick;
-    BarData* m_lastBar;
+    BarData* m_lastBar=NULL;
 public:
     void updateTick(TickData* tickData);
     void updateBar(BarData* barData);

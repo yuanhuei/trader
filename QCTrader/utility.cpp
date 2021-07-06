@@ -11,13 +11,19 @@ QString str2qstr_new(std::string str)
 
 BarGenerator::BarGenerator(ON_FUNC onBar_Func, int iWindow, ON_FUNC onWindowBar_FUNC, Interval iInterval)
 {
-
+    m_onBar_Func = onBar_Func;
+    m_onWindowBar_FUNC = onWindowBar_FUNC;
+    m_iWindow = iWindow;
+    m_interval = iInterval;
 
 
 }
 BarGenerator::~BarGenerator()
 {
-
+    delete m_Bar;
+    delete m_lastTick;
+    delete m_lastBar;
+    delete m_windowBar;
 
 }
 
@@ -47,21 +53,24 @@ void BarGenerator::updateTick(TickData* tickData)
     //这两种情况都需要新new 一个分钟bar
     if (m_Bar == NULL)
     {
+        m_Bar = new BarData();
         bNewMinute = true;
 
     }
     else if(barDateTime.date()!= tickDateTime.date()|| barDateTime.time().hour()!=tickDateTime.time().hour()||barDateTime.time().minute()!=tickDateTime.time().minute() )
 
     {
-        //日期，小时，分钟只要有一个不同，tick就属于不同的minute了，需要合成一个bar了
-        this->m_onBar_Func(m_Bar);
+        //日期，小时，分钟只要有一个不同，tick就属于不同的minute了，需要合成一个新bar了
+        //bar的时间,例如”13：30：09“，需要把秒写成0
+        QString time = QString::fromStdString(m_Bar->time);
+        m_Bar->time = (time.section(":", 0, 1)).toStdString() + ":00";
+        //走完一个bar,之后调用on_bar回调函数，再新建一个bar
+        m_onBar_Func(m_Bar);
         bNewMinute = true;
 
     }
     if (bNewMinute == true)
     {
-
-        m_Bar = new BarData();
         m_Bar->symbol = tickData->symbol;
         m_Bar->exchange = tickData->exchange;
         m_Bar->interval = MINUTE;
@@ -96,13 +105,62 @@ void BarGenerator::updateTick(TickData* tickData)
 
     }
     else//第一次来tick，需要new一个lastTick
+    {
         m_lastTick = new TickData();
+    }
     //把推送的tick复制为lastTick，下次会用
     *m_lastTick = *tickData;
 
 }
 void BarGenerator::updateBar(BarData* barData)
 {
+    //第一次开始合成windowbar或者刚合成完一次
+    if (m_windowBar == NULL || m_bWindowFinished==true)
+    {
+        m_windowBar = new BarData();
+        *m_windowBar = *barData;
+    }
+    else
+    {
+        m_windowBar->high = std::max(m_windowBar->high, barData->high);
+        m_windowBar->low = std::max(m_windowBar->low, barData->low);
 
+    }
+    m_windowBar->close =  barData->close;
+    m_windowBar->volume += barData->volume;
+    m_windowBar->openInterest = barData->openInterest;
 
+    //bool bFinished = false;
+    if (m_interval == MINUTE)
+    {
+        //获取分钟
+        QString time = QString::fromStdString(barData->time);
+        int iMinute=time.section(":", 1, 1).toInt();
+        //是否能被iWindow数字整除
+        float f = (iMinute+1) / m_iWindow;
+        if ((f - int(f)) == 0) 
+        {
+            m_bWindowFinished = true;
+        }//#商品期货的30分钟周期合成需要特别处理一下10：15到10：30的停牌    
+        else if((m_lastBar!=NULL && barData->time=="10:14:00")&&m_iWindow=30)
+        {
+            m_bWindowFinished = true;
+        }
+
+    }
+    else if (m_interval == HOUR)
+    {}
+    else if(m_interval == DAILY)
+    { }
+
+    if (m_bWindowFinished)
+    {
+        (*m_onWindowBar_FUNC)(m_windowBar);
+        //m_windowBar = NULL;
+
+    }
+    if (m_lastBar == NULL)
+        m_lastBar = new BarData();
+    *m_lastBar = *barData;
+    
 }

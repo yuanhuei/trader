@@ -443,7 +443,7 @@ void CtaEngine::stopStrategy(std::string name)
 	}
 	m_strategymtx.unlock();
 }
-
+//算法交易
 void CtaEngine::changesupposedpos(std::string strategyname, std::string symbol, double pos)
 {
 	std::unique_lock<std::mutex>lck(m_strategymtx);
@@ -745,6 +745,7 @@ void CtaEngine::showLog(std::shared_ptr<Event>e)
 	}
 }
 */
+//设置了定时器，非交易时间断开连接，交易时间自动连接
 void CtaEngine::autoConnect(std::shared_ptr<Event>e)
 {
 	auto nowtime2 = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
