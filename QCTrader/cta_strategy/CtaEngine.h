@@ -82,6 +82,10 @@ public:
 	void ReadStrategyConfFileJson();
 	void ReadStrategyDataJson();
 	void WriteStrategyDataJson(std::map<std::string, std::string>,std::string fileName);
+
+	//配置和变量参数配置文件读取后放到两个map中，两个map的key都是[StrategyName + "__" + vt_symbol + "__" + ClassName] 
+	std::map<std::string, std::map<std::string, float>> m_strategyConfigInfo_map;
+	std::map<std::string, std::map<std::string, float>> m_strategyData_map;
 private:
 	EventEngine* m_eventengine;
 	Gatewaymanager* m_gatewaymanager;
@@ -100,9 +104,7 @@ private:
 	//key 策略名+合约名, value 为策略指针    用来把界面选中的策略名 对应的的策略对象启动
 	std::map<std::string, StrategyTemplate*>m_strategymap;			std::mutex m_strategymtx;
 
-	//配置和变量参数配置文件读取后放到两个map中，两个map的key都是[StrategyName + "__" + vt_symbol + "__" + ClassName] 
-	std::map<std::string, std::map<std::string, float>> m_strategyConfigInfo_map;
-	std::map<std::string, std::map<std::string, float>> m_strategyData_map;
+
 
 	//处理函数
 	void procecssTickEvent(std::shared_ptr<Event>e);

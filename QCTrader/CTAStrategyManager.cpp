@@ -31,76 +31,11 @@ CTAStrategyManager::~CTAStrategyManager()
 {
 }
 
-void CTAStrategyManager::ReadStrategyConfFileJson()
-{
-	Json::Reader reader;
-	Json::Value root;
-
-	//从文件中读取，保证当前文件有demo.json文件  
-	std::ifstream in("./Strategy/cta_strategy_setting.json", std::ios::binary);
-
-	if (!in.is_open())
-	{
-		this->pushLogData("打开策略配置文件失败");
-		return;
-	}
-
-	if (reader.parse(in, root))
-	{
-		this->pushLogData("打开策略配置文件成功");
-		for (int i = 0; i < root.size(); i++)
-		{
-			//读取策略名称和合约名称
-
-			std::string StrategyName = root[i]["strategy_name"].asString();
-			std::string vt_symbol = root[i]["vt_symbol"].asString();
-			std::string ClassName = root[i]["vt_symbol"].asString();
-			if ((StrategyName.length() < 1|| vt_symbol.length())< 1 || ClassName.length() < 1)
-			{
-				this->pushLogData("配置文件策略信息不全");
-				return;
-			}
-
-			//读取策略配置信息 
-			std::map<std::string, float> settingMap;
-			Json::Value::Members members;
-			members = root[i]["setting"].getMemberNames();
-			//std::vector<std::string> settingKeys= root["setting"].getMemberNames();
-			for (Json::Value::Members::iterator iterMember = members.begin(); iterMember != members.end(); iterMember++)   // 遍历每个key
-			{
-				std::string strKey = *iterMember;
-				float fValue= root[i]["setting"][strKey.c_str()].asFloat();
-				/*
-				if (root[i]["setting"][strKey.c_str()].isString())
-				{
-					fValue = root[i]["setting"][strKey.c_str()].asString();
-				}
-				else
-					fValue = root[i]["setting"][strKey.c_str()].asFloat();
-				*/
-				//if(fValue.ist)
-				settingMap.insert({ strKey,  fValue});
-
-			}
-			//插入到策略配置map中
-			m_strategyConfigInfo_map[ StrategyName +"__"+vt_symbol + "__" + ClassName]=settingMap;
-		}
-
-	}
-	else
-	{
-		this->pushLogData("解析策略配置文件失败");
-	}
-
-	in.close();
-}
-
-
 
 void CTAStrategyManager::InitUI()
 {
 	//读取策略配置文件
-	ReadStrategyConfFileJson();
+	//ReadStrategyConfFileJson();
 
 
 
@@ -119,7 +54,7 @@ void CTAStrategyManager::InitUI()
 	//根据读取的策略文件内容，填入策略表
 	std::map<std::string, std::map<std::string, float>>::iterator it;
 	int i = 0;
-	for (it = m_strategyConfigInfo_map.begin(); it != m_strategyConfigInfo_map.end(); it++)
+	for (it = m_ctaEngine->m_strategyConfigInfo_map.begin(); it != m_ctaEngine->m_strategyConfigInfo_map.end(); it++)
 	{
 		QString strStrategy = QString::fromStdString(it->first).section("__",0,0);
 		QString strSymbol = QString::fromStdString(it->first).section("__", 1, 1);

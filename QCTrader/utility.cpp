@@ -23,18 +23,19 @@ BarGenerator::~BarGenerator()
 
 void BarGenerator::updateTick(TickData* tickData)
 {
-	bool bNewMinute = false;
-    QDateTime tickDateTime;
+	bool bNewMinute = false; //是否是新的一分钟
+    QDateTime tickDateTime; //转换为QDataTime主要是为了比较大小，早晚
     QDateTime lasttickDateTime;
     QDateTime barDateTime;
     if(m_Bar!=NULL)
+        //将std::string的时间转换为QDataTime
         barDateTime = QDateTime::fromString(QString::fromStdString(m_Bar->date + " " + m_Bar->time), "yyyy--mm--dd hh:mm:ss");
 
-   // Filter tick data with 0 last price
+   // Filter tick data with 0 last price过滤垃圾tick
     if (tickData->lastprice==0)
         return;
     
-    // Filter tick data with older timestamp
+    // Filter tick data with older timestamp过滤垃圾tick
     if (m_lastTick != NULL)
     {
         tickDateTime = QDateTime::fromString(QString::fromStdString(tickData->date + " " + tickData->time), "yyyy--mm--dd hh:mm:ss");
@@ -42,7 +43,8 @@ void BarGenerator::updateTick(TickData* tickData)
         if(tickDateTime< lasttickDateTime) //新来的tick的时间要比上一个tick时间早，过滤掉
             return;
     }
-         
+    //给bNewMinute赋值 true，分两种情况，一种是新的tick和当前的一分种bar时间不在一个分钟里面，还有就是当前一分钟bar还没有生成
+    //这两种情况都需要新new 一个分钟bar
     if (m_Bar == NULL)
     {
         bNewMinute = true;
@@ -72,7 +74,7 @@ void BarGenerator::updateTick(TickData* tickData)
         m_Bar->openInterest = tickData->openInterest;
      
     }
-    else
+    else//不是新的bar，只需要更新高低点，持仓量
     {
         m_Bar->high =std::max(m_Bar->high, tickData->lastprice);
         if(tickData->highPrice>m_lastTick->highPrice)
@@ -93,8 +95,9 @@ void BarGenerator::updateTick(TickData* tickData)
         m_Bar->volume= m_Bar->volume+std::max(volume_change, 0.0);
 
     }
-    else
+    else//第一次来tick，需要new一个lastTick
         m_lastTick = new TickData();
+    //把推送的tick复制为lastTick，下次会用
     *m_lastTick = *tickData;
 
 }

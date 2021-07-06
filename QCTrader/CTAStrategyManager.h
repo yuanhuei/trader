@@ -14,7 +14,6 @@ public:
 	~CTAStrategyManager();
 private:
 	void InitUI();
-	void ReadStrategyConfFileJson();
 	//void pushLogToCTAStrategyWindow(std::string msg);
 	void UpdateLogTable(LogData data);
 	void pushLogData(std::string msg);
@@ -22,7 +21,7 @@ private:
 private:
 	Ui::CTAStrategyManager ui;
 	MainWindow* m_mainwindow;
-	std::map<std::string, std::map<std::string, float>> m_strategyConfigInfo_map;
+	//std::map<std::string, std::map<std::string, float>>* m_strategyConfigInfo_map;
 
 	QStandardItemModel* m_StrategyConf;
 	CtaEngine* m_ctaEngine;

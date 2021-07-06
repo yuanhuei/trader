@@ -640,7 +640,7 @@ void MainWindow::menu_CTAStrategy()
 {
 	if(m_ctaStrategyDailog==NULL)
 		CTAStrategyManager* m_ctaStrategyDailog = new CTAStrategyManager(this);
-	ctaStrategyDailog->show();
+	m_ctaStrategyDailog->show();
 }
 void MainWindow::menu_CTABacktest()
 {

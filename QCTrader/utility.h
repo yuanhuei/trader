@@ -36,7 +36,7 @@ public:
 
 private:
 
-    BarData*  m_Bar;
+    BarData*  m_Bar; //当前的一分钟bar
     ON_FUNC m_onBar_Func;
     ON_FUNC m_onWindowBar_FUNC;
 

@@ -57,7 +57,7 @@ CtaEngine::~CtaEngine()
 	}*/
 	delete m_portfolio;
 }
-/******************外部调用***************************/
+//读取策略配置文件
 void CtaEngine::ReadStrategyConfFileJson()
 {
 	Json::Reader reader;
@@ -228,8 +228,9 @@ void CtaEngine::loadStrategy()
 		return;
 
 	}
-	else//根据策略配置文件生成策略集,加载策略配置和策略数据
+	else//根据策略配置文件生成策略集,加载策略配置和策略变量
 	{
+		std::set<std::string> symbolSet;//把策略中所关联的合约都放到一个set里面，后面会统一订阅合约
 		std::map<std::string, std::map<std::string, float>>::iterator it;
 		for (it = m_strategyConfigInfo_map.begin(); it != m_strategyConfigInfo_map.end(); it++)
 		{
@@ -241,6 +242,7 @@ void CtaEngine::loadStrategy()
 			std::string strClassName = strClassname.toStdString();
 			std::map<std::string, float>settingMap = it->second;
 
+			symbolSet.insert(strSymbolName);
 			//生成策略
 			StrategyTemplate* strategy_ptr;
 			HINSTANCE his;
@@ -268,7 +270,7 @@ void CtaEngine::loadStrategy()
 					return;
 				}
 				strategy_ptr = dll(this);
-				std::string strName= strStrategyName + "__" + strSymbolName;
+				std::string strName = strStrategyName + "__" + strSymbolName;
 				dllmap.insert(std::pair<std::string, HINSTANCE>(strName, his));
 
 			}
@@ -278,7 +280,7 @@ void CtaEngine::loadStrategy()
 					strategy_ptr = new turtlebreak(this, strStrategyName, strSymbolName);
 				else
 				{
-					this->writeCtaLog("没有策略被创建");
+					this->writeCtaLog("没有相关的策略提供");
 					return;
 				}
 
@@ -316,7 +318,7 @@ void CtaEngine::loadStrategy()
 			{
 				strategy_ptr->checkSymbol((*iter).c_str());
 			}
-			
+
 			if (strategy_ptr->getparam("name") == "Null")
 			{
 				this->writeCtaLog("策略中有一个没有给策略起名！", strategy_ptr->gatewayname);
@@ -325,7 +327,7 @@ void CtaEngine::loadStrategy()
 			{*/
 			//strategy_ptr->putEvent();
 			//strategy_ptr->putGUI();
-			
+
 			m_tickstrategymtx.lock();
 			//for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
 			//{
@@ -343,16 +345,20 @@ void CtaEngine::loadStrategy()
 			}
 			//}
 			m_tickstrategymtx.unlock();
-			//插入策略m_strategymap,   key是策略名+合约名，值是之前new出来的 指向策略对象的指针
+			//插入策略m_strategymap,   key是策略名+合约名+类名，值是之前new出来的 指向策略对象的指针
 			//
-			std::string strName = strStrategyName + "__" + strSymbolName;
+			std::string strName = strStrategyName + "__" + strSymbolName+"__"+ strClassName;
 			//m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strategy_ptr->getparam("name"), strategy_ptr));//策略名和策略
-			m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strName, strategy_ptr));//策略名和策略
-
+			
+			//生成策略集
+			m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strName, strategy_ptr));
+		}
 
 			//订阅合约
-			//for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
-			//{
+		std::set<std::string>::iterator iter;
+		for (iter=symbolSet.begin();iter!=symbolSet.end();iter++)
+		{
+			std::string strSymbolName = *iter;
 			std::shared_ptr<Event_Contract>contract = m_gatewaymanager->getContract(strSymbolName);
 			SubscribeReq req;
 			req.symbol = contract->symbol;
@@ -364,11 +370,7 @@ void CtaEngine::loadStrategy()
 				req.productClass = strategy_ptr->getparam("productClass");
 			}*/
 			m_gatewaymanager->subscribe(req, "CTP");// strategy_ptr->getparam("gatewayname"));
-			//}
-
-
 		}
-
 
 	}
 
