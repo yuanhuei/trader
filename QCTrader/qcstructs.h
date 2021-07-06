@@ -264,6 +264,7 @@ public:
 
 	double volume = 0;
 	double openInterest = 0;
+	Interval interval; //表示是分钟，小时，还是天
 };
 
 class DailyBar :public BaseData

@@ -53,7 +53,7 @@ public:
 	std::string m_exchange;						//合约交易所
 	std::string m_strategyName;             //策略名称
 
-	std::string trademode;					//交易模式
+	std::string trademode;					//交易模式bar或者tick两种
 	bool inited;							//初始化控制
 	bool trading;							//交易控制
 	int m_Pos;                                //仓位
@@ -113,10 +113,12 @@ public:
 
 	//撤单函数
 	void cancelOrder(std::string orderID, std::string gatewayname);
+	//获取m_Pos
+	int getpos();
 
 	//算法交易
 	double getpos(std::string symbol);							//给算法交易模块获取持仓外部接口
-	int getpos();
+	
 	std::map<std::string, double>getposmap();					//获取全部持仓，给算法交易设置用
 
 	//提供给backtestengine的外部接口
@@ -131,7 +133,7 @@ protected:
 	std::vector<TickData>loadTick(std::string symbol, int days);
 	std::vector<BarData>loadBar(std::string symbol, int days);
 
-	//利用mongocxx模板保存和读取mongodb
+	//利用mongocxx模板保存和读取mongodb，已经没使用了，使用json文件保存变量
 	virtual void savepostomongo();
 	virtual void loadposfrommongo();
 	MongoCxx *m_MongoCxx;
@@ -148,7 +150,7 @@ protected:
 	//两个参数列表
 	StrategyData *m_strategydata;
 
-	/**********************************_(:з」∠)_回测专用神器***********************************************/
+	/**********************************_(:з」∠)_回测用***********************************************/
 	std::map<std::string, std::string>m_VarPlot;	std::map<std::string, std::string>m_indicatorPlot;			std::mutex m_VarPlotmtx;
 private:
 	//总报单开平函数公用
