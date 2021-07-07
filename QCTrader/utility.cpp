@@ -1,4 +1,4 @@
-#include<utility.h>
+#include"utility.h"
 
 //#include<qstring.h>
 #include<qdatetime.h>
@@ -8,6 +8,91 @@ QString str2qstr_new(std::string str)
 	return QString::fromLocal8Bit(str.c_str());
 }
 
+ArrayManager::ArrayManager(int iSize)
+{
+    m_iSize = iSize;
+    m_iInit = false;
+    m_iCount = 0;
+
+    openprice_array.resize(m_iSize);
+    closeprice_array.resize(m_iSize);
+    highprice_array.resize(m_iSize);
+    lowprice_array.resize(m_iSize);
+    volume_array.resize(m_iSize);
+    openinterest_array.resize(m_iSize);
+
+}
+
+ArrayManager::~ArrayManager()
+{
+
+}
+
+void ArrayManager::update_bar(BarData barData)
+{
+    //没有填满，就直接填入一个
+    if (!m_iInit)
+    {
+        openprice_array[m_iCount] = barData.open;
+        closeprice_array[m_iCount] = barData.close;
+        highprice_array[m_iCount] = barData.high;
+        lowprice_array[m_iCount] = barData.low;
+        volume_array[m_iCount] = barData.volume;
+        openinterest_array[m_iCount] = barData.openInterest;
+    }
+    else//已经填满了，初始化完成了，也就是m_iCount计数等于了m_iSize,新加入bar需要删除第0个元素，整体向前移位一个
+    {
+        for (int i = 0; i < m_iSize-1; i++)
+        {
+            openprice_array[i] = openprice_array[i + 1];
+            closeprice_array[i] = closeprice_array[i + 1];
+            highprice_array[i] = highprice_array[i + 1];
+            lowprice_array[i] = lowprice_array[i + 1];
+            volume_array[i] = volume_array[i + 1];
+            openinterest_array[i] = openinterest_array[i + 1];
+        }
+
+        openprice_array[m_iSize - 1] = barData.open;
+        closeprice_array[m_iSize - 1] = barData.close;
+        highprice_array[m_iSize - 1] = barData.high;
+        lowprice_array[m_iSize - 1] = barData.low;
+        volume_array[m_iSize - 1] = barData.volume;
+        openinterest_array[m_iSize - 1] = barData.openInterest;
+    }
+    m_iCount++;
+    //没有完成初始化，只需要填入就可以了
+    if (m_iCount >=m_iSize)
+        m_iInit = true;
+   
+
+}
+
+std::vector<float>* ArrayManager::Get_openprice_array()
+{
+    return &openprice_array;
+}
+std::vector<float>* ArrayManager::Get_closeprice_array()
+{
+    return &closeprice_array;
+}
+std::vector<float>* ArrayManager::Get_highprice_array()
+{
+    return &highprice_array;
+}
+std::vector<float>* ArrayManager::Get_lowprice_array()
+{
+    return &lowprice_array;
+}
+std::vector<float>* ArrayManager::Get_volume_array()
+{
+    return &volume_array;
+}
+std::vector<float>* ArrayManager::Get_openinterest_array()
+{
+    return &openinterest_array;
+}
+
+
 
 BarGenerator::BarGenerator(ON_FUNC onBar_Func, int iWindow, ON_FUNC onWindowBar_FUNC, Interval iInterval)
 {
@@ -15,6 +100,10 @@ BarGenerator::BarGenerator(ON_FUNC onBar_Func, int iWindow, ON_FUNC onWindowBar_
     m_onWindowBar_FUNC = onWindowBar_FUNC;
     m_iWindow = iWindow;
     m_interval = iInterval;
+    m_Bar = NULL;
+    m_lastTick = NULL;
+    m_lastBar = NULL;
+    m_windowBar = NULL;
 
 
 }
@@ -114,21 +203,26 @@ void BarGenerator::updateTick(TickData* tickData)
 }
 void BarGenerator::updateBar(BarData* barData)
 {
-    //第一次开始合成windowbar或者刚合成完一次
-    if (m_windowBar == NULL || m_bWindowFinished==true)
+    //第一次开始合成windowbar或者刚合成完一次,这次是新的windowbar
+    if (m_windowBar == NULL )
     {
         m_windowBar = new BarData();
         *m_windowBar = *barData;
     }
-    else
+    if(m_bWindowFinished )//新的一根windowbar，数据完全赋值barData,
     {
-        m_windowBar->high = std::max(m_windowBar->high, barData->high);
+        *m_windowBar = *barData;
+    }
+    else//不是一根新的windowbar，需要更新最高最低价，收盘价，开盘价不更新
+    {
         m_windowBar->low = std::max(m_windowBar->low, barData->low);
+        m_windowBar->high = std::max(m_windowBar->high, barData->high);
+        m_windowBar->close = barData->close;
+        m_windowBar->volume += barData->volume;
+        m_windowBar->openInterest = barData->openInterest;
+
 
     }
-    m_windowBar->close =  barData->close;
-    m_windowBar->volume += barData->volume;
-    m_windowBar->openInterest = barData->openInterest;
 
     //bool bFinished = false;
     if (m_interval == MINUTE)
@@ -142,16 +236,17 @@ void BarGenerator::updateBar(BarData* barData)
         {
             m_bWindowFinished = true;
         }//#商品期货的30分钟周期合成需要特别处理一下10：15到10：30的停牌    
-        else if((m_lastBar!=NULL && barData->time=="10:14:00")&&m_iWindow=30)
+        else if((m_lastBar!=NULL && barData->time=="10:14:00")&&m_iWindow==30)
         {
             m_bWindowFinished = true;
         }
 
     }
     else if (m_interval == HOUR)
-    {}
+    {//待写
+    }
     else if(m_interval == DAILY)
-    { }
+    {//待写}
 
     if (m_bWindowFinished)
     {
@@ -164,3 +259,4 @@ void BarGenerator::updateBar(BarData* barData)
     *m_lastBar = *barData;
     
 }
+

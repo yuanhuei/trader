@@ -35,6 +35,15 @@
 #define STATUS_CANCELLED "ordercanceld"
 #define STATUS_WAITING "orderwaiting"
 
+typedef enum
+{
+	MINUTE = 0,
+	HOUR = 1,
+	DAILY = 2,
+	WEEKLY = 3,
+	TICK = 4
+}Interval;
+
 enum Mode
 {
 	RealMode = 0,

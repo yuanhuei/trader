@@ -6,17 +6,47 @@
 #include<QString>
 #include"qcstructs.h"
 
+
 QString str2qstr_new(std::string str);
 typedef void(*ON_FUNC)(BarData*);
 
-typedef enum 
+
+
+class ArrayManager
 {
-    MINUTE=0,
-    HOUR=1,
-    DAILY=2,
-    WEEKLY=3 ,
-    TICK=4 
-}Interval;
+    /*
+    For:
+    1. time series container of bar data
+    2. calculating technical indicator value
+    */
+public:
+    ArrayManager(int iSize);
+    ~ArrayManager();
+    void update_bar(BarData barData);
+
+    std::vector<float>* Get_openprice_array();
+    std::vector<float>* Get_closeprice_array();
+    std::vector<float>* Get_highprice_array();
+    std::vector<float>* Get_lowprice_array();
+    std::vector<float>* Get_volume_array();
+    std::vector<float>* Get_openinterest_array();
+
+
+
+public:
+    int m_iSize;
+    int m_iCount;
+    bool m_iInit;
+
+    std::vector<float> openprice_array;
+    std::vector<float> closeprice_array;
+    std::vector<float> highprice_array;
+    std::vector<float> lowprice_array;
+    std::vector<float> volume_array;
+    std::vector<float> openinterest_array;
+
+
+};
 
 class BarGenerator
 {
