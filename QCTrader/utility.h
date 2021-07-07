@@ -31,6 +31,7 @@ public:
     std::vector<float>* Get_volume_array();
     std::vector<float>* Get_openinterest_array();
 
+    float ema(int n);
 
 
 public:

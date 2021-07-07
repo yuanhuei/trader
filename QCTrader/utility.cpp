@@ -2,6 +2,7 @@
 
 //#include<qstring.h>
 #include<qdatetime.h>
+#include"talib.h"
 
 QString str2qstr_new(std::string str)
 {
@@ -92,6 +93,29 @@ std::vector<float>* ArrayManager::Get_openinterest_array()
     return &openinterest_array;
 }
 
+float ArrayManager::ema(int n)
+{
+    float fEma;
+
+    int    startIdx=0;
+    int    endIdx=m_iSize-1;
+    double inReal[100];
+    int           optInTimePeriod; /* From 2 to 100000 */
+    int outBegIdx;
+    int outNBElement;
+    double        outReal[100];
+     
+    for (int i = 0; i < m_iSize; i++)
+    {
+        inReal[i] = openprice_array[i];
+    }
+
+    int iReturn=TA_EMA(startIdx, endIdx, inReal, n, &outBegIdx, &outNBElement, outReal);
+    //if(iReturn!=0)
+    //    print("Ê§°Ü");
+    fEma = outReal[m_iSize-n]; //´ý¶¨
+    return fEma;
+}
 
 
 BarGenerator::BarGenerator(ON_FUNC onBar_Func, int iWindow, ON_FUNC onWindowBar_FUNC, Interval iInterval)
