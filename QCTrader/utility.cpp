@@ -198,13 +198,13 @@ void BarGenerator::updateTick(TickData* tickData)
     }
     else//不是新的bar，只需要更新高低点，持仓量
     {
-        m_Bar->high =std::max(m_Bar->high, tickData->lastprice);
-        if(tickData->highPrice>m_lastTick->highPrice)
-            m_Bar->high=std::max(m_Bar->high, tickData->highPrice);
+        m_Bar->high =std::max(m_Bar->high, tickData->highPrice);
+       // if(tickData->highPrice>m_lastTick->highPrice)
+       //     m_Bar->high=std::max(m_Bar->high, tickData->highPrice);
 
-        m_Bar->low = std::min(m_Bar->low, tickData->lastprice);
-        if (tickData->lowPrice < m_lastTick->lowerLimit)
-            m_Bar->low = std::min(m_Bar->low, tickData->lowerLimit);
+        m_Bar->low = std::min(m_Bar->low, tickData->lowPrice);
+        //if (tickData->lowPrice < m_lastTick->lowPrice)
+        //    m_Bar->low = std::min(m_Bar->low, tickData->lowPrice);
 
         m_Bar->close = tickData->lastprice;
         m_Bar->openInterest = tickData->openInterest;

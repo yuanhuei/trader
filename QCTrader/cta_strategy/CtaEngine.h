@@ -24,6 +24,10 @@
 #define CTAORDER_SELL "ctaordersell"
 #define CTAORDER_SHORT "ctaordershort"
 #define CTAORDER_COVER "ctaordercover"
+
+#define DATABASE_NAME "test"
+#define TICKCOLLECTION_NAME "db_tick_data"
+#define  BARCOLLECTION_NAME  "db_bar_data"
 //class EventEngine;
 //class Gatewaymanager;
 //class riskmanager;
@@ -62,8 +66,8 @@ public:
 	void cancelOrder(std::string orderID, std::string gatewayname);
 	void writeCtaLog(std::string msg, std::string gatewayname);
 	void PutEvent(std::shared_ptr<Event>e);
-	std::vector<TickData> loadTick(std::string tickDbName, std::string symbol, int days);
-	std::vector<BarData> loadBar(std::string BarDbName, std::string symbol, int days);
+	std::vector<TickData> loadTick(std::string symbol, int days);
+	std::vector<BarData> loadBar(std::string symbol, int days);
 
 
 	//主程序调用所需函数

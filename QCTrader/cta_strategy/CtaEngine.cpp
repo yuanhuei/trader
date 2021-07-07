@@ -1044,15 +1044,15 @@ void CtaEngine::savetraderecord(std::string strategyname, std::shared_ptr<Event_
 	}
 }
 
-std::vector<TickData> CtaEngine::loadTick(std::string tickDbName, std::string symbol, int days)
+std::vector<TickData> CtaEngine::loadTick( std::string symbol, int days)
 {
 	std::vector<TickData>datavector;
 	if (symbol == " " || symbol == "")
 	{
 		return datavector;
 	}
-	const char* databasename = tickDbName.c_str();
-	const char* collectionsname = symbol.c_str();
+	const char* databasename = DATABASE_NAME;
+	const char* collectionsname = TICKCOLLECTION_NAME;
 	auto targetday = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) - (days * 24 * 3600);//获取当前的系统时间
 
 
@@ -1068,6 +1068,8 @@ std::vector<TickData> CtaEngine::loadTick(std::string tickDbName, std::string sy
 	bson_t child;
 	mongoc_collection_t* collection;
 	bson_init(&parent);
+	//查询bson
+	BSON_APPEND_UTF8(&parent, "symbol", symbol.c_str());
 	BSON_APPEND_DOCUMENT_BEGIN(&parent, "datetime", &child);
 	BSON_APPEND_TIME_T(&child, "$gt", targetday);
 	bson_append_document_end(&parent, &child);
@@ -1076,7 +1078,7 @@ std::vector<TickData> CtaEngine::loadTick(std::string tickDbName, std::string sy
 	char* str = bson_as_json(&parent, NULL);
 	//	printf("\n%s\n", str);
 
-	collection = mongoc_client_get_collection(client, tickDbName.c_str(), symbol.c_str());
+	collection = mongoc_client_get_collection(client, DATABASE_NAME, symbol.c_str());
 
 	cursor = mongoc_collection_find(collection, MONGOC_QUERY_NONE, 0, 0, 0, &parent, NULL, NULL);
 
@@ -1154,15 +1156,15 @@ std::vector<TickData> CtaEngine::loadTick(std::string tickDbName, std::string sy
 	mongoc_client_pool_push(m_pool, client);																						//放回一个mongo连接
 	return datavector;
 }
-std::vector<BarData> CtaEngine::loadBar(std::string BarDbName, std::string symbol, int days)
+std::vector<BarData> CtaEngine::loadBar( std::string symbol, int days)
 {
 	std::vector<BarData>datavector;
 	if (symbol == " " || symbol == "")
 	{
 		return datavector;
 	}
-	const char* databasename = BarDbName.c_str();
-	const char* collectionsname = symbol.c_str();
+	const char* databasename = DATABASE_NAME;
+	const char* collectionsname = BARCOLLECTION_NAME;
 	auto targetday = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) - (days * 24 * 3600);//获取当前的系统时间
 
 	mongoc_cursor_t* cursor;
@@ -1174,8 +1176,10 @@ std::vector<BarData> CtaEngine::loadBar(std::string BarDbName, std::string symbo
 	bson_t child;
 	mongoc_collection_t* collection;
 	bson_init(&parent);
+	//查询bson
+	BSON_APPEND_UTF8(&parent, "symbol", symbol.c_str());
 	BSON_APPEND_DOCUMENT_BEGIN(&parent, "datetime", &child);
-	BSON_APPEND_TIME_T(&child, "$gt", targetday);
+	BSON_APPEND_TIME_T(&child, "$gt", targetday);//$gt大于某个时间，"$lt"小于某个时间
 	bson_append_document_end(&parent, &child);
 
 
@@ -1185,7 +1189,7 @@ std::vector<BarData> CtaEngine::loadBar(std::string BarDbName, std::string symbo
 	// 从客户端池中获取一个客户端
 	mongoc_client_t* client = mongoc_client_pool_pop(m_pool);																				//取一个mongo连接
 
-	collection = mongoc_client_get_collection(client, BarDbName.c_str(), symbol.c_str());
+	collection = mongoc_client_get_collection(client, DATABASE_NAME, symbol.c_str());
 
 	cursor = mongoc_collection_find(collection, MONGOC_QUERY_NONE, 0, 0, 0, &parent, NULL, NULL);
 
