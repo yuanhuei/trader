@@ -115,6 +115,9 @@
     <ClCompile Include="cta_strategy\strategies\turtlebreak.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cta_strategy\strategies\BollChannelStrategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="event_engine\eventengine.h">
@@ -178,6 +181,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cta_strategy\strategies\turtlebreak.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cta_strategy\strategies\BollChannelStrategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -288,14 +288,14 @@ void CtaEngine::loadStrategy()
 
 
 
-			//赋值参数,策略中必须生成strategeData,里面包含了配置参数和变量参数，下面是根据配置文件更新。
+			//赋值参数给策略中的strategeData,策略中必须生成strategeData,里面包含了配置参数和变量参数，下面是根据配置文件更新。
 			for (std::map<std::string, float>::iterator it = settingMap.begin(); it != settingMap.end(); it++)
 			{
 				//遍历parameter
 				std::string value = std::to_string(it->second);
 				strategy_ptr->updateParam(it->first.c_str(), value.c_str());
 			}
-			//赋值变量
+			//赋值变量给策略中的strategeData
 			for (std::map<std::string, std::map<std::string, float>>::iterator it = m_strategyData_map.begin(); it != m_strategyData_map.end(); it++)
 			{
 				std::string str = it->first;
@@ -311,6 +311,9 @@ void CtaEngine::loadStrategy()
 				}
 
 			}
+			//把读取到的配置和变量值通过strategeData更新到策略的变量上去
+			strategy_ptr->updateSetting();
+
 			//插入pos_map
 			//strategy_ptr->checkSymbol(strSymbolName.c_str());
 			/*

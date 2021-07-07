@@ -99,6 +99,7 @@
     <ClCompile Include="ClickTableView.cpp" />
     <ClCompile Include="CTAStrategyManager.cpp" />
     <ClCompile Include="cta_strategy\CtaEngine.cpp" />
+    <ClCompile Include="cta_strategy\strategies\BollChannelStrategy.cpp" />
     <ClCompile Include="cta_strategy\strategies\turtlebreak.cpp" />
     <ClCompile Include="CTPConnectWidgets.cpp" />
     <ClCompile Include="gateway\ctp_gateway\ctpgateway.cpp" />
@@ -132,6 +133,7 @@
     <QtMoc Include="MainWindow.h" />
     <QtMoc Include="CTAStrategyManager.h" />
     <ClInclude Include="cta_strategy\CtaEngine.h" />
+    <ClInclude Include="cta_strategy\strategies\BollChannelStrategy.h" />
     <ClInclude Include="cta_strategy\strategies\turtlebreak.h" />
     <ClInclude Include="Debug\uic\ui_CTAStrategyManager.h" />
     <ClInclude Include="Debug\uic\ui_MainWindow.h" />

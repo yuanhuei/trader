@@ -42,12 +42,10 @@ class StrategyTemplate
 {
 public:
 	StrategyTemplate(CtaEngine* ctaEngine,std::string strategyName,std::string symbol);
-	~StrategyTemplate();
+	virtual ~StrategyTemplate();
 	/******************************策略参数和变量*********************************************/
 	//基本参数
 	std::string gatewayname;				//CTP
-	std::string tickDbName;					//tick数据库名
-	std::string BarDbName;					//Bar数据库名
 	//基础变量
 	std::string m_symbol;					//交易的合约
 	std::string m_exchange;						//合约交易所
@@ -72,8 +70,14 @@ public:
 	virtual void onStop();
 	//撤所有单，停止策略时使用
 	void cancelallorder();
+
+	//需要具体的策略函数实现，将配置文件中取得的值赋值给策略中具体的变量
+	virtual void updateSetting();
+
+
 	//给参数赋值
 	void checkparam(const char* paramname, const char* paramvalue);
+
 	//更新参数和变量的值
 	void updateParam(const char* paramname, const char* paramvalue);
 	void updateVar(const char* paramname, const char* paramvalue);
@@ -128,7 +132,7 @@ public:
 
 	//算法交易
 	algorithmOrder *m_algorithm;
-protected:
+public:
 	//读取历史数据
 	std::vector<TickData>loadTick(std::string symbol, int days);
 	std::vector<BarData>loadBar(std::string symbol, int days);

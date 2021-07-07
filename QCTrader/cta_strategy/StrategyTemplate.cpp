@@ -6,8 +6,6 @@
 StrategyTemplate::StrategyTemplate(CtaEngine*ctaEngine,std::string strategyName, std::string symbol)
 {
 	m_ctaEngine = ctaEngine;
-	tickDbName = "";
-	BarDbName = "";
 	gatewayname = "CTP";
 	inited = false;
 	trading = false;
@@ -34,7 +32,8 @@ StrategyTemplate::~StrategyTemplate()
 	delete m_strategydata;
 	delete m_MongoCxx;
 }
-
+void StrategyTemplate::updateSetting()
+{}
 void StrategyTemplate::sync_data()
 {
 	std::string strFileName = m_strategyName + "_" + m_symbol;
@@ -55,12 +54,16 @@ void StrategyTemplate::changeposmap(std::string symbol, double pos)
 //初始化
 void StrategyTemplate::onInit()
 {
-	//配置表和变量表中的值都是字符串，需要改为数字，并给变量赋值，需要在自己写的策略的onInit()里面写一下，这里改仓位的
-	m_Pos = std::stoi(m_strategydata->getvar("pos"));
 
 	//默认使用bar 需要使用tick自己修改
 	std::string strategyname = m_strategyName;
 	m_ctaEngine->writeCtaLog("策略初始化" + strategyname, gatewayname);
+	std::vector<BarData>datalist = loadBar(m_symbol, initDays);
+	for (std::vector<BarData>::iterator it = datalist.begin(); it != datalist.end(); it++)
+	{
+		onBar(*it);
+	}
+	/*
 	std::vector<std::string>symbol_v = Utils::split(m_strategydata->getparam("symbol"), ",");
 	if (trademode == BAR_MODE)
 	{
@@ -106,8 +109,10 @@ void StrategyTemplate::onInit()
 	{
 		m_algorithm->set_supposedPos(iter->first, iter->second);
 	}
+
+	*/
 	inited = true;
-	putEvent();
+	//putEvent();
 }
 //开始 
 void StrategyTemplate::onStart()
@@ -227,11 +232,11 @@ void StrategyTemplate::cancelOrder(std::string orderID, std::string gatewayname)
 //读取历史数据
 std::vector<TickData>StrategyTemplate::loadTick(std::string symbol, int days)
 {
-	return m_ctaEngine->loadTick(BarDbName, symbol, days);
+	return m_ctaEngine->loadTick(symbol, days);
 }
 std::vector<BarData>StrategyTemplate::loadBar(std::string symbol, int days)
 {
-	return m_ctaEngine->loadBar(BarDbName, symbol, days);
+	return m_ctaEngine->loadBar( symbol, days);
 }
 
 //获取参数的值

@@ -8,7 +8,7 @@
 
 
 QString str2qstr_new(std::string str);
-typedef void(*ON_FUNC)(BarData*);
+typedef void(*ON_FUNC)(BarData);
 
 
 
@@ -20,7 +20,7 @@ class ArrayManager
     2. calculating technical indicator value
     */
 public:
-    ArrayManager(int iSize);
+    ArrayManager(int iSize=100);
     ~ArrayManager();
     void update_bar(BarData barData);
 

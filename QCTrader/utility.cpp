@@ -9,7 +9,7 @@ QString str2qstr_new(std::string str)
 	return QString::fromLocal8Bit(str.c_str());
 }
 
-ArrayManager::ArrayManager(int iSize)
+ArrayManager::ArrayManager(int iSize=100)
 {
     m_iSize = iSize;
     m_iInit = false;
@@ -178,7 +178,7 @@ void BarGenerator::updateTick(TickData* tickData)
         QString time = QString::fromStdString(m_Bar->time);
         m_Bar->time = (time.section(":", 0, 1)).toStdString() + ":00";
         //走完一个bar,之后调用on_bar回调函数，再新建一个bar
-        m_onBar_Func(m_Bar);
+        m_onBar_Func(*m_Bar);
         bNewMinute = true;
 
     }
@@ -213,8 +213,8 @@ void BarGenerator::updateTick(TickData* tickData)
 
     if (m_lastTick != NULL)
     {
-        double volume_change = tickData->volume - m_lastTick->volume;
-        m_Bar->volume= m_Bar->volume+std::max(volume_change, 0.0);
+        //double volume_change = tickData->volume - m_lastTick->volume;
+        m_Bar->volume = m_Bar->volume + tickData->volume;// std::max(volume_change, 0.0);
 
     }
     else//第一次来tick，需要new一个lastTick
@@ -274,7 +274,7 @@ void BarGenerator::updateBar(BarData* barData)
 
     if (m_bWindowFinished)
     {
-        (*m_onWindowBar_FUNC)(m_windowBar);
+        (*m_onWindowBar_FUNC)(*m_windowBar);
         //m_windowBar = NULL;
 
     }
