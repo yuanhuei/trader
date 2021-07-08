@@ -8,7 +8,7 @@
 #include<qglobal.h>
 #include"./cta_strategy/CtaEngine.h"
 #include"risk_manager/riskmanager.h"
-
+#include"BacktesterManager.h"
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
@@ -638,12 +638,15 @@ void MainWindow::write_log(std::string msg, std::string gateway_name)
 
 void MainWindow::menu_CTAStrategy()
 {
-	if(m_ctaStrategyDailog==NULL)
-		CTAStrategyManager* m_ctaStrategyDailog = new CTAStrategyManager(this);
+	if(m_ctaStrategyDailog== nullptr)
+		 m_ctaStrategyDailog = new CTAStrategyManager(this);
 	m_ctaStrategyDailog->show();
 }
 void MainWindow::menu_CTABacktest()
 {
+	if (m_ctaBacktesterManager == NULL)
+		 m_ctaBacktesterManager = new BacktesterManager(this);
 
+	m_ctaBacktesterManager->show();
 
 }

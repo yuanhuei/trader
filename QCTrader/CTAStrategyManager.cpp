@@ -16,9 +16,9 @@ CTAStrategyManager::CTAStrategyManager(QWidget* parent)
 	//setWindowModality(Qt::NonModal);
 	setWindowFlags(Qt::Window);
 
-	setWindowFlags(Qt::CustomizeWindowHint |
-		Qt::WindowMinimizeButtonHint |
-		Qt::WindowMaximizeButtonHint);
+	//setWindowFlags(Qt::CustomizeWindowHint |
+	//	Qt::WindowMinimizeButtonHint |
+	//	Qt::WindowMaximizeButtonHint);
 
 	ui.setupUi(this);
 	m_mainwindow = (MainWindow*)parent;
@@ -38,14 +38,15 @@ void CTAStrategyManager::InitUI()
 	//ReadStrategyConfFileJson();
 
 
-
+	
 	//设置策略配置表
 	m_StrategyConf = new QStandardItemModel;
 	QStringList StrategyConfHeader;
 	StrategyConfHeader << str2qstr_new("策略名") << str2qstr_new("合约") << str2qstr_new("策略类名")<< str2qstr_new("状态");
 	m_StrategyConf->setHorizontalHeaderLabels(StrategyConfHeader);
 	ui.tableView->setModel(m_StrategyConf);
-	ui.tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	ui.tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+	//ui.tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	ui.tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	ui.tableView->setSelectionBehavior(QAbstractItemView::SelectRows);  //单击选择一行  
 	ui.tableView->setSelectionMode(QAbstractItemView::SingleSelection); //设置只能选择一行，不能多行选中  
@@ -56,9 +57,9 @@ void CTAStrategyManager::InitUI()
 	int i = 0;
 	for (it = m_ctaEngine->m_strategyConfigInfo_map.begin(); it != m_ctaEngine->m_strategyConfigInfo_map.end(); it++)
 	{
-		QString strStrategy = QString::fromStdString(it->first).section("__",0,0);
-		QString strSymbol = QString::fromStdString(it->first).section("__", 1, 1);
-		QString strClassname = QString::fromStdString(it->first).section("__", 2, 2);
+		QString strStrategy = QString::fromStdString(it->first).section("_",0,0);
+		QString strSymbol = QString::fromStdString(it->first).section("_", 1, 1);
+		QString strClassname = QString::fromStdString(it->first).section("_", 2, 2);
 		
 		m_StrategyConf->setItem(i, 0, new QStandardItem(strStrategy));
 		m_StrategyConf->setItem(i, 1, new QStandardItem(strSymbol));
@@ -167,11 +168,12 @@ void CTAStrategyManager::UpdateLogTable(LogData data)
 	//data.gatewayname = "CTP";
 	//data.msg = msg;
 	//data.logTime= Utils::getCurrentSystemTime();
+	/*
 	int rowCount = ui.tableWidget_3->rowCount();
 	ui.tableWidget_3->insertRow(rowCount);
 	ui.tableWidget_3->setItem(rowCount, 0, new QTableWidgetItem(str2qstr_new(data.logTime)));
 	ui.tableWidget_3->setItem(rowCount, 1, new QTableWidgetItem(str2qstr_new(data.msg)));
-	ui.tableWidget_3->setItem(rowCount, 2, new QTableWidgetItem(str2qstr_new(data.gatewayname)));
+	ui.tableWidget_3->setItem(rowCount, 2, new QTableWidgetItem(str2qstr_new(data.gatewayname)));*/
 }
 
 void CTAStrategyManager::pushLogData(std::string msg)

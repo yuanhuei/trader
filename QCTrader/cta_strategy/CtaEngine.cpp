@@ -257,7 +257,7 @@ void CtaEngine::loadStrategy()
 			//生成策略
 			StrategyTemplate* strategy_ptr;
 			HINSTANCE his;
-			if (strStrategyName.find(".dll"))//策略通过DLL文件提供
+			if (strStrategyName.find(".dll")!= strStrategyName.npos)//策略通过DLL文件提供
 			{
 				std::string strategy = "./Strategy/" + strStrategyName;//策略DLL文件
 				his = LoadLibraryA(strategy.c_str());//加载一个策略

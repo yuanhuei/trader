@@ -106,6 +106,12 @@
     <ClCompile Include="json11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BacktesterManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="qcustomplot-source\qcustomplot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="event_engine\eventengine.h">
@@ -188,6 +194,12 @@
     <QtMoc Include="CTAStrategyManager.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="BacktesterManager.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="qcustomplot-source\qcustomplot.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="CTPConnectWidgets.ui">
@@ -197,6 +209,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="CTAStrategyManager.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="BacktesterManager.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
