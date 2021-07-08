@@ -68,9 +68,6 @@ public:
 	virtual void onStart();
 	//停止
 	virtual void onStop();
-	//撤所有单，停止策略时使用
-	void cancelallorder();
-
 	//需要具体的策略函数实现，将配置文件中取得的值赋值给策略中具体的变量
 	virtual void updateSetting();
 
@@ -107,16 +104,22 @@ public:
 	//发单函数
 
 	//做多
-	std::vector<std::string> buy(std::string symbol, double price, double volume);
+	std::vector<std::string> buy(double price, double volume);
 	//平多
-	std::vector<std::string> sell(std::string symbol, double price, double volume);
+	std::vector<std::string> sell(double price, double volume);
 	//做空
-	std::vector<std::string> sellshort(std::string symbol, double price, double volume);
+	std::vector<std::string> sellshort(double price, double volume);
 	//平空
-	std::vector<std::string> buycover(std::string symbol, double price, double volume);
+	std::vector<std::string> buycover(double price, double volume);
 
+	//总报单开平函数公用
+	std::vector<std::string> sendOrder(std::string orderType, double price, double volume);
+	//撤所有单，停止策略时使用
+	void cancelallorder();
 	//撤单函数
 	void cancelOrder(std::string orderID, std::string gatewayname);
+
+
 	//获取m_Pos
 	int getpos();
 
@@ -157,8 +160,6 @@ public:
 	/**********************************_(:з」∠)_回测用***********************************************/
 	std::map<std::string, std::string>m_VarPlot;	std::map<std::string, std::string>m_indicatorPlot;			std::mutex m_VarPlotmtx;
 private:
-	//总报单开平函数公用
-	std::vector<std::string> sendOrder(std::string symbol, std::string orderType, double price, double volume);
 
 	/*******************************************************/
 	std::map<std::string, double>m_pos_map;				//持仓

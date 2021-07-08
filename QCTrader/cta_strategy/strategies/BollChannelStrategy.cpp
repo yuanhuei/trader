@@ -5,7 +5,12 @@
 BollChannelStrategy::BollChannelStrategy(CtaEngine* ctaEngine, std::string strategyName, std::string symbol):
 	StrategyTemplate(ctaEngine, strategyName, symbol)
 {
-	m_BarGenerate = new BarGenerator(onBar, 5, on_5min_bar, MINUTE);
+	Interval iInterval = MINUTE;
+	ON_FUNC on_func1, on_fun2;
+	on_func1 = &BollChannelStrategy::onBar;
+	on_fun2= &BollChannelStrategy::on_5min_bar;
+
+	m_BarGenerate = new BarGenerator(on_func1, int(5), on_fun2, iInterval);
 	m_ArrayManager = new ArrayManager();
 
 }
@@ -63,12 +68,14 @@ void BollChannelStrategy::on_5min_bar(BarData data)
 	m_ArrayManager->update_bar(data);
 	if (m_ArrayManager->m_iInit != true)
 		return;
-	/*
-	boll_up=
-	boll_down=
-	cci_value=
-	atr_value=
-	*/
+	
+	std::map<std::string, double>mapBoll;
+	mapBoll= m_ArrayManager->boll(boll_window, boll_dev);
+	boll_up = mapBoll["boll_up"];
+	boll_down = mapBoll["boll_down"];
+	cci_value = m_ArrayManager->cci(cci_window);
+	atr_value = m_ArrayManager->atr(atr_window);
+	
 	if (m_Pos == 0)
 	{
 
@@ -76,9 +83,9 @@ void BollChannelStrategy::on_5min_bar(BarData data)
 		intra_trade_low = data.low;
 
 		if (cci_value > 0)
-			buy(m_symbol, boll_up, fixed_size);
+			buy(boll_up, fixed_size);
 		else if (cci_value < 0)
-			sellshort(m_symbol, boll_down, fixed_size);
+			sellshort(boll_down, fixed_size);
 	}
 	else if (m_Pos > 0)
 	{
@@ -86,7 +93,7 @@ void BollChannelStrategy::on_5min_bar(BarData data)
 		intra_trade_low = data.low;
 
 		long_stop = intra_trade_high - atr_value * sl_multiplier;
-		sell(m_symbol, long_stop, std::abs(m_Pos));
+		sell(long_stop, std::abs(m_Pos));
 
 
 	}
@@ -95,7 +102,7 @@ void BollChannelStrategy::on_5min_bar(BarData data)
 		intra_trade_high = data.high;
 		intra_trade_low = std::min(intra_trade_low, float(data.low));
 		short_stop = intra_trade_low + atr_value * sl_multiplier;
-		sellshort(m_symbol, short_stop,std::abs(m_Pos));
+		sellshort(short_stop,std::abs(m_Pos));
 	}
 
 				

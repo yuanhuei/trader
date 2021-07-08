@@ -174,33 +174,33 @@ void StrategyTemplate::onTrade(std::shared_ptr<Event_Trade>e)
 }
 
 //做多
-std::vector<std::string> StrategyTemplate::buy(std::string symbol, double price, double volume)
+std::vector<std::string> StrategyTemplate::buy(double price, double volume)
 {
-	return sendOrder(symbol, CTAORDER_BUY, price, volume);
+	return sendOrder(CTAORDER_BUY, price, volume);
 }
 //平多
-std::vector<std::string> StrategyTemplate::sell(std::string symbol, double price, double volume)
+std::vector<std::string> StrategyTemplate::sell(double price, double volume)
 {
-	return sendOrder(symbol, CTAORDER_SELL, price, volume);
+	return sendOrder(CTAORDER_SELL, price, volume);
 }
 //做空
-std::vector<std::string> StrategyTemplate::sellshort(std::string symbol, double price, double volume)
+std::vector<std::string> StrategyTemplate::sellshort(double price, double volume)
 {
-	return sendOrder(symbol, CTAORDER_SHORT, price, volume);
+	return sendOrder(CTAORDER_SHORT, price, volume);
 }
 //平空
-std::vector<std::string> StrategyTemplate::buycover(std::string symbol, double price, double volume)
+std::vector<std::string> StrategyTemplate::buycover(double price, double volume)
 {
-	return sendOrder(symbol, CTAORDER_COVER, price, volume);
+	return sendOrder(CTAORDER_COVER, price, volume);
 }
 
 //总报单开平函数公用
-std::vector<std::string> StrategyTemplate::sendOrder(std::string symbol, std::string orderType, double price, double volume)
+std::vector<std::string> StrategyTemplate::sendOrder(std::string orderType, double price, double volume)
 {
 	std::vector<std::string>orderIDv;
 	if (trading == true)
 	{
-		orderIDv = m_ctaEngine->sendOrder(symbol, orderType, price, volume, this);
+		orderIDv = m_ctaEngine->sendOrder(m_symbol, orderType, price, volume, this);
 		for (std::vector<std::string>::iterator it = orderIDv.begin(); it != orderIDv.end(); it++)
 		{
 			m_orderlistmtx.lock();
@@ -405,12 +405,12 @@ std::string StrategyData::getparam(std::string key)
 
 void StrategyData::setparam(std::string key,std::string value)
 {
-
+	//找到就更新，找不大就插入
 	m_mtx.lock();
-	if (m_parammap.find(key) != m_parammap.end())
-	{
+	//if (m_parammap.find(key) != m_parammap.end())
+	//{
 		 m_parammap[key]=value;
-	}
+	//}
 
 	m_mtx.unlock();
 }
@@ -420,10 +420,10 @@ void StrategyData::setvar(std::string key,std::string value)
 {
 
 	m_mtx.lock();
-	if (m_varmap.find(key) != m_varmap.end())
-	{
+	//if (m_varmap.find(key) != m_varmap.end())
+	//{
 		m_varmap[key]=value;
-	}
+	//}
 
 	m_mtx.unlock();
 }

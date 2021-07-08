@@ -2,7 +2,8 @@
 
 //#include<qstring.h>
 #include<qdatetime.h>
-#include"talib.h"
+#include<talib.h>
+#include<ta_defs.h>
 
 QString str2qstr_new(std::string str)
 {
@@ -93,14 +94,12 @@ std::vector<float>* ArrayManager::Get_openinterest_array()
     return &openinterest_array;
 }
 
-float ArrayManager::ema(int n)
+double ArrayManager::sma(int n)
 {
-    float fEma;
-
     int    startIdx=0;
     int    endIdx=m_iSize-1;
     double inReal[100];
-    int           optInTimePeriod; /* From 2 to 100000 */
+    int           optInTimePeriod=n; /* From 2 to 100000 */
     int outBegIdx;
     int outNBElement;
     double        outReal[100];
@@ -110,13 +109,88 @@ float ArrayManager::ema(int n)
         inReal[i] = openprice_array[i];
     }
 
-    int iReturn=TA_EMA(startIdx, endIdx, inReal, n, &outBegIdx, &outNBElement, outReal);
+    int iReturn=TA_SMA(startIdx, endIdx, inReal, optInTimePeriod, &outBegIdx, &outNBElement, outReal);
     //if(iReturn!=0)
     //    print("Ê§°Ü");
-    fEma = outReal[m_iSize-n]; //´ý¶¨
-    return fEma;
+    return outReal[m_iSize - n];
+}
+std::map<std::string, double> ArrayManager::boll(int iWindow,int iDev)
+{
+    std::map<std::string, double> mapBoll;
+    int            startIdx = 0;
+    int            endIdx =m_iSize-1;
+    double        inReal[100];
+    int           optInTimePeriod=iWindow; /* From 2 to 100000 */
+    double        optInNbDevUp=iDev; /* From TA_REAL_MIN to TA_REAL_MAX */
+    double        optInNbDevDn=iDev; /* From TA_REAL_MIN to TA_REAL_MAX */
+    TA_MAType     optInMAType = TA_MAType_SMA;
+    int*          outBegIdx;
+    int*          outNBElement;
+    double        outRealUpperBand[100];
+    double        outRealMiddleBand[100];
+    double        outRealLowerBand[100];
+
+    for (int i = 0; i < m_iSize; i++)
+    {
+        inReal[i] = openprice_array[i];
+    }
+
+    TA_BBANDS(startIdx, endIdx, inReal, optInTimePeriod, optInNbDevDn, 
+        optInNbDevDn, optInMAType, outBegIdx, outNBElement, outRealUpperBand, outRealMiddleBand, outRealLowerBand);
+    mapBoll["boll_up"] = outRealUpperBand[m_iSize - iWindow];
+    mapBoll["boll_middle"] = outRealMiddleBand[m_iSize - iWindow];
+    mapBoll["boll_down"] = outRealLowerBand[m_iSize - iWindow];
+    return mapBoll;
+
 }
 
+double ArrayManager::cci(int iWindow)
+{
+    int            startIdx = 0;
+    int            endIdx = m_iSize - 1;
+    double inHigh[100];
+     double inLow[100];
+     double inClose[100];
+    int           optInTimePeriod=iWindow; /* From 2 to 100000 */
+    int* outBegIdx;
+    int* outNBElement;
+    double        outReal[100];
+
+    for (int i = 0; i < m_iSize; i++)
+    {
+        inHigh[i] = highprice_array[i];
+        inLow[i] = lowprice_array[i];
+        inClose[i] = closeprice_array[i];
+    }
+
+    TA_CCI(startIdx, endIdx, inHigh, inLow, inClose, optInTimePeriod, outBegIdx, outNBElement, outReal);
+
+    return outReal[m_iSize - iWindow];
+}
+
+double ArrayManager::atr(int iWindow)
+{
+    int            startIdx = 0;
+    int            endIdx = m_iSize - 1;
+    double inHigh[100];
+    double inLow[100];
+    double inClose[100];
+    int           optInTimePeriod = iWindow; /* From 2 to 100000 */
+    int* outBegIdx;
+    int* outNBElement;
+    double        outReal[100];
+
+    for (int i = 0; i < m_iSize; i++)
+    {
+        inHigh[i] = highprice_array[i];
+        inLow[i] = lowprice_array[i];
+        inClose[i] = closeprice_array[i];
+    }
+
+    TA_ATR(startIdx, endIdx, inHigh, inLow, inClose, optInTimePeriod, outBegIdx, outNBElement, outReal);
+
+    return outReal[m_iSize - iWindow];
+}
 
 BarGenerator::BarGenerator(ON_FUNC onBar_Func, int iWindow, ON_FUNC onWindowBar_FUNC, Interval iInterval)
 {
@@ -128,8 +202,6 @@ BarGenerator::BarGenerator(ON_FUNC onBar_Func, int iWindow, ON_FUNC onWindowBar_
     m_lastTick = NULL;
     m_lastBar = NULL;
     m_windowBar = NULL;
-
-
 }
 BarGenerator::~BarGenerator()
 {

@@ -191,6 +191,7 @@ public:
 	Gatewaymanager* m_gatewaymanager;//接口管理器
 	riskmanager* m_riskmanager;//风险管理器
 	CtaEngine* m_ctaEngine;//cta管理器
+	CTAStrategyManager* m_ctaStrategyDailog=NULL;
 
 
     //model

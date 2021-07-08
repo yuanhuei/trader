@@ -8,7 +8,7 @@
 
 
 QString str2qstr_new(std::string str);
-typedef void(*ON_FUNC)(BarData);
+typedef void(BollChannelStrategy::*ON_FUNC)(BarData);
 
 
 
@@ -47,6 +47,10 @@ public:
     std::vector<float> openinterest_array;
 
 
+    std::map<std::string, double> boll(int iWindow, int iDev);
+    double sma(int n);
+    double cci(int iWindow);
+    double atr(int iWindow);
 };
 
 class BarGenerator

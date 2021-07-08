@@ -110,7 +110,7 @@ void CtaEngine::ReadStrategyConfFileJson()
 
 			}
 			//插入到策略配置map中
-			m_strategyConfigInfo_map[StrategyName + "__" + vt_symbol + "__" + ClassName] = settingMap;
+			m_strategyConfigInfo_map[StrategyName + "_" + vt_symbol + "_" + ClassName] = settingMap;
 		}
 
 	}
@@ -122,13 +122,13 @@ void CtaEngine::ReadStrategyConfFileJson()
 	in.close();
 }
 //读取策略数据文件
-void CtaEngine::ReadStrategyDataJson()
+void CtaEngine::ReadStrategyDataJson(std::string strfileName)
 {
 	Json::Reader reader;
 	Json::Value root;
 
 	//从文件中读取，保证当前文件有demo.json文件  
-	std::ifstream in("./Strategy/cta_strategy_data.json", std::ios::binary);
+	std::ifstream in(strfileName, std::ios::binary);
 
 	if (!in.is_open())
 	{
@@ -174,7 +174,7 @@ void CtaEngine::ReadStrategyDataJson()
 
 			}
 			//插入到策略数据map中
-			m_strategyData_map[StrategyName + "__" + vt_symbol + "__" + ClassName] = settingMap;
+			m_strategyData_map[StrategyName + "_" + vt_symbol + "_" + ClassName] = settingMap;
 		}
 
 	}
@@ -185,7 +185,7 @@ void CtaEngine::ReadStrategyDataJson()
 
 	in.close();
 }
-//读取策略数据文件
+//写变量文件
 void CtaEngine::WriteStrategyDataJson(std::map<std::string, std::string>dataMap,std::string fileName)
 {
 
@@ -205,7 +205,7 @@ void CtaEngine::WriteStrategyDataJson(std::map<std::string, std::string>dataMap,
 
 	//输出到文件
 	std::ofstream os;
-	std::string file = "./Strategy/cta_strategy_setting" + fileName + ".json";
+	std::string file = "./Strategy/cta_strategy_data_" + fileName + ".json";
 	os.open(file);
 	os << sw.write(root);
 	os.close();
@@ -219,8 +219,18 @@ void CtaEngine::loadStrategy()
 
 	//读取策略配置文件（存放策略配置参数，包括策略名，合约，类名还有配置参数
 	ReadStrategyConfFileJson();
-	//读取策略数据文件（存放策略变量,例如仓位）
-	ReadStrategyDataJson();
+	//读取变量文件信息，这里的文件名称包含策略名和合约，与StrategyTemplate::sync_data()写的文件名称要一致
+	std::map<std::string, std::map<std::string, float>>::iterator iter;
+	for (iter = m_strategyConfigInfo_map.begin(); iter!=m_strategyConfigInfo_map.end(); iter++)
+	{
+		QString str = QString::fromStdString(iter->first).section("_", 0, 1);
+		//循环读取策略数据文件（存放策略变量,例如仓位）
+		std::string strfileName = "./Strategy/cta_strategy_data_" + str.toStdString() + ".json";
+		
+		ReadStrategyDataJson(strfileName);
+
+	}
+
 
 	if (m_strategyConfigInfo_map.size() == 0)
 	{
@@ -234,9 +244,9 @@ void CtaEngine::loadStrategy()
 		std::map<std::string, std::map<std::string, float>>::iterator it;
 		for (it = m_strategyConfigInfo_map.begin(); it != m_strategyConfigInfo_map.end(); it++)
 		{
-			QString strStrategy = QString::fromStdString(it->first).section("__", 0, 0);
-			QString strSymbol = QString::fromStdString(it->first).section("__", 1, 1);
-			QString strClassname = QString::fromStdString(it->first).section("__", 2, 2);
+			QString strStrategy = QString::fromStdString(it->first).section("_", 0, 0);
+			QString strSymbol = QString::fromStdString(it->first).section("_", 1, 1);
+			QString strClassname = QString::fromStdString(it->first).section("_", 2, 2);
 			std::string strStrategyName = strStrategy.toStdString();
 			std::string strSymbolName = strSymbol.toStdString();
 			std::string strClassName = strClassname.toStdString();
@@ -270,7 +280,7 @@ void CtaEngine::loadStrategy()
 					return;
 				}
 				strategy_ptr = dll(this);
-				std::string strName = strStrategyName + "__" + strSymbolName;
+				std::string strName = strStrategyName + "_" + strSymbolName;
 				dllmap.insert(std::pair<std::string, HINSTANCE>(strName, his));
 
 			}
@@ -296,10 +306,22 @@ void CtaEngine::loadStrategy()
 				strategy_ptr->updateParam(it->first.c_str(), value.c_str());
 			}
 			//赋值变量给策略中的strategeData
+			if (m_strategyData_map.find(iter->first) != m_strategyData_map.end())
+			{
+				std::map<std::string, float>varMap = m_strategyData_map[iter->first];//变量map
+				for (std::map<std::string, float>::iterator it = varMap.begin(); it != varMap.end(); it++)
+				{
+					//遍历var
+					std::string value = std::to_string(it->second);
+					strategy_ptr->updateVar(it->first.c_str(), value.c_str());
+				}
+
+			}
+			/*
 			for (std::map<std::string, std::map<std::string, float>>::iterator it = m_strategyData_map.begin(); it != m_strategyData_map.end(); it++)
 			{
 				std::string str = it->first;
-				if (str == (strStrategyName + "__" + strSymbolName))//找到对应的策略合约
+				if (str == (strStrategyName + "_" + strSymbolName))//找到对应的策略合约
 				{
 					std::map<std::string, float>varMap = it->second;//变量map
 					for (std::map<std::string, float>::iterator it = varMap.begin(); it != varMap.end(); it++)
@@ -310,7 +332,7 @@ void CtaEngine::loadStrategy()
 					}
 				}
 
-			}
+			}*/
 			//把读取到的配置和变量值通过strategeData更新到策略的变量上去
 			strategy_ptr->updateSetting();
 
@@ -350,7 +372,7 @@ void CtaEngine::loadStrategy()
 			m_tickstrategymtx.unlock();
 			//插入策略m_strategymap,   key是策略名+合约名+类名，值是之前new出来的 指向策略对象的指针
 			//
-			std::string strName = strStrategyName + "__" + strSymbolName+"__"+ strClassName;
+			std::string strName = strStrategyName + "_" + strSymbolName+"_"+ strClassName;
 			//m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strategy_ptr->getparam("name"), strategy_ptr));//策略名和策略
 			
 			//生成策略集

@@ -64,7 +64,7 @@ public:
 	//策略所需函数
 	std::vector<std::string> sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy);
 	void cancelOrder(std::string orderID, std::string gatewayname);
-	void writeCtaLog(std::string msg, std::string gatewayname);
+	void writeCtaLog(std::string msg, std::string gatewayname="CTP");
 	void PutEvent(std::shared_ptr<Event>e);
 	std::vector<TickData> loadTick(std::string symbol, int days);
 	std::vector<BarData> loadBar(std::string symbol, int days);
@@ -84,7 +84,7 @@ public:
 	void savetraderecord(std::string strategyname, std::shared_ptr<Event_Trade>etrade);
 
 	void ReadStrategyConfFileJson();
-	void ReadStrategyDataJson();
+	void ReadStrategyDataJson(std::string strfileName);
 	void WriteStrategyDataJson(std::map<std::string, std::string>,std::string fileName);
 
 	//配置和变量参数配置文件读取后放到两个map中，两个map的key都是[StrategyName + "__" + vt_symbol + "__" + ClassName] 
