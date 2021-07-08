@@ -6,6 +6,7 @@
 
 #include <iostream>  
 #include <fstream>  
+#include"./cta_strategy/strategies/BollChannelStrategy.h"
 
 typedef StrategyTemplate* (*Dllfun)(CtaEngine*);
 typedef int(*Release)();
@@ -286,8 +287,8 @@ void CtaEngine::loadStrategy()
 			}
 			else//通过在源代码中提供的策略
 			{
-				if (strStrategyName == "turtlebreak")
-					strategy_ptr = new turtlebreak(this, strStrategyName, strSymbolName);
+				if (strStrategyName == "BollChannelStrategy")
+					strategy_ptr = new BollChannelStrategy(this, strStrategyName, strSymbolName);
 				else
 				{
 					this->writeCtaLog("没有相关的策略提供");
@@ -1027,7 +1028,7 @@ void CtaEngine::cancelOrder(std::string orderID, std::string gatewayname)
 	}
 }
 
-void CtaEngine::writeCtaLog(std::string msg, std::string gatewayname="CTP")
+void CtaEngine::writeCtaLog(std::string msg, std::string gatewayname)
 {
 	std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
 	e->msg = msg;

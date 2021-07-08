@@ -61,19 +61,7 @@
     <ClCompile Include="portfolio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReadOnlyDelegate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SpinBoxDelegate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ClickTableView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AlgorithmOrder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="json11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\include\MongoCxx.cpp">
@@ -112,10 +100,10 @@
     <ClCompile Include="cta_strategy\CtaEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cta_strategy\strategies\turtlebreak.cpp">
+    <ClCompile Include="cta_strategy\strategies\BollChannelStrategy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cta_strategy\strategies\BollChannelStrategy.cpp">
+    <ClCompile Include="json11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -180,9 +168,6 @@
     <ClInclude Include="cta_strategy\CtaEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cta_strategy\strategies\turtlebreak.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="cta_strategy\strategies\BollChannelStrategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -192,9 +177,6 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="SpinBoxDelegate.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="ClickTableView.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="CTPConnectWidgets.h">

@@ -64,7 +64,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>../lib;../bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>mongoc-1.0.lib;bson-1.0.lib;thostmduserapi_se.lib;thosttraderapi_se.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mongoc-1.0.lib;bson-1.0.lib;thostmduserapi_se.lib;thosttraderapi_se.lib;ta_libc_cmr.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'" Label="Configuration">
@@ -96,11 +96,9 @@
   <ItemGroup>
     <ClCompile Include="..\include\MongoCxx.cpp" />
     <ClCompile Include="AlgorithmOrder.cpp" />
-    <ClCompile Include="ClickTableView.cpp" />
     <ClCompile Include="CTAStrategyManager.cpp" />
     <ClCompile Include="cta_strategy\CtaEngine.cpp" />
     <ClCompile Include="cta_strategy\strategies\BollChannelStrategy.cpp" />
-    <ClCompile Include="cta_strategy\strategies\turtlebreak.cpp" />
     <ClCompile Include="CTPConnectWidgets.cpp" />
     <ClCompile Include="gateway\ctp_gateway\ctpgateway.cpp" />
     <ClCompile Include="gateway\ctp_gateway\ctpmd.cpp" />
@@ -111,9 +109,7 @@
     <ClCompile Include="jsoncpp\src\json_writer.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="portfolio.cpp" />
-    <ClCompile Include="ReadOnlyDelegate.cpp" />
     <ClCompile Include="risk_manager\riskmanager.cpp" />
-    <ClCompile Include="SpinBoxDelegate.cpp" />
     <ClCompile Include="utility.cpp" />
     <QtRcc Include="QCTrader.qrc" />
     <QtUic Include="CTAStrategyManager.ui" />
@@ -134,11 +130,9 @@
     <QtMoc Include="CTAStrategyManager.h" />
     <ClInclude Include="cta_strategy\CtaEngine.h" />
     <ClInclude Include="cta_strategy\strategies\BollChannelStrategy.h" />
-    <ClInclude Include="cta_strategy\strategies\turtlebreak.h" />
     <ClInclude Include="Debug\uic\ui_CTAStrategyManager.h" />
     <ClInclude Include="Debug\uic\ui_MainWindow.h" />
     <ClInclude Include="utility.h" />
-    <QtMoc Include="ClickTableView.h" />
     <ClInclude Include="..\include\MongoCxx.h" />
     <ClInclude Include="AlgorithmOrder.h" />
     <ClInclude Include="cta_strategy\StrategyTemplate.h" />

@@ -10,8 +10,7 @@ public:
     ~BollChannelStrategy();
 
     void updateSetting();
-    void on_5min_bar(BarData data);
-    void onBar(BarData data);
+    //void onBar(BarData data);
     //初始化
     virtual void onInit();
     //开始 
@@ -23,7 +22,10 @@ public:
     //TICK
     virtual void onTick(TickData Tick);
     //BAR
-    virtual void onBar(BarData Bar);
+    void onBar(BarData Bar);
+
+    void on_5min_bar(BarData data);
+
     //报单回调
     virtual void onOrder(std::shared_ptr<Event_Order>e);
     //成交回调

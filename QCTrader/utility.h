@@ -5,11 +5,12 @@
 #include<String>
 #include<QString>
 #include"qcstructs.h"
-
+#include <functional> 
+class BollChannelStrategy;
 
 QString str2qstr_new(std::string str);
-typedef void(BollChannelStrategy::*ON_FUNC)(BarData);
-
+//typedef void(StrategyTemplate::*ON_FUNC)(BarData);
+typedef std::function<void(BarData)> ON_Functional;
 
 
 class ArrayManager
@@ -66,15 +67,15 @@ class BarGenerator
 
      */
 public:
-     BarGenerator(ON_FUNC onBar_Func,int iWindow, ON_FUNC onWindowBar_FUNC,Interval iInterval);
+     BarGenerator(ON_Functional onBar_Func,int iWindow, ON_Functional onWindowBar_FUNC,Interval iInterval);
      ~BarGenerator();
 
 private:
 
     BarData*  m_Bar; //当前的一分钟bar
     BarData* m_windowBar;//合成的x分钟的bar
-    ON_FUNC m_onBar_Func;
-    ON_FUNC m_onWindowBar_FUNC;
+    ON_Functional m_onBar_Func;
+    ON_Functional m_onWindowBar_FUNC;
 
     bool m_bWindowFinished = false;//barwindow 是否合成完成
     Interval m_interval;

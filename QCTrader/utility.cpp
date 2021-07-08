@@ -10,7 +10,7 @@ QString str2qstr_new(std::string str)
 	return QString::fromLocal8Bit(str.c_str());
 }
 
-ArrayManager::ArrayManager(int iSize=100)
+ArrayManager::ArrayManager(int iSize)
 {
     m_iSize = iSize;
     m_iInit = false;
@@ -192,7 +192,7 @@ double ArrayManager::atr(int iWindow)
     return outReal[m_iSize - iWindow];
 }
 
-BarGenerator::BarGenerator(ON_FUNC onBar_Func, int iWindow, ON_FUNC onWindowBar_FUNC, Interval iInterval)
+BarGenerator::BarGenerator(ON_Functional onBar_Func, int iWindow, ON_Functional onWindowBar_FUNC, Interval iInterval)
 {
     m_onBar_Func = onBar_Func;
     m_onWindowBar_FUNC = onWindowBar_FUNC;
@@ -338,15 +338,16 @@ void BarGenerator::updateBar(BarData* barData)
         }
 
     }
+    /*
     else if (m_interval == HOUR)
     {//ดýะด
     }
     else if(m_interval == DAILY)
-    {//ดýะด}
+    {//ดýะด}*/
 
     if (m_bWindowFinished)
     {
-        (*m_onWindowBar_FUNC)(*m_windowBar);
+        m_onWindowBar_FUNC(*m_windowBar);
         //m_windowBar = NULL;
 
     }

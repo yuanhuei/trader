@@ -60,7 +60,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 				{
 					orderID_Vector_Map[symbol].clear();
 					std::vector<std::string>v;
-					v = m_strategy_ptr->buy(Tick->symbol, Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+					v = m_strategy_ptr->buy(Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 					for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 					{
 						orderID_Vector_Map[symbol].push_back(*it);
@@ -69,7 +69,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 				else
 				{
 					std::vector<std::string>v;
-					v = m_strategy_ptr->buy(Tick->symbol, Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+					v = m_strategy_ptr->buy( Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 					orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 				}
 				m_orderIDvmtx.unlock();
@@ -81,7 +81,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 				{
 					orderID_Vector_Map[symbol].clear();
 					std::vector<std::string>v;
-					v = m_strategy_ptr->sellshort(Tick->symbol, Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+					v = m_strategy_ptr->sellshort(Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 					for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 					{
 						orderID_Vector_Map[symbol].push_back(*it);
@@ -90,7 +90,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 				else
 				{
 					std::vector<std::string>v;
-					v = m_strategy_ptr->sellshort(Tick->symbol, Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+					v = m_strategy_ptr->sellshort(Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 					orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 				}
 				m_orderIDvmtx.unlock();
@@ -105,7 +105,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 				{
 					orderID_Vector_Map[symbol].clear();
 					std::vector<std::string>v;
-					v = m_strategy_ptr->buy(Tick->symbol, Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+					v = m_strategy_ptr->buy( Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 					for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 					{
 						orderID_Vector_Map[symbol].push_back(*it);
@@ -114,7 +114,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 				else
 				{
 					std::vector<std::string>v;
-					v = m_strategy_ptr->buy(Tick->symbol, Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+					v = m_strategy_ptr->buy(Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 					orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 				}
 				m_orderIDvmtx.unlock();
@@ -128,7 +128,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 					{
 						orderID_Vector_Map[symbol].clear();
 						std::vector<std::string>v;
-						v = m_strategy_ptr->sell(Tick->symbol, Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+						v = m_strategy_ptr->sell(Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 						for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 						{
 							orderID_Vector_Map[symbol].push_back(*it);
@@ -137,7 +137,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 					else
 					{
 						std::vector<std::string>v;
-						v = m_strategy_ptr->sell(Tick->symbol, Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+						v = m_strategy_ptr->sell(Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 						orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 					}
 					m_orderIDvmtx.unlock();
@@ -149,7 +149,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 					{
 						orderID_Vector_Map[symbol].clear();
 						std::vector<std::string>v;
-						v = m_strategy_ptr->sell(Tick->symbol, Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol), m_unitLimit));
+						v = m_strategy_ptr->sell(Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol), m_unitLimit));
 						for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 						{
 							orderID_Vector_Map[symbol].push_back(*it);
@@ -158,7 +158,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 					else
 					{
 						std::vector<std::string>v;
-						v = m_strategy_ptr->sell(Tick->symbol, Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol), m_unitLimit));
+						v = m_strategy_ptr->sell(Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol), m_unitLimit));
 						orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 					}
 					m_orderIDvmtx.unlock();
@@ -176,7 +176,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 					{
 						orderID_Vector_Map[symbol].clear();
 						std::vector<std::string>v;
-						v = m_strategy_ptr->buycover(Tick->symbol, Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+						v = m_strategy_ptr->buycover(Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 						for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 						{
 							orderID_Vector_Map[symbol].push_back(*it);
@@ -185,7 +185,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 					else
 					{
 						std::vector<std::string>v;
-						v = m_strategy_ptr->buycover(Tick->symbol, Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+						v = m_strategy_ptr->buycover(Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 						orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 					}
 					m_orderIDvmtx.unlock();
@@ -197,7 +197,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 					{
 						orderID_Vector_Map[symbol].clear();
 						std::vector<std::string>v;
-						v = m_strategy_ptr->buycover(Tick->symbol, Tick->askprice1, std::min(std::abs(m_strategy_ptr->getpos(symbol)), m_unitLimit));
+						v = m_strategy_ptr->buycover(Tick->askprice1, std::min(std::abs(m_strategy_ptr->getpos(symbol)), m_unitLimit));
 						for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 						{
 							orderID_Vector_Map[symbol].push_back(*it);
@@ -206,7 +206,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 					else
 					{
 						std::vector<std::string>v;
-						v = m_strategy_ptr->buycover(Tick->symbol, Tick->askprice1, std::min(std::abs(m_strategy_ptr->getpos(symbol)), m_unitLimit));
+						v = m_strategy_ptr->buycover(Tick->askprice1, std::min(std::abs(m_strategy_ptr->getpos(symbol)), m_unitLimit));
 						orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 					}
 					m_orderIDvmtx.unlock();
@@ -219,7 +219,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 				{
 					orderID_Vector_Map[symbol].clear();
 					std::vector<std::string>v;
-					v = m_strategy_ptr->sellshort(Tick->symbol, Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+					v = m_strategy_ptr->sellshort(Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 					for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 					{
 						orderID_Vector_Map[symbol].push_back(*it);
@@ -228,7 +228,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 				else
 				{
 					std::vector<std::string>v;
-					v = m_strategy_ptr->sellshort(Tick->symbol, Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+					v = m_strategy_ptr->sellshort(Tick->bidprice1, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 					orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 				}
 				m_orderIDvmtx.unlock();
@@ -277,7 +277,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				{
 					orderID_Vector_Map[symbol].clear();
 					std::vector<std::string>v;
-					v = m_strategy_ptr->buy(Bar->symbol, Bar->high, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+					v = m_strategy_ptr->buy(Bar->high, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 					for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 					{
 						orderID_Vector_Map[symbol].push_back(*it);
@@ -286,7 +286,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				else
 				{
 					std::vector<std::string>v;
-					v = m_strategy_ptr->buy(Bar->symbol, Bar->high, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+					v = m_strategy_ptr->buy(Bar->high, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 					orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 				}
 				m_orderIDvmtx.unlock();
@@ -298,7 +298,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				{
 					orderID_Vector_Map[symbol].clear();
 					std::vector<std::string>v;
-					v = m_strategy_ptr->sellshort(Bar->symbol, Bar->low, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+					v = m_strategy_ptr->sellshort(Bar->low, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 					for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 					{
 						orderID_Vector_Map[symbol].push_back(*it);
@@ -307,7 +307,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				else
 				{
 					std::vector<std::string>v;
-					v = m_strategy_ptr->sellshort(Bar->symbol, Bar->low, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+					v = m_strategy_ptr->sellshort( Bar->low, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 					orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 				}
 				m_orderIDvmtx.unlock();
@@ -322,7 +322,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				{
 					orderID_Vector_Map[symbol].clear();
 					std::vector<std::string>v;
-					v = m_strategy_ptr->buy(Bar->symbol, Bar->high, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+					v = m_strategy_ptr->buy( Bar->high, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 					for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 					{
 						orderID_Vector_Map[symbol].push_back(*it);
@@ -331,7 +331,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				else
 				{
 					std::vector<std::string>v;
-					v = m_strategy_ptr->buy(Bar->symbol, Bar->high, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+					v = m_strategy_ptr->buy(Bar->high, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 					orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 				}
 				m_orderIDvmtx.unlock();
@@ -345,7 +345,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					{
 						orderID_Vector_Map[symbol].clear();
 						std::vector<std::string>v;
-						v = m_strategy_ptr->sell(Bar->symbol, Bar->low, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+						v = m_strategy_ptr->sell(Bar->low, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 						for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 						{
 							orderID_Vector_Map[symbol].push_back(*it);
@@ -354,7 +354,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					else
 					{
 						std::vector<std::string>v;
-						v = m_strategy_ptr->sell(Bar->symbol, Bar->low, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+						v = m_strategy_ptr->sell(Bar->low, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 						orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 					}
 					m_orderIDvmtx.unlock();
@@ -366,7 +366,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					{
 						orderID_Vector_Map[symbol].clear();
 						std::vector<std::string>v;
-						v = m_strategy_ptr->sell(Bar->symbol, Bar->low, std::min(m_strategy_ptr->getpos(symbol), m_unitLimit));
+						v = m_strategy_ptr->sell(Bar->low, std::min(m_strategy_ptr->getpos(symbol), m_unitLimit));
 						for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 						{
 							orderID_Vector_Map[symbol].push_back(*it);
@@ -375,7 +375,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					else
 					{
 						std::vector<std::string>v;
-						v = m_strategy_ptr->sell(Bar->symbol, Bar->low, std::min(m_strategy_ptr->getpos(symbol), m_unitLimit));
+						v = m_strategy_ptr->sell(Bar->low, std::min(m_strategy_ptr->getpos(symbol), m_unitLimit));
 						orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 					}
 					m_orderIDvmtx.unlock();
@@ -393,7 +393,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					{
 						orderID_Vector_Map[symbol].clear();
 						std::vector<std::string>v;
-						v = m_strategy_ptr->buycover(Bar->symbol, Bar->high, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+						v = m_strategy_ptr->buycover(Bar->high, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 						for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 						{
 							orderID_Vector_Map[symbol].push_back(*it);
@@ -402,7 +402,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					else
 					{
 						std::vector<std::string>v;
-						v = m_strategy_ptr->buycover(Bar->symbol, Bar->high, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+						v = m_strategy_ptr->buycover(Bar->high, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 						orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 					}
 					m_orderIDvmtx.unlock();
@@ -414,7 +414,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					{
 						orderID_Vector_Map[symbol].clear();
 						std::vector<std::string>v;
-						v = m_strategy_ptr->buycover(Bar->symbol, Bar->high, std::min(std::abs(m_strategy_ptr->getpos(symbol)), m_unitLimit));
+						v = m_strategy_ptr->buycover(Bar->high, std::min(std::abs(m_strategy_ptr->getpos(symbol)), m_unitLimit));
 						for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 						{
 							orderID_Vector_Map[symbol].push_back(*it);
@@ -423,7 +423,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					else
 					{
 						std::vector<std::string>v;
-						v = m_strategy_ptr->buycover(Bar->symbol, Bar->high, std::min(std::abs(m_strategy_ptr->getpos(symbol)), m_unitLimit));
+						v = m_strategy_ptr->buycover( Bar->high, std::min(std::abs(m_strategy_ptr->getpos(symbol)), m_unitLimit));
 						orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 					}
 					m_orderIDvmtx.unlock();
@@ -436,7 +436,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				{
 					orderID_Vector_Map[symbol].clear();
 					std::vector<std::string>v;
-					v = m_strategy_ptr->sellshort(Bar->symbol, Bar->low, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+					v = m_strategy_ptr->sellshort(Bar->low, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 					for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 					{
 						orderID_Vector_Map[symbol].push_back(*it);
@@ -445,7 +445,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				else
 				{
 					std::vector<std::string>v;
-					v = m_strategy_ptr->sellshort(Bar->symbol, Bar->low, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+					v = m_strategy_ptr->sellshort(Bar->low, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 					orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 				}
 				m_orderIDvmtx.unlock();
@@ -463,7 +463,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				{
 					orderID_Vector_Map[symbol].clear();
 					std::vector<std::string>v;
-					v = m_strategy_ptr->buy(Bar->symbol, Bar->high + 99, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+					v = m_strategy_ptr->buy( Bar->high + 99, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 					for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 					{
 						orderID_Vector_Map[symbol].push_back(*it);
@@ -472,7 +472,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				else
 				{
 					std::vector<std::string>v;
-					v = m_strategy_ptr->buy(Bar->symbol, Bar->high + 99, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+					v = m_strategy_ptr->buy(Bar->high + 99, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 					orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 				}
 				m_orderIDvmtx.unlock();
@@ -484,7 +484,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				{
 					orderID_Vector_Map[symbol].clear();
 					std::vector<std::string>v;
-					v = m_strategy_ptr->sellshort(Bar->symbol, Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+					v = m_strategy_ptr->sellshort(Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 					for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 					{
 						orderID_Vector_Map[symbol].push_back(*it);
@@ -493,7 +493,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				else
 				{
 					std::vector<std::string>v;
-					v = m_strategy_ptr->sellshort(Bar->symbol, Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+					v = m_strategy_ptr->sellshort(Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 					orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 				}
 				m_orderIDvmtx.unlock();
@@ -508,7 +508,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				{
 					orderID_Vector_Map[symbol].clear();
 					std::vector<std::string>v;
-					v = m_strategy_ptr->buy(Bar->symbol, Bar->high + 99, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+					v = m_strategy_ptr->buy( Bar->high + 99, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 					for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 					{
 						orderID_Vector_Map[symbol].push_back(*it);
@@ -517,7 +517,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				else
 				{
 					std::vector<std::string>v;
-					v = m_strategy_ptr->buy(Bar->symbol, Bar->high + 99, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+					v = m_strategy_ptr->buy( Bar->high + 99, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 					orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 				}
 				m_orderIDvmtx.unlock();
@@ -531,7 +531,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					{
 						orderID_Vector_Map[symbol].clear();
 						std::vector<std::string>v;
-						v = m_strategy_ptr->sell(Bar->symbol, Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+						v = m_strategy_ptr->sell( Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 						for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 						{
 							orderID_Vector_Map[symbol].push_back(*it);
@@ -540,7 +540,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					else
 					{
 						std::vector<std::string>v;
-						v = m_strategy_ptr->sell(Bar->symbol, Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+						v = m_strategy_ptr->sell( Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 						orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 					}
 					m_orderIDvmtx.unlock();
@@ -552,7 +552,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					{
 						orderID_Vector_Map[symbol].clear();
 						std::vector<std::string>v;
-						v = m_strategy_ptr->sell(Bar->symbol, Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol), m_unitLimit));
+						v = m_strategy_ptr->sell( Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol), m_unitLimit));
 						for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 						{
 							orderID_Vector_Map[symbol].push_back(*it);
@@ -561,7 +561,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					else
 					{
 						std::vector<std::string>v;
-						v = m_strategy_ptr->sell(Bar->symbol, Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol), m_unitLimit));
+						v = m_strategy_ptr->sell(Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol), m_unitLimit));
 						orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 					}
 					m_orderIDvmtx.unlock();
@@ -579,7 +579,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					{
 						orderID_Vector_Map[symbol].clear();
 						std::vector<std::string>v;
-						v = m_strategy_ptr->buycover(Bar->symbol, Bar->high + 99, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+						v = m_strategy_ptr->buycover( Bar->high + 99, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 						for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 						{
 							orderID_Vector_Map[symbol].push_back(*it);
@@ -588,7 +588,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					else
 					{
 						std::vector<std::string>v;
-						v = m_strategy_ptr->buycover(Bar->symbol, Bar->high + 99, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+						v = m_strategy_ptr->buycover( Bar->high + 99, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 						orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 					}
 					m_orderIDvmtx.unlock();
@@ -600,7 +600,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					{
 						orderID_Vector_Map[symbol].clear();
 						std::vector<std::string>v;
-						v = m_strategy_ptr->buycover(Bar->symbol, Bar->high + 99, std::min(std::abs(m_strategy_ptr->getpos(symbol)), m_unitLimit));
+						v = m_strategy_ptr->buycover( Bar->high + 99, std::min(std::abs(m_strategy_ptr->getpos(symbol)), m_unitLimit));
 						for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 						{
 							orderID_Vector_Map[symbol].push_back(*it);
@@ -609,7 +609,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 					else
 					{
 						std::vector<std::string>v;
-						v = m_strategy_ptr->buycover(Bar->symbol, Bar->high + 99, std::min(std::abs(m_strategy_ptr->getpos(symbol)), m_unitLimit));
+						v = m_strategy_ptr->buycover( Bar->high + 99, std::min(std::abs(m_strategy_ptr->getpos(symbol)), m_unitLimit));
 						orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 					}
 					m_orderIDvmtx.unlock();
@@ -622,7 +622,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				{
 					orderID_Vector_Map[symbol].clear();
 					std::vector<std::string>v;
-					v = m_strategy_ptr->sellshort(Bar->symbol, Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+					v = m_strategy_ptr->sellshort( Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 					for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 					{
 						orderID_Vector_Map[symbol].push_back(*it);
@@ -631,7 +631,7 @@ void algorithmOrder::checkPositions_Bar(const BarData *Bar)
 				else
 				{
 					std::vector<std::string>v;
-					v = m_strategy_ptr->sellshort(Bar->symbol, Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
+					v = m_strategy_ptr->sellshort( Bar->low - 99, std::min(m_strategy_ptr->getpos(symbol) - m_supposedPos[symbol], m_unitLimit));
 					orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 				}
 				m_orderIDvmtx.unlock();

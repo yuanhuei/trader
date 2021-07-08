@@ -6,11 +6,11 @@ BollChannelStrategy::BollChannelStrategy(CtaEngine* ctaEngine, std::string strat
 	StrategyTemplate(ctaEngine, strategyName, symbol)
 {
 	Interval iInterval = MINUTE;
-	ON_FUNC on_func1, on_fun2;
-	on_func1 = &BollChannelStrategy::onBar;
-	on_fun2= &BollChannelStrategy::on_5min_bar;
+	ON_Functional on_func1, on_fun2;
+	on_func1 = std::bind(&BollChannelStrategy::onBar, this, std::placeholders::_1);
+	on_fun2 = std::bind(&BollChannelStrategy::on_5min_bar, this, std::placeholders::_1);
 
-	m_BarGenerate = new BarGenerator(on_func1, int(5), on_fun2, iInterval);
+	m_BarGenerate = new BarGenerator(on_func1, 5, on_fun2, iInterval);
 	m_ArrayManager = new ArrayManager();
 
 }

@@ -12,7 +12,7 @@ class CTAStrategyManager : public QWidget
 public:
 	CTAStrategyManager(QWidget *parent = Q_NULLPTR);
 	~CTAStrategyManager();
-private:
+public:
 	void InitUI();
 	//void pushLogToCTAStrategyWindow(std::string msg);
 	void UpdateLogTable(LogData data);
