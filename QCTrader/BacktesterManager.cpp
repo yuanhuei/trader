@@ -1,11 +1,9 @@
+#define WIN32_LEAN_AND_MEAN
 #include "BacktesterManager.h"
 #include"utility.h"
 #include"cta_backtester/BackteserEngine.h"
-#include"json11.hpp"
-#include"utils.hpp"
-#include"MongoCxx.h"
-#include"../include/libmongoc-1.0/mongoc.h"
-#include"../include/libbson-1.0/bson.h"
+
+
 #include <qvalidator.h>
 #include"MainWindow.h"
 

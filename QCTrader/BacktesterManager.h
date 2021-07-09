@@ -19,11 +19,10 @@ public:
 
 	void InitUI();
 
-	BacktesterEngine* m_backtesterEngine=NULL;
+	BacktesterEngine* m_backtesterEngine;
 	std::map<std::string, std::map<std::string, float>>  m_ctaStrategyMap;
 
 	MainWindow* m_mainwindow;
-	BacktesterEngine* m_backtesterEngine;
 
 private:
 	Ui::BacktesterManager ui;

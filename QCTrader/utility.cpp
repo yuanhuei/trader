@@ -369,30 +369,31 @@ std::map<std::string, std::map<std::string, float>> ReadStrategyConfFileJson(std
     Json::Reader reader;
     Json::Value root;
     std::map<std::string, std::map<std::string, float>> strategyConfigInfo_map;
+    std::string StrategyName, ClassName;
 
     //从文件中读取，保证当前文件有demo.json文件  
     std::ifstream in(fileName, std::ios::binary);
 
     if (!in.is_open())
     {
-        ctaEngine->writeCtaLog("打开策略配置文件失败");
-        return;
+        ctaEngine->writeCtaLog("打开策略配置文件失败","CTP");
+        return strategyConfigInfo_map;
     }
 
     if (reader.parse(in, root))
     {
-        ctaEngine->writeCtaLog("打开策略配置文件成功");
+        ctaEngine->writeCtaLog("打开策略配置文件成功","CTP");
         for (int i = 0; i < root.size(); i++)
         {
             //读取策略名称和合约名称
 
-            std::string StrategyName = root[i]["strategy_name"].asString();
+            StrategyName = root[i]["strategy_name"].asString();
            // std::string vt_symbol = root[i]["vt_symbol"].asString();
-            std::string ClassName = root[i]["class_name"].asString();
-            if ((StrategyName.length() < 1  || ClassName.length() < 1)
+            ClassName = root[i]["class_name"].asString();
+            if (StrategyName.length() < 1  || ClassName.length() < 1)
             {
-                ctaEngine->writeCtaLog("配置文件策略信息不全");
-                return;
+                ctaEngine->writeCtaLog("配置文件策略信息不全","CTP");
+                return strategyConfigInfo_map;
             }
 
             //读取策略配置信息 
@@ -419,13 +420,39 @@ std::map<std::string, std::map<std::string, float>> ReadStrategyConfFileJson(std
             //插入到策略配置map中
             strategyConfigInfo_map[StrategyName  + "_" + ClassName] = settingMap;
         }
-
     }
     else
     {
-        ctaEngine->writeCtaLog("解析策略配置文件失败");
+        ctaEngine->writeCtaLog("解析策略配置文件失败","CTP");
     }
 
     in.close();
+    return  strategyConfigInfo_map;
 }
 
+void WriteStrategyDataJson(std::map<std::string, std::string>dataMap, std::string fileName)
+{
+
+
+    Json::Value root;
+
+    //根节点属性
+    std::map<std::string, std::string>::iterator iter;
+    for (iter = dataMap.begin(); iter != dataMap.end(); iter++)
+    {
+        std::string varName = iter->first;
+        std::string varValue = iter->second;
+        root[varName] = Json::Value(varValue);
+    }
+
+    Json::StyledWriter sw;
+
+    //输出到文件
+    std::ofstream os;
+    std::string file = "./Strategy/cta_strategy_data_" + fileName + ".json";
+    os.open(file);
+    os << sw.write(root);
+    os.close();
+
+
+}

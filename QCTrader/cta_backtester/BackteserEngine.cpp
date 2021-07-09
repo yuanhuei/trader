@@ -1,6 +1,6 @@
 #include "BackteserEngine.h"
 #include"utility.h"
-
+#include"qcstructs.h"
 #include"json11.hpp"
 #include"utils.hpp"
 #include"MongoCxx.h"
@@ -17,6 +17,33 @@
 extern mongoc_uri_t* g_uri;
 extern mongoc_client_pool_t* g_pool;
 
+TradingResult::TradingResult(double entryPrice, std::string entryDt, double exitPrice, 
+	std::string exitDt, double volume, double rate, double slippage, double size)
+{
+	//清算
+	m_entryPrice = entryPrice;  //开仓价格
+	m_exitPrice = exitPrice;    // 平仓价格
+	m_entryDt = entryDt;        // 开仓时间datetime
+	m_exitDt = exitDt;          // 平仓时间
+	m_volume = volume;			//交易数量（ + / -代表方向）
+	m_turnover = (entryPrice + exitPrice) * size * abs(volume);   //成交金额
+	m_commission = m_turnover * rate;                                // 手续费成本
+	m_slippage = slippage * 2 * size * abs(volume);                        // 滑点成本
+	m_pnl = ((m_exitPrice - m_entryPrice) * volume * size - m_commission - m_slippage);  //净盈亏
+}
+TradingResult::TradingResult(double entryPrice, std::string entryDt, double exitPrice,
+	std::string exitDt, double volume, double size)
+{
+	//清算
+	m_entryPrice = entryPrice;  //开仓价格
+	m_exitPrice = exitPrice;    // 平仓价格
+	m_entryDt = entryDt;        // 开仓时间datetime
+	m_exitDt = exitDt;          // 平仓时间
+	m_volume = volume;			//交易数量（ + / -代表方向）
+	m_pnl = ((m_exitPrice - m_entryPrice) * volume * size);  //净盈亏
+}
+
+
 BacktesterEngine::BacktesterEngine(EventEngine* eventengine)
 {
 
@@ -30,15 +57,11 @@ BacktesterEngine::BacktesterEngine(EventEngine* eventengine)
 
 BacktesterEngine::~BacktesterEngine()
 {
-	mongoc_client_pool_destroy(m_pool);
-	mongoc_uri_destroy(m_uri);
-	mongoc_cleanup();
-}
-
-std::vector<BarData> BacktesterEngine::LoadHistoryData()
-{
 
 }
+
+
+
 void BacktesterEngine::processTickEvent(std::shared_ptr<Event>e)
 {
 
@@ -97,8 +120,9 @@ void BacktesterEngine::StartBacktesting(
 	//exchange;
 	m_startDay = starDate;
 	m_endDay = endDate;
+	m_iInterval = iInterval;
 	m_rate = rate;
-	m_slippage = slippage;
+	m_fSlippage = slippage;
 	m_size = contractsize;
 	m_pricetick = pricetick;
 	m_capital = capital;
@@ -126,18 +150,30 @@ void BacktesterEngine::runBacktesting()
 	}
 	m_strategy->updateSetting();//更新策略实例里面配置参数的值
 
-	//加载数据
+//加载数据
 
-	LoadHistoryData();
+	 LoadHistoryData();
 
-	//推送数据
+//推送数据
+	 
+	 //std::vector<BarData>datalist = loadBar(m_symbol, initDays);
+	 for (std::vector<BarData>::iterator it = vector_history_data.begin(); it != vector_history_data.end(); it++)
+	 {
+		 m_strategy->onBar(*it);
+		 if (m_strategy->inited)
+		 {
+			 m_strategy->trading = true;//初始化完成后开始执行策略
+			 writeCtaLog("策略初始化完成，开始回测策略");
+		 }
+		
+	 }
+	 
+
+//计算统计结果
 
 
-	//计算统计结果
-
-
-	//推送回测完成信号
-	this->writeCtaLog("回测完成", "回测模块");
+//推送回测完成信号
+	writeCtaLog("策略回测完成");
 }
 
 void BacktesterEngine::writeCtaLog(std::string msg, std::string gatewayname)
@@ -147,31 +183,20 @@ void BacktesterEngine::writeCtaLog(std::string msg, std::string gatewayname)
 	e->gatewayname = gatewayname;
 	m_eventengine->Put(e);
 }
+void BacktesterEngine::writeCtaLog(std::string msg)
+{
+	writeCtaLog(msg, "BacktesterEngine");
+}
 
 std::vector<BarData> BacktesterEngine::LoadHistoryData()
 {
-	vector_history_data = loadBar(m_symbol, m_startDay, m_endDay);
+	vector_history_data = loadBarbyDateTime(m_symbol, m_startDay, m_endDay);
 	return vector_history_data;
 }	
 
-std::vector<TickData> loadTick(std::string symbol, int days)
-{
-	//QDateTime startDay
-	QDateTime endDay = QDateTime::currentDateTime();
-	QDateTime startDay = endDay.addDays(0 - days);
-	return loadTick(symbol, startDay, endDay);
 
 
-}
-std::vector<BarData> loadBar(std::string symbol, int days)
-{
-	//QDateTime startDay
-	QDateTime endDay = QDateTime::currentDateTime();
-	QDateTime startDay = endDay.addDays(0 - days);
-	return loadBar(symbol, startDay, endDay);
-}
-
-std::vector<BarData> loadBar(std::string symbol, QDateTime startDay, QDateTime endDay)
+std::vector<BarData> BacktesterEngine::loadBarbyDateTime(std::string symbol, QDateTime startDay, QDateTime endDay)
 {
 	std::vector<BarData>datavector;
 	if (symbol == " " || symbol == "")
@@ -265,7 +290,7 @@ std::vector<BarData> loadBar(std::string symbol, QDateTime startDay, QDateTime e
 	return datavector;
 }
 
-std::vector<TickData> loadTick(std::string symbol, QDateTime startDay, QDateTime endDay)
+std::vector<TickData> BacktesterEngine::loadTickbyDateTime(std::string symbol, QDateTime startDay, QDateTime endDay)
 {
 	std::vector<TickData>datavector;
 	if (symbol == " " || symbol == "")
@@ -381,4 +406,120 @@ std::vector<TickData> loadTick(std::string symbol, QDateTime startDay, QDateTime
 	return datavector;
 
 
+}
+
+std::vector<TickData> BacktesterEngine::loadTick(std::string symbol, int days)
+{
+	//QDateTime startDay
+	QDateTime endDay = QDateTime::currentDateTime();
+	QDateTime startDay = endDay.addDays(0 - days);
+
+	std::vector<TickData> tickData = loadTickbyDateTime(symbol, startDay, endDay);
+	return tickData;
+
+}
+std::vector<BarData> BacktesterEngine::loadBar(std::string symbol, int days)
+{
+	//QDateTime startDay
+	QDateTime endDay = QDateTime::currentDateTime();
+	QDateTime startDay = endDay.addDays(0 - days);
+	return loadBarbyDateTime(symbol, startDay, endDay);
+}
+
+
+//提供给Strategytemplate
+std::vector<std::string> BacktesterEngine::sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy)
+{
+	std::unique_lock<std::mutex>lck(m_ordermapmtx);
+	std::unique_lock<std::mutex>lck2(m_orderStrategymtx);
+	std::shared_ptr<Event_Order> req = std::make_shared<Event_Order>();
+	req->symbol = symbol;
+	req->price = price;
+	req->totalVolume = volume;
+	req->status = STATUS_WAITING;
+	if (orderType == CTAORDER_BUY)
+	{
+		req->direction = DIRECTION_LONG;//做多
+		req->offset = OFFSET_OPEN;//开仓
+		//
+		//发单
+		std::string orderID = Utils::doubletostring(m_limitorderCount++); //
+		req->orderID = orderID;
+		m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
+		m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
+
+		m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
+		std::vector<std::string>result;
+		result.push_back(orderID);
+		return result;
+	}
+	else if (orderType == CTAORDER_SELL)
+	{
+		req->direction = DIRECTION_SHORT;//平多
+		req->offset = OFFSET_CLOSE;
+		std::string orderID = Utils::doubletostring(m_limitorderCount++); //
+		req->orderID = orderID;
+		m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
+		m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
+
+		m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
+		std::vector<std::string>result;
+		result.push_back(orderID);
+		return result;
+	}
+	else if (orderType == CTAORDER_SHORT)
+	{
+		//做空
+		req->direction = DIRECTION_SHORT;
+		req->offset = OFFSET_OPEN;
+		//发单
+
+		std::string orderID = Utils::doubletostring(m_limitorderCount++); //
+		req->orderID = orderID;
+		m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
+		m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
+
+		m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
+		std::vector<std::string>result;
+		result.push_back(orderID);
+		return result;
+	}
+	else if (orderType == CTAORDER_COVER)
+	{
+		//平空
+		req->direction = DIRECTION_LONG;
+		req->offset = OFFSET_CLOSE;
+		std::string orderID = Utils::doubletostring(m_limitorderCount++); //
+		req->orderID = orderID;
+		m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
+		m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
+		m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
+		std::vector<std::string>result;
+		result.push_back(orderID);
+		return result;
+	}
+}
+
+void BacktesterEngine::cancelOrder(std::string orderID, std::string gatewayname)
+{
+	std::unique_lock<std::mutex>lck(m_ordermapmtx);
+	if (m_WorkingOrdermap.find(orderID) != m_WorkingOrdermap.end())
+	{
+		std::shared_ptr<Event_Order>order = m_WorkingOrdermap[orderID];
+		if (order != nullptr)
+		{
+			//报单有效
+			if (!(order->status == STATUS_ALLTRADED || order->status == STATUS_CANCELLED))
+			{
+				//可撤单状态
+				m_Ordermap[orderID]->status = STATUS_CANCELLED;
+				m_WorkingOrdermap.erase(orderID);
+			}
+		}
+	}
+}
+
+void BacktesterEngine::PutEvent(std::shared_ptr<Event>e)
+{
+	m_eventengine->Put(e);
 }

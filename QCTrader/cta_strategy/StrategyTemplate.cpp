@@ -3,6 +3,9 @@
 #include<cstdlib>
 #include<string>
 #include"CTAAPI.h"
+#include"utility.h"
+extern mongoc_uri_t* g_uri;
+extern mongoc_client_pool_t* g_pool;
 
 StrategyTemplate::StrategyTemplate(CTAAPI*ctaEngine,std::string strategyName, std::string symbol)
 {
@@ -24,7 +27,7 @@ StrategyTemplate::StrategyTemplate(CTAAPI*ctaEngine,std::string strategyName, st
 	m_strategydata->insertvar("pos", Utils::booltostring(trading));
 
 	m_algorithm = new algorithmOrder(unitLimit, TradingMode, this);
-	m_MongoCxx = new MongoCxx(m_ctaEngine->m_pool);
+	m_MongoCxx = new MongoCxx(g_pool);
 }
 
 StrategyTemplate::~StrategyTemplate()
@@ -38,7 +41,7 @@ void StrategyTemplate::updateSetting()
 void StrategyTemplate::sync_data()
 {
 	std::string strFileName = m_strategyName + "_" + m_symbol;
-	m_ctaEngine->WriteStrategyDataJson(m_strategydata->getallvar(), strFileName);
+	WriteStrategyDataJson(m_strategydata->getallvar(), strFileName);
 }
 void StrategyTemplate::setPos(int pos)
 {

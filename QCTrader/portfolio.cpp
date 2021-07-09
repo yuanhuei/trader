@@ -6,7 +6,7 @@
 #include<io.h>
 #include<direct.h>
 #include<fstream>
-
+#include"./cta_backtester/BackteserEngine.h"
 #include <stdlib.h>
 #include<string>
 #include<algorithm>
@@ -791,7 +791,7 @@ void Portfolio::writelog(std::string log)
 	e->gatewayname = "Portfolio";
 	m_eventengine->Put(e);
 }
-
+/*
 TradingResult::TradingResult(double entryPrice, std::string entryDt, double exitPrice, std::string exitDt, double volume, double size)
 {
 	//清算
@@ -801,4 +801,4 @@ TradingResult::TradingResult(double entryPrice, std::string entryDt, double exit
 	m_exitDt = exitDt;          // 平仓时间
 	m_volume = volume;			//交易数量（ + / -代表方向）
 	m_pnl = ((m_exitPrice - m_entryPrice) * volume * size);  //净盈亏
-};
+};*/

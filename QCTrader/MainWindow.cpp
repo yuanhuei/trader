@@ -10,10 +10,28 @@
 #include"risk_manager/riskmanager.h"
 #include"BacktesterManager.h"
 #include"cta_backtester/BackteserEngine.h"
+
+
+
+#include"MongoCxx.h"
+#include"../include/libmongoc-1.0/mongoc.h"
+#include"../include/libbson-1.0/bson.h"
+
+//MONGOC 线程池
+mongoc_uri_t* g_uri;
+mongoc_client_pool_t* g_pool;
+//初始化MONGODB
+
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
+
+	mongoc_init();													//1
+	g_uri = mongoc_uri_new("mongodb://localhost:27017/");			//2
+	// 创建客户端池
+	g_pool = mongoc_client_pool_new(g_uri);
+
 	setUI();
 	LoadEngine();
 	
@@ -33,6 +51,10 @@ MainWindow::~MainWindow()
 	//delete m_ctamanager;
 	delete m_gatewaymanager;
 	delete m_eventengine;
+
+	mongoc_client_pool_destroy(g_pool);
+	mongoc_uri_destroy(g_uri);
+	mongoc_cleanup();
 }
 
 //对UI生成的界面做一些设置

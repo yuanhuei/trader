@@ -113,12 +113,12 @@ void BollChannelStrategy::on_5min_bar(BarData data)
  
 void BollChannelStrategy::onOrder(std::shared_ptr<Event_Order>e)
 {
-	m_ctaEngine->writeCtaLog("委托单提交成功");
+	m_ctaEngine->writeCtaLog("委托单提交成功","CTP");
 }
 //成交回调
 void BollChannelStrategy::onTrade(std::shared_ptr<Event_Trade>e)
 {
-	m_ctaEngine->writeCtaLog("订单成交");
+	m_ctaEngine->writeCtaLog("订单成交","CTP");
 }
 
 void BollChannelStrategy::onInit()

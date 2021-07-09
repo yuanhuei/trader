@@ -6,8 +6,9 @@
 #include"cta_strategy/StrategyTemplate.h"
 #include"gateway/gatewaymanager.h"
 #include"event_engine/eventengine.h"
+#include"./cta_backtester/BackteserEngine.h"
 class StrategyTemplate;
-
+/*
 class TradingResult
 {
 public:
@@ -36,7 +37,7 @@ struct UnitResult
 	double holdingprice;
 };
 
-
+*/
 
 typedef std::map<std::string, UnitResult> Result;//key是合约 value是一个结果单位
 class Portfolio

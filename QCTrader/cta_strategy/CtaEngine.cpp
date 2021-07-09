@@ -34,9 +34,7 @@ CtaEngine::CtaEngine(Gatewaymanager* gatewaymanager, EventEngine* eventengine, r
 }
 CtaEngine::~CtaEngine()
 {
-	mongoc_client_pool_destroy(m_pool);
-	mongoc_uri_destroy(m_uri);
-	mongoc_cleanup();
+
 
 	std::map<std::string, StrategyTemplate*>::iterator iter;
 	for (iter = m_strategymap.begin(); iter != m_strategymap.end(); iter++)
@@ -69,13 +67,13 @@ void CtaEngine::ReadStrategyConfFileJson()
 
 	if (!in.is_open())
 	{
-		this->writeCtaLog("打开策略配置文件失败");
+		writeCtaLog("打开策略配置文件失败");
 		return;
 	}
 
 	if (reader.parse(in, root))
 	{
-		this->writeCtaLog("打开策略配置文件成功");
+		writeCtaLog("打开策略配置文件成功");
 		for (int i = 0; i < root.size(); i++)
 		{
 			//读取策略名称和合约名称
@@ -1034,6 +1032,10 @@ void CtaEngine::writeCtaLog(std::string msg, std::string gatewayname)
 	e->msg = msg;
 	e->gatewayname = gatewayname;
 	m_eventengine->Put(e);
+}
+void CtaEngine::writeCtaLog(std::string msg)
+{
+	writeCtaLog(msg, "BacktesterEngine");
 }
 
 void CtaEngine::PutEvent(std::shared_ptr<Event>e)

@@ -168,12 +168,12 @@ void CTAStrategyManager::UpdateLogTable(LogData data)
 	//data.gatewayname = "CTP";
 	//data.msg = msg;
 	//data.logTime= Utils::getCurrentSystemTime();
-	/*
+	
 	int rowCount = ui.tableWidget_3->rowCount();
 	ui.tableWidget_3->insertRow(rowCount);
 	ui.tableWidget_3->setItem(rowCount, 0, new QTableWidgetItem(str2qstr_new(data.logTime)));
 	ui.tableWidget_3->setItem(rowCount, 1, new QTableWidgetItem(str2qstr_new(data.msg)));
-	ui.tableWidget_3->setItem(rowCount, 2, new QTableWidgetItem(str2qstr_new(data.gatewayname)));*/
+	ui.tableWidget_3->setItem(rowCount, 2, new QTableWidgetItem(str2qstr_new(data.gatewayname)));
 }
 
 void CTAStrategyManager::pushLogData(std::string msg)
