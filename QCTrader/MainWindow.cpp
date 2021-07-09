@@ -9,7 +9,7 @@
 #include"./cta_strategy/CtaEngine.h"
 #include"risk_manager/riskmanager.h"
 #include"BacktesterManager.h"
-
+#include"cta_backtester/BackteserEngine.h"
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
 {
@@ -125,6 +125,8 @@ void MainWindow::LoadEngine()
 	m_riskmanager = new riskmanager(m_eventengine); //风险管理器
 
 	m_ctaEngine = new CtaEngine(m_gatewaymanager, m_eventengine, m_riskmanager);//cta管理器
+
+	m_backtesterEngine = new BacktesterEngine(m_eventengine);
 
 	RegEvent();
 	ConnectSignalAndSlot();

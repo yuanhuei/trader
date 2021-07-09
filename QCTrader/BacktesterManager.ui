@@ -48,7 +48,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit"/>
+          <widget class="QComboBox" name="comboBox"/>
          </item>
         </layout>
        </item>
@@ -76,7 +76,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_7"/>
+          <widget class="QComboBox" name="comboBox_2"/>
          </item>
         </layout>
        </item>
@@ -528,5 +528,25 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>BacktesterManager</receiver>
+   <slot>startBacktest_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>131</x>
+     <y>363</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>324</x>
+     <y>-17</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>startBacktest_clicked()</slot>
+ </slots>
 </ui>

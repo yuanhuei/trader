@@ -1,0 +1,30 @@
+[
+{
+
+        "strategy_name": "MyBollingStrategy",
+        "vt_symbol": "FG2109.INE",
+        "class_name": "MyBollingStrategy",
+        "setting": {
+            
+            "bollWindow5min": 26,
+            "bollWindow15min": 26,
+            "bollWindow30min": 52,
+            "entryDev": 2,
+            "initDays": 15,
+            "fixedSize": 1,
+            "DayTrendStatus": 1
+        }
+
+},
+{
+	"strategy_name": "oneminutebreak.dll",
+	"vt_symbol": "rb1710",
+                "class_name": "minturtle",
+	"setting": {
+		"gatewayname": 1,
+		"name": 1,
+		"slippage_rb": 1,
+		"rb1710": 0.000045
+	}
+}
+]

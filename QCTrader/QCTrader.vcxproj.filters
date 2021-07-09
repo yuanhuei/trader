@@ -112,6 +112,9 @@
     <ClCompile Include="qcustomplot-source\qcustomplot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cta_backtester\BackteserEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="event_engine\eventengine.h">
@@ -175,6 +178,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cta_strategy\strategies\BollChannelStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cta_backtester\BackteserEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -98,6 +98,7 @@
     <ClCompile Include="AlgorithmOrder.cpp" />
     <ClCompile Include="BacktesterManager.cpp" />
     <ClCompile Include="CTAStrategyManager.cpp" />
+    <ClCompile Include="cta_backtester\BackteserEngine.cpp" />
     <ClCompile Include="cta_strategy\CtaEngine.cpp" />
     <ClCompile Include="cta_strategy\strategies\BollChannelStrategy.cpp" />
     <ClCompile Include="CTPConnectWidgets.cpp" />
@@ -132,6 +133,7 @@
     <QtMoc Include="MainWindow.h" />
     <QtMoc Include="CTAStrategyManager.h" />
     <QtMoc Include="BacktesterManager.h" />
+    <ClInclude Include="cta_backtester\BackteserEngine.h" />
     <ClInclude Include="cta_strategy\CtaEngine.h" />
     <ClInclude Include="cta_strategy\strategies\BollChannelStrategy.h" />
     <ClInclude Include="Debug\uic\ui_CTAStrategyManager.h" />

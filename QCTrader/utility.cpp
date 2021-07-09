@@ -5,6 +5,13 @@
 #include<talib.h>
 #include<ta_defs.h>
 
+#include <json/json.h>
+#include<qstring.h>
+
+#include <iostream>  
+#include <fstream>  
+#include"CTAAPI.h"
+
 QString str2qstr_new(std::string str)
 {
 	return QString::fromLocal8Bit(str.c_str());
@@ -355,5 +362,70 @@ void BarGenerator::updateBar(BarData* barData)
         m_lastBar = new BarData();
     *m_lastBar = *barData;
     
+}
+
+std::map<std::string, std::map<std::string, float>> ReadStrategyConfFileJson(std::string fileName,CTAAPI* ctaEngine)
+{
+    Json::Reader reader;
+    Json::Value root;
+    std::map<std::string, std::map<std::string, float>> strategyConfigInfo_map;
+
+    //从文件中读取，保证当前文件有demo.json文件  
+    std::ifstream in(fileName, std::ios::binary);
+
+    if (!in.is_open())
+    {
+        ctaEngine->writeCtaLog("打开策略配置文件失败");
+        return;
+    }
+
+    if (reader.parse(in, root))
+    {
+        ctaEngine->writeCtaLog("打开策略配置文件成功");
+        for (int i = 0; i < root.size(); i++)
+        {
+            //读取策略名称和合约名称
+
+            std::string StrategyName = root[i]["strategy_name"].asString();
+           // std::string vt_symbol = root[i]["vt_symbol"].asString();
+            std::string ClassName = root[i]["class_name"].asString();
+            if ((StrategyName.length() < 1  || ClassName.length() < 1)
+            {
+                ctaEngine->writeCtaLog("配置文件策略信息不全");
+                return;
+            }
+
+            //读取策略配置信息 
+            std::map<std::string, float> settingMap;
+            Json::Value::Members members;
+            members = root[i]["setting"].getMemberNames();
+            //std::vector<std::string> settingKeys= root["setting"].getMemberNames();
+            for (Json::Value::Members::iterator iterMember = members.begin(); iterMember != members.end(); iterMember++)   // 遍历每个key
+            {
+                std::string strKey = *iterMember;
+                float fValue = root[i]["setting"][strKey.c_str()].asFloat();
+                /*
+                if (root[i]["setting"][strKey.c_str()].isString())
+                {
+                    fValue = root[i]["setting"][strKey.c_str()].asString();
+                }
+                else
+                    fValue = root[i]["setting"][strKey.c_str()].asFloat();
+                */
+                //if(fValue.ist)
+                settingMap.insert({ strKey,  fValue });
+
+            }
+            //插入到策略配置map中
+            strategyConfigInfo_map[StrategyName  + "_" + ClassName] = settingMap;
+        }
+
+    }
+    else
+    {
+        ctaEngine->writeCtaLog("解析策略配置文件失败");
+    }
+
+    in.close();
 }
 

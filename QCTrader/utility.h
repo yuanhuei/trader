@@ -9,6 +9,8 @@
 class BollChannelStrategy;
 
 QString str2qstr_new(std::string str);
+std::map<std::string, std::map<std::string, float>> ReadStrategyConfFileJson(std::string fileName, CTAAPI* ctaEngine);
+
 //typedef void(StrategyTemplate::*ON_FUNC)(BarData);
 typedef std::function<void(BarData)> ON_Functional;
 

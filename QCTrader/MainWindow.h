@@ -13,6 +13,7 @@ class riskmanager;
 class CtaEngine;
 class CTAStrategyManager;
 class BacktesterManager;
+class BacktesterEngine;
 
 #pragma pack(1)
 struct UpdatePriceTableData
@@ -193,8 +194,10 @@ public:
 	EventEngine* m_eventengine;//事件驱动引擎
 	Gatewaymanager* m_gatewaymanager;//接口管理器
 	riskmanager* m_riskmanager;//风险管理器
+
 	CtaEngine* m_ctaEngine;//cta管理器
 	CTAStrategyManager* m_ctaStrategyDailog=NULL;
+	BacktesterEngine* m_backtesterEngine = NULL;
 	BacktesterManager* m_ctaBacktesterManager=NULL;
 
 
