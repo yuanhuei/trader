@@ -133,6 +133,7 @@
     <QtMoc Include="MainWindow.h" />
     <QtMoc Include="CTAStrategyManager.h" />
     <QtMoc Include="BacktesterManager.h" />
+    <ClInclude Include="..\include\CTAAPI.h" />
     <ClInclude Include="cta_backtester\BackteserEngine.h" />
     <ClInclude Include="cta_strategy\CtaEngine.h" />
     <ClInclude Include="cta_strategy\strategies\BollChannelStrategy.h" />

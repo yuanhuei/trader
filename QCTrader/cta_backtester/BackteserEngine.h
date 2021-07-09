@@ -98,15 +98,17 @@ public:
 	void cancelOrder(std::string orderID, std::string gatewayname);
 	void writeCtaLog(std::string msg, std::string gatewayname);
 	void PutEvent(std::shared_ptr<Event>e);
-	std::vector<TickData> loadTick(std::string tickDbName, std::string symbol, int days);
-	std::vector<BarData> loadBar(std::string BarDbName, std::string symbol, int days);
+	std::vector<TickData> loadTick(std::string symbol, QDateTime startDay, QDateTime endDay);
+	std::vector<BarData> loadBar(std::string symbol, QDateTime startDay, QDateTime endDay);
+	std::vector<TickData> loadTick(std::string symbol, int days);
+	std::vector<BarData> loadBar(std::string symbol, int days);
 
 	EventEngine* m_eventengine;
 	void InitUI();
 
 	//MONGOC 线程池
 	mongoc_uri_t* m_uri;
-	mongoc_client_pool_t* m_pool;
+	//mongoc_client_pool_t* m_pool;
 
 	//回测函数
 	std::vector<BarData> LoadHistoryData();				//读取回测用的历史数据
@@ -136,7 +138,7 @@ public:
 	void runBacktesting();
 
 
-	void writeCtaLog(std::string msg, std::string gatewayname);
+	void writeCtaLog(std::string msg, std::string gatewayname="BacktesterEngine");
 
 };
 

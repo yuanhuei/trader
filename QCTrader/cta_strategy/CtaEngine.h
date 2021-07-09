@@ -64,7 +64,7 @@ public:
 	//策略所需函数
 	std::vector<std::string> sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy);
 	void cancelOrder(std::string orderID, std::string gatewayname);
-	void writeCtaLog(std::string msg, std::string gatewayname="CTP");
+	void writeCtaLog(std::string msg, std::string gatewayname="CtaEngine");
 	void PutEvent(std::shared_ptr<Event>e);
 	std::vector<TickData> loadTick(std::string symbol, int days);
 	std::vector<BarData> loadBar(std::string symbol, int days);
@@ -130,7 +130,7 @@ private:
 	//MONGOC 线程池
 	mongoc_uri_t* m_uri;
 public:
-	mongoc_client_pool_t* m_pool;
+	//mongoc_client_pool_t* m_pool;
 
 	//portfolio
 	Portfolio* m_portfolio;

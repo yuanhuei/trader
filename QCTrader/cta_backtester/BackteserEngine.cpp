@@ -14,15 +14,14 @@
 #include<QDateTime>
 #include"../cta_strategy/strategies/BollChannelStrategy.h"
 
+extern mongoc_uri_t* g_uri;
+extern mongoc_client_pool_t* g_pool;
+
 BacktesterEngine::BacktesterEngine(EventEngine* eventengine)
 {
 
 
-	//初始化数据库
-	mongoc_init();													//1
-	m_uri = mongoc_uri_new("mongodb://localhost:27017/");			//2
-	// 创建客户端池
-	m_pool = mongoc_client_pool_new(m_uri);							//3
+
 
 
 	m_eventengine = eventengine;
@@ -96,8 +95,8 @@ void BacktesterEngine::StartBacktesting(
 	//vt_symbol;
 	m_symbol = strSymbol;
 	//exchange;
-	m_start = starDate;
-	m_end = endDate;
+	m_startDay = starDate;
+	m_endDay = endDate;
 	m_rate = rate;
 	m_slippage = slippage;
 	m_size = contractsize;
@@ -151,18 +150,39 @@ void BacktesterEngine::writeCtaLog(std::string msg, std::string gatewayname)
 
 std::vector<BarData> BacktesterEngine::LoadHistoryData()
 {
-	std::string symbol = m_symbol;
-	int days;
+	vector_history_data = loadBar(m_symbol, m_startDay, m_endDay);
+	return vector_history_data;
+}	
+
+std::vector<TickData> loadTick(std::string symbol, int days)
+{
+	//QDateTime startDay
+	QDateTime endDay = QDateTime::currentDateTime();
+	QDateTime startDay = endDay.addDays(0 - days);
+	return loadTick(symbol, startDay, endDay);
+
+
+}
+std::vector<BarData> loadBar(std::string symbol, int days)
+{
+	//QDateTime startDay
+	QDateTime endDay = QDateTime::currentDateTime();
+	QDateTime startDay = endDay.addDays(0 - days);
+	return loadBar(symbol, startDay, endDay);
+}
+
+std::vector<BarData> loadBar(std::string symbol, QDateTime startDay, QDateTime endDay)
+{
 	std::vector<BarData>datavector;
 	if (symbol == " " || symbol == "")
 	{
-		return vector_history_data;
+		return datavector;
 	}
 	const char* databasename = DATABASE_NAME;
 	const char* collectionsname = BARCOLLECTION_NAME;
 	//auto targetday = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) - (days * 24 * 3600);//获取当前的系统时间
-	auto starDay = m_startDay.toTime_t();
-	auto endDay = m_endDay.toTime_t(); 
+	auto start = startDay.toTime_t();
+	auto end = endDay.toTime_t();
 
 	mongoc_cursor_t* cursor;
 	bson_error_t error;
@@ -176,8 +196,8 @@ std::vector<BarData> BacktesterEngine::LoadHistoryData()
 	//查询bson
 	BSON_APPEND_UTF8(&parent, "symbol", symbol.c_str());
 	BSON_APPEND_DOCUMENT_BEGIN(&parent, "datetime", &child);
-	BSON_APPEND_TIME_T(&child, "$gt", starDay);//$gt大于某个时间，"$lt"小于某个时间
-	BSON_APPEND_TIME_T(&child, "$lt", endDay);//$gt大于某个时间，"$lt"小于某个时间
+	BSON_APPEND_TIME_T(&child, "$gt", start);//$gt大于某个时间，"$lt"小于某个时间
+	BSON_APPEND_TIME_T(&child, "$lt", end);//$gt大于某个时间，"$lt"小于某个时间
 	bson_append_document_end(&parent, &child);
 
 
@@ -185,7 +205,7 @@ std::vector<BarData> BacktesterEngine::LoadHistoryData()
 	//	printf("\n%s\n", str);
 
 	// 从客户端池中获取一个客户端
-	mongoc_client_t* client = mongoc_client_pool_pop(m_pool);																				//取一个mongo连接
+	mongoc_client_t* client = mongoc_client_pool_pop(g_pool);																		//取一个mongo连接
 
 	collection = mongoc_client_get_collection(client, DATABASE_NAME, symbol.c_str());
 
@@ -202,8 +222,8 @@ std::vector<BarData> BacktesterEngine::LoadHistoryData()
 		if (!err.empty())
 		{
 			mongoc_cursor_destroy(cursor);
-			mongoc_client_pool_push(m_pool, client);																						//放回一个mongo连接
-			return vector_history_data;
+			mongoc_client_pool_push(g_pool, client);																						//放回一个mongo连接
+			return datavector;
 		}
 		BarData bardata;
 		bardata.symbol = json["symbol"].string_value();
@@ -241,8 +261,124 @@ std::vector<BarData> BacktesterEngine::LoadHistoryData()
 	}
 
 	mongoc_cursor_destroy(cursor);
-	mongoc_client_pool_push(m_pool, client);																						//放回一个mongo连接
-	return vector_history_data;
+	mongoc_client_pool_push(g_pool, client);																						//放回一个mongo连接
+	return datavector;
+}
+
+std::vector<TickData> loadTick(std::string symbol, QDateTime startDay, QDateTime endDay)
+{
+	std::vector<TickData>datavector;
+	if (symbol == " " || symbol == "")
+	{
+		return datavector;
+	}
+	const char* databasename = DATABASE_NAME;
+	const char* collectionsname = TICKCOLLECTION_NAME;
+	//auto targetday = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) - (days * 24 * 3600);//获取当前的系统时间
+	auto start = startDay.toTime_t();
+	auto end = endDay.toTime_t();
+
+	mongoc_cursor_t* cursor;
+	bson_error_t error;
+	const bson_t* doc;
+
+
+	// 从客户端池中获取一个客户端
+	mongoc_client_t* client = mongoc_client_pool_pop(g_pool);																//取一个mongo连接
+
+	bson_t parent;
+	bson_t child;
+	mongoc_collection_t* collection;
+	bson_init(&parent);
+	//查询bson
+	BSON_APPEND_UTF8(&parent, "symbol", symbol.c_str());
+	BSON_APPEND_DOCUMENT_BEGIN(&parent, "datetime", &child);
+	BSON_APPEND_TIME_T(&child, "$gt", start);
+	BSON_APPEND_TIME_T(&child, "$lt", end);
+
+	bson_append_document_end(&parent, &child);
+
+
+	char* str = bson_as_json(&parent, NULL);
+	//	printf("\n%s\n", str);
+
+	collection = mongoc_client_get_collection(client, DATABASE_NAME, symbol.c_str());
+
+	cursor = mongoc_collection_find(collection, MONGOC_QUERY_NONE, 0, 0, 0, &parent, NULL, NULL);
+
+	while (mongoc_cursor_next(cursor, &doc)) {
+		str = bson_as_json(doc, NULL);
+		std::string s = str;
+		std::string err;
+
+
+		auto json = json11::Json::parse(s, err);
+		if (!err.empty())
+		{
+			mongoc_cursor_destroy(cursor);
+			mongoc_client_pool_push(g_pool, client);																						//放回一个mongo连接
+			return datavector;
+		}
+		TickData tickdata;
+
+		tickdata.symbol = json["symbol"].string_value();
+		tickdata.exchange = json["exchange"].string_value();
+		tickdata.gatewayname = json["gatewayname"].string_value();
+
+		tickdata.lastprice = json["lastprice"].number_value();
+		tickdata.volume = json["volume"].number_value();
+		tickdata.openInterest = json["openInterest"].number_value();
+
+		json11::Json::object datetime = json["datetime"].object_items();
+		tickdata.unixdatetime = datetime["$date"].number_value() / 1000;
+
+		tickdata.date = json["date"].string_value();
+		tickdata.time = json["time"].string_value();
+
+		tickdata.openPrice = json["openPrice"].number_value();//今日开
+		tickdata.highPrice = json["highPrice"].number_value();//今日高
+		tickdata.lowPrice = json["lowPrice"].number_value();//今日低
+		tickdata.preClosePrice = json["preClosePrice"].number_value();//昨收
+
+		tickdata.upperLimit = json["upperLimit"].number_value();//涨停
+		tickdata.lowerLimit = json["lowerLimit"].number_value();//跌停
+
+		tickdata.bidprice1 = json["bidprice1"].number_value();
+		tickdata.bidprice2 = json["bidprice2"].number_value();
+		tickdata.bidprice3 = json["bidprice3"].number_value();
+		tickdata.bidprice4 = json["bidprice4"].number_value();
+		tickdata.bidprice5 = json["bidprice5"].number_value();
+
+		tickdata.askprice1 = json["askprice1"].number_value();
+		tickdata.askprice2 = json["askprice2"].number_value();
+		tickdata.askprice3 = json["askprice3"].number_value();
+		tickdata.askprice4 = json["askprice4"].number_value();
+		tickdata.askprice5 = json["askprice5"].number_value();
+
+		tickdata.bidvolume1 = json["bidvolume1"].number_value();
+		tickdata.bidvolume2 = json["bidvolume2"].number_value();
+		tickdata.bidvolume3 = json["bidvolume3"].number_value();
+		tickdata.bidvolume4 = json["bidvolume4"].number_value();
+		tickdata.bidvolume5 = json["bidvolume5"].number_value();
+
+		tickdata.askvolume1 = json["askvolume1"].number_value();
+		tickdata.askvolume2 = json["askvolume2"].number_value();
+		tickdata.askvolume3 = json["askvolume3"].number_value();
+		tickdata.askvolume4 = json["askvolume4"].number_value();
+		tickdata.askvolume5 = json["askvolume5"].number_value();
+
+		datavector.push_back(tickdata);
+
+		//		printf("%s\n", str);
+		bson_free(str);
+	}
+
+	if (mongoc_cursor_error(cursor, &error)) {
+		fprintf(stderr, "An error occurred: %s\n", error.message);
+	}
+	mongoc_cursor_destroy(cursor);
+	mongoc_client_pool_push(g_pool, client);																						//放回一个mongo连接
+	return datavector;
 
 
 }

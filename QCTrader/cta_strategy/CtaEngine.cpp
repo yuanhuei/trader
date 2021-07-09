@@ -8,6 +8,10 @@
 #include <fstream>  
 #include"./cta_strategy/strategies/BollChannelStrategy.h"
 
+extern mongoc_uri_t* g_uri;
+extern mongoc_client_pool_t* g_pool;
+
+
 typedef StrategyTemplate* (*Dllfun)(CtaEngine*);
 typedef int(*Release)();
 
@@ -18,11 +22,7 @@ CtaEngine::CtaEngine(Gatewaymanager* gatewaymanager, EventEngine* eventengine, r
 	m_riskmanager = riskmanager;
 	m_connectstatus = false;//CTP连接
 
-	//初始化MONGODB
-	mongoc_init();													//1
-	m_uri = mongoc_uri_new("mongodb://localhost:27017/");			//2
-	// 创建客户端池
-	m_pool = mongoc_client_pool_new(m_uri);							//3
+
 
 	//加载策略
 	loadStrategy();
@@ -1088,7 +1088,7 @@ std::vector<TickData> CtaEngine::loadTick( std::string symbol, int days)
 
 
 	// 从客户端池中获取一个客户端
-	mongoc_client_t* client = mongoc_client_pool_pop(m_pool);																//取一个mongo连接
+	mongoc_client_t* client = mongoc_client_pool_pop(g_pool);																//取一个mongo连接
 
 	bson_t parent;
 	bson_t child;
@@ -1118,7 +1118,7 @@ std::vector<TickData> CtaEngine::loadTick( std::string symbol, int days)
 		if (!err.empty())
 		{
 			mongoc_cursor_destroy(cursor);
-			mongoc_client_pool_push(m_pool, client);																						//放回一个mongo连接
+			mongoc_client_pool_push(g_pool, client);																						//放回一个mongo连接
 			return datavector;
 		}
 		TickData tickdata;
@@ -1179,7 +1179,7 @@ std::vector<TickData> CtaEngine::loadTick( std::string symbol, int days)
 		fprintf(stderr, "An error occurred: %s\n", error.message);
 	}
 	mongoc_cursor_destroy(cursor);
-	mongoc_client_pool_push(m_pool, client);																						//放回一个mongo连接
+	mongoc_client_pool_push(g_pool, client);																						//放回一个mongo连接
 	return datavector;
 }
 std::vector<BarData> CtaEngine::loadBar( std::string symbol, int days)
@@ -1213,7 +1213,7 @@ std::vector<BarData> CtaEngine::loadBar( std::string symbol, int days)
 	//	printf("\n%s\n", str);
 
 	// 从客户端池中获取一个客户端
-	mongoc_client_t* client = mongoc_client_pool_pop(m_pool);																				//取一个mongo连接
+	mongoc_client_t* client = mongoc_client_pool_pop(g_pool);																				//取一个mongo连接
 
 	collection = mongoc_client_get_collection(client, DATABASE_NAME, symbol.c_str());
 
@@ -1230,7 +1230,7 @@ std::vector<BarData> CtaEngine::loadBar( std::string symbol, int days)
 		if (!err.empty())
 		{
 			mongoc_cursor_destroy(cursor);
-			mongoc_client_pool_push(m_pool, client);																						//放回一个mongo连接
+			mongoc_client_pool_push(g_pool, client);																						//放回一个mongo连接
 			return datavector;
 		}
 		BarData bardata;
@@ -1269,6 +1269,6 @@ std::vector<BarData> CtaEngine::loadBar( std::string symbol, int days)
 	}
 
 	mongoc_cursor_destroy(cursor);
-	mongoc_client_pool_push(m_pool, client);																						//放回一个mongo连接
+	mongoc_client_pool_push(g_pool, client);																						//放回一个mongo连接
 	return datavector;
 }
