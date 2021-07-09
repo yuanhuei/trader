@@ -90,7 +90,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_8"/>
+          <widget class="QDateEdit" name="dateEdit"/>
          </item>
         </layout>
        </item>
@@ -104,7 +104,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_11"/>
+          <widget class="QDateEdit" name="dateEdit_2"/>
          </item>
         </layout>
        </item>

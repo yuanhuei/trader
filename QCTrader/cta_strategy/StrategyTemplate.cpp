@@ -2,8 +2,9 @@
 #include"CtaEngine.h"
 #include<cstdlib>
 #include<string>
+#include"CTAAPI.h"
 
-StrategyTemplate::StrategyTemplate(CtaEngine*ctaEngine,std::string strategyName, std::string symbol)
+StrategyTemplate::StrategyTemplate(CTAAPI*ctaEngine,std::string strategyName, std::string symbol)
 {
 	m_ctaEngine = ctaEngine;
 	gatewayname = "CTP";

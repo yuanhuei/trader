@@ -2,7 +2,7 @@
 #include"utility.h"
 #include <algorithm>
 
-BollChannelStrategy::BollChannelStrategy(CtaEngine* ctaEngine, std::string strategyName, std::string symbol):
+BollChannelStrategy::BollChannelStrategy(CTAAPI* ctaEngine, std::string strategyName, std::string symbol):
 	StrategyTemplate(ctaEngine, strategyName, symbol)
 {
 	Interval iInterval = MINUTE;

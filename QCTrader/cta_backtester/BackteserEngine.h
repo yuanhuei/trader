@@ -3,6 +3,7 @@
 #include<string>
 #include<map>
 #include"qcstructs.h"
+#include<QDateTime>
 
 class StrategyTemplate;
 class EventEngine;
@@ -45,22 +46,27 @@ public:
 	~BacktesterEngine();
 
 
+	StrategyTemplate* m_strategy=nullptr;
+	std::map<std::string, float>  m_settingMap;
+
+	std::string m_strategy_classname;
+	std::string m_strategyName;
 	std::string vt_symbol;
-	std::string		m_symbol;
+	std::string	m_symbol;
+
 	std::string  exchange;
-	std::string m_start;
-	std::string	m_end;
+	QDateTime m_startDay;
+	QDateTime	m_endDay;
 	float	m_rate = 0;
 	float	m_slippage = 0;
 	float	m_size = 1;
 	float m_pricetick = 0;
-	float m_capital = 1_000_000;
+	float m_capital = 1000000;
 	//floatself.risk_free: float = 0.02;
 	//mode = BacktestingMode.BAR;
 	//self.inverse = False
 
-	std::string m_strategy_class;
-	std::string m_strategyName;
+
 	TickData m_tick;
 	BarData m_bar;
 	//self.datetime = None
@@ -68,7 +74,7 @@ public:
 	Interval m_iInterval;
 	int m_days = 0;
 	//self.callback = None
-	//self.history_data = []
+	std::vector<BarData> vector_history_data;
 
 	int m_stop_order_count = 0;
 	//stop_orders = {}
@@ -103,7 +109,7 @@ public:
 	mongoc_client_pool_t* m_pool;
 
 	//回测函数
-	void LoadHistoryData(std::string collectionstring);				//读取回测用的历史数据
+	std::vector<BarData> LoadHistoryData();				//读取回测用的历史数据
 	void processTickEvent(std::shared_ptr<Event>e);					//处理tick事件
 	void processBarEvent(std::shared_ptr<Event>e);					//处理bar事件
 	void CrossLimitOrder(const TickData& data);
@@ -114,18 +120,19 @@ public:
 	void RecordPNL(const TickData& data);
 	void RecordPNL(const BarData& data);
 
-	int StartBacktesting(
+	void StartBacktesting(
 		std::string strStrategyName ,
 		std::string strStrategyClassName,
 		std::string strSymbol ,
 		Interval iInterval ,
-		std::string starDate,
-		std::string	endDate,
+		QDateTime starDate,
+		QDateTime	endDate,
 		float rate ,
 		float slippage ,
 		float contractsize ,
 		float pricetick ,
-		float capital);
+		float capital,
+		 std::map<std::string, float>  m_ctaStrategyMap);
 	void runBacktesting();
 
 

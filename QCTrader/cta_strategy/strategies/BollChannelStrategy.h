@@ -2,11 +2,12 @@
 #include "../StrategyTemplate.h"
 class BarGenerator;
 class ArrayManager;
+
 class BollChannelStrategy :
     public StrategyTemplate
 {
 public:
-    BollChannelStrategy(CtaEngine* ctaEngine, std::string strategyName, std::string symbol);
+    BollChannelStrategy(CTAAPI* ctaEngine, std::string strategyName, std::string symbol);
     ~BollChannelStrategy();
 
     void updateSetting();

@@ -89,26 +89,35 @@ void BacktesterManager::startBacktest_clicked()
 {
 	std::string strStrategyName = ui.comboBox->currentText().toStdString();
 	std::string strSymbol = ui.lineEdit_2->text().toStdString();
+	//根据策略名称获取策略类名称
 	QString strStategyClassName;
-
+	std::map<std::string, float> settingMap;
 	std::map<std::string, std::map<std::string, float>>::iterator iter;
 	for (iter = m_ctaStrategyMap.begin(); iter != m_ctaStrategyMap.end(); iter++)
 	{
-		if(iter->first.find(strStrategyName)!=iter->first.npos)
-			 strStategyClassName = QString::fromStdString(iter->first).section("_", 1, 1);
-
+		if (iter->first.find(strStrategyName) != iter->first.npos)
+		{
+			strStategyClassName = QString::fromStdString(iter->first).section("_", 1, 1);
+			settingMap = iter->second;
+		}
 	}
 
 
 	Interval iInterval = Interval(ui.comboBox_2->currentIndex());
-	std::string starDate, endDate;
+	QDateTime starDate, endDate;
+	starDate=ui.dateEdit->dateTime();
+	endDate = ui.dateEdit_2->dateTime();
+
 	float rate = ui.lineEdit_10->text().toFloat();//费率
 	float slippage = ui.lineEdit_10->text().toFloat();//交易滑点
 	float contractsize = ui.lineEdit_10->text().toFloat();//合约乘数
 	float pricetick = ui.lineEdit_10->text().toFloat();//价格跳动
 	float capital = ui.lineEdit_10->text().toFloat();//资金
 
-	int iResult=m_backtesterEngine->StartBacktesting(strStrategyName, strStategyClassName.toStdString(), strSymbol, iInterval,
-		starDate, endDate, rate, slippage, contractsize, pricetick, capital);
+	m_backtesterEngine->StartBacktesting(strStrategyName, strStategyClassName.toStdString(), strSymbol, iInterval,
+		starDate, endDate, rate, slippage, contractsize, pricetick, capital, settingMap);
+	//子线程在执行回测的时候，回测界面需要清除上次的遗留数据，几个按钮也需要disable
+	ui.pushButton->setEnabled(false);
+	ui.pushButton_2->setEnabled(false);
 
 }
