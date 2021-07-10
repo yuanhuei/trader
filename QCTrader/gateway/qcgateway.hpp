@@ -59,7 +59,7 @@ public:
 	virtual void qryAccount() = 0;																				//查询账户资金
 	virtual void qryPosition() = 0;																				//查询持仓
 	virtual void close() = 0;																					//断开API
-private:
+public:
 	EventEngine* m_eventengine;
 	std::string m_gatewayname;
 };

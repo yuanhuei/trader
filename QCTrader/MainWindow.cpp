@@ -9,7 +9,7 @@
 #include"./cta_strategy/CtaEngine.h"
 #include"risk_manager/riskmanager.h"
 #include"BacktesterManager.h"
-#include"cta_backtester/BackteserEngine.h"
+#include"cta_backtester/BacktesterEngine.h"
 
 
 
@@ -39,16 +39,17 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-	//delete portfoliowidget;
-	//delete riskControlWidget;
-	//delete m_portfolioModel;
+	delete m_TradeSubmitTableModel;;
+	delete m_OrderSubmitTableModel;;
 	delete m_AccountModel;
 	delete m_PositionModel;
 	delete m_SymbolSubscribedTableModel;
 
+
 	m_gatewaymanager->exit();
-	//delete m_riskmanager;
-	//delete m_ctamanager;
+	delete m_riskmanager;
+	delete m_ctaEngine;
+	delete m_ctaBacktesterManager;
 	delete m_gatewaymanager;
 	delete m_eventengine;
 
@@ -337,10 +338,33 @@ void MainWindow::symbol_ReturnPressed()
 
 	SubscribeReq req;
 	req.symbol = ui.lineEdit->text().toStdString();
+	req.exchange = ui.comboBox->currentText().toStdString();
 	if (req.symbol.length() > 0)
 		m_gatewaymanager->subscribe(req, "CTP");
 
+	bool bAdded = false;//还没有加入行情价格表
+	for (int i = 0; i < m_SymbolSubscribedTableModel->rowCount(); i++)
+	{
+		if (m_SymbolSubscribedTableModel->item(i, 0)->text().toStdString() != req.symbol)//判断是否是一个合约，是就更新数据
+			bAdded = true;
+	}
+	if (bAdded==false)//还没加入，就加入
+	{
+		int i = m_SymbolSubscribedTableModel->rowCount();
+		m_SymbolSubscribedTableModel->setItem(i, 0, new QStandardItem(str2qstr_new(req.symbol)));
+		m_SymbolSubscribedTableModel->setItem(i, 1, new QStandardItem(str2qstr_new(req.exchange)));
+		//m_SymbolSubscribedTableModel->setItem(i, 2, new QStandardItem("0"));
+		m_SymbolSubscribedTableModel->setItem(i, 3, new QStandardItem(QString::fromStdString((std::to_string(0)))));
+		m_SymbolSubscribedTableModel->setItem(i, 4, new QStandardItem(QString::fromStdString((std::to_string(0)))));
+		m_SymbolSubscribedTableModel->setItem(i, 5, new QStandardItem(QString::fromStdString((std::to_string(0)))));
+		m_SymbolSubscribedTableModel->setItem(i, 6, new QStandardItem(QString::fromStdString((std::to_string(0)))));
+		m_SymbolSubscribedTableModel->setItem(i, 7, new QStandardItem(QString::fromStdString((std::to_string(0)))));
+		std::string DateTime = " ";
+		m_SymbolSubscribedTableModel->setItem(i, 8, new QStandardItem(QString::fromStdString(DateTime)));
+		m_SymbolSubscribedTableModel->setItem(i, 9, new QStandardItem("CTP"));
 
+
+	}
 }
 
 void MainWindow::SendOrder_clicked()
@@ -391,7 +415,7 @@ void MainWindow::SendOrder_clicked()
 	std::string orderRef;
 	orderRef = m_gatewaymanager->sendOrder(req, gatewayname);
 	
-	this->write_log("订单发送,编号为:" + orderRef, gatewayname);
+	this->write_log("订单发送,编号为:" + orderRef, "MainWindow");
 }
 void MainWindow::UpdateOrderTable(UpdateOrderTableData data)
 {
@@ -636,14 +660,30 @@ void MainWindow::UpdatePositionBox(PositionData data)
 //更新日志窗口
 void MainWindow::UpdateLogTable(LogData data)
 {
-	int rowCount = ui.tableWidget->rowCount();
-	ui.tableWidget->insertRow(rowCount);
-	ui.tableWidget->setItem(rowCount, 0, new QTableWidgetItem(str2qstr_new(data.logTime)));
-	ui.tableWidget->setItem(rowCount, 1, new QTableWidgetItem(str2qstr_new(data.msg)));
-	ui.tableWidget->setItem(rowCount, 2, new QTableWidgetItem(str2qstr_new(data.gatewayname)));
+	//收取到EVENT_LOG事件后，由MainWindow统一分发日志到不同的窗口，有三个日志窗口mainwindow,ctastrategymanager,backtestermanager
+	if ( data.gatewayname.find("CtaEngine") != data.gatewayname.npos)
+	{
+		if (m_ctaStrategyDailog != NULL)
+			m_ctaStrategyDailog->UpdateLogTable(data);
 
-	if (m_ctaStrategyDailog != NULL)
-		m_ctaStrategyDailog->UpdateLogTable(data);
+	}
+	else if (data.gatewayname.find("BacktesterEngine") != data.gatewayname.npos)
+	{
+		if (m_ctaBacktesterManager != NULL)
+			m_ctaBacktesterManager->UpdateLogTable(data);
+
+	}
+	else//发送到MainWindow
+	{
+		int rowCount = ui.tableWidget->rowCount();
+		ui.tableWidget->insertRow(rowCount);
+		ui.tableWidget->setItem(rowCount, 0, new QTableWidgetItem(str2qstr_new(data.logTime)));
+		ui.tableWidget->setItem(rowCount, 1, new QTableWidgetItem(str2qstr_new(data.msg)));
+		ui.tableWidget->setItem(rowCount, 2, new QTableWidgetItem(str2qstr_new(data.gatewayname)));
+
+
+	}
+
 }
 
 

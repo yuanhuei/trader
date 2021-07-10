@@ -376,13 +376,13 @@ std::map<std::string, std::map<std::string, float>> ReadStrategyConfFileJson(std
 
     if (!in.is_open())
     {
-        ctaEngine->writeCtaLog("打开策略配置文件失败","CTP");
+        ctaEngine->writeCtaLog("打开策略配置文件失败");
         return strategyConfigInfo_map;
     }
 
     if (reader.parse(in, root))
     {
-        ctaEngine->writeCtaLog("打开策略配置文件成功","CTP");
+        ctaEngine->writeCtaLog("打开策略配置文件成功");
         for (int i = 0; i < root.size(); i++)
         {
             //读取策略名称和合约名称
@@ -392,7 +392,7 @@ std::map<std::string, std::map<std::string, float>> ReadStrategyConfFileJson(std
             ClassName = root[i]["class_name"].asString();
             if (StrategyName.length() < 1  || ClassName.length() < 1)
             {
-                ctaEngine->writeCtaLog("配置文件策略信息不全","CTP");
+                ctaEngine->writeCtaLog("配置文件策略信息不全");
                 return strategyConfigInfo_map;
             }
 
@@ -423,7 +423,7 @@ std::map<std::string, std::map<std::string, float>> ReadStrategyConfFileJson(std
     }
     else
     {
-        ctaEngine->writeCtaLog("解析策略配置文件失败","CTP");
+        ctaEngine->writeCtaLog("解析策略配置文件失败");
     }
 
     in.close();

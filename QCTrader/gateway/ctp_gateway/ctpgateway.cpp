@@ -13,10 +13,10 @@
 #include"ctpmd.h"
 #include"ctptd.h"
 
-CTPGateway::CTPGateway(EventEngine* eventengine, std::string gatewayname) :QCGateway(eventengine, "CTP")
+CTPGateway::CTPGateway(EventEngine* eventengine, std::string gatewayname) :QCGateway(eventengine, gatewayname)
 {
-	m_eventengine = eventengine;
-	m_gatewayname = gatewayname;
+	//m_eventengine = eventengine;
+	//m_gatewayname = gatewayname;
 
 	//创建行情和交易的回调对象
 	m_MDSPI = new CTPMD(this, gatewayname);
@@ -26,7 +26,7 @@ CTPGateway::CTPGateway(EventEngine* eventengine, std::string gatewayname) :QCGat
 	ctptdconnected = false;
 	m_qryEnabled = false;
 	m_qrycount = 0;
-	m_eventengine->RegEvent(EVENT_TIMER, std::bind(&CTPGateway::query, this));//注册到事件驱动引擎，循环查询
+	m_eventengine->RegEvent(EVENT_TIMER, std::bind(&CTPGateway::query, this));//注册到事件驱动引擎，循环查询仓位和账户
 }
 
 CTPGateway::~CTPGateway()
@@ -52,10 +52,11 @@ void CTPGateway::connect()
 		if (!f.is_open())
 		{
 			//如果打不开文件
-			std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-			e->msg = "无法读取本地配置文件";
-			e->gatewayname = m_gatewayname;
-			this->onLog(e);
+			write_log("无法读取本地配置文件");
+			//std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
+			//e->msg = "无法读取本地配置文件";
+			//e->gatewayname = m_gatewayname;
+			//this->onLog(e);
 			return;
 		}
 		std::string line;
@@ -68,14 +69,16 @@ void CTPGateway::connect()
 		}
 		m_MDSPI->connect(configmap["username"], configmap["password"], configmap["brokerid"], configmap["mdipaddress"]);
 		m_TDSPI->connect(configmap["userR"], configmap["password"], configmap["brokerid"], configmap["tdipaddress"], configmap["authcode"], configmap["productname"], configmap["productinfo"]);
+		write_log("连接请求已发送");
 
 	}
 	else
 	{
-		std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-		e->msg = "无法读取本地配置文件";
-		e->gatewayname = m_gatewayname;
-		this->onLog(e);
+		write_log("无法读取本地配置文件");
+		//std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
+		//e->msg = "无法读取本地配置文件";
+		//e->gatewayname = m_gatewayname;
+		//this->onLog(e);
 	}
 }
 void CTPGateway::connect(std::string userID, std::string password, std::string brokerID, std::string mdaddress, std::string tdaddress, std::string authcode, std::string appid, std::string productinfo)

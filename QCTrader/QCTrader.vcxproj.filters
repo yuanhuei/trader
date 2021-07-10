@@ -43,9 +43,6 @@
     <ClCompile Include="event_engine\eventengine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main_engine\mainengine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="gateway\qcgateway.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -112,7 +109,7 @@
     <ClCompile Include="qcustomplot-source\qcustomplot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cta_backtester\BackteserEngine.cpp">
+    <ClCompile Include="cta_backtester\BacktesterEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -180,7 +177,7 @@
     <ClInclude Include="cta_strategy\strategies\BollChannelStrategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cta_backtester\BackteserEngine.h">
+    <ClInclude Include="cta_backtester\BacktesterEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\CTAAPI.h">

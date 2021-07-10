@@ -175,7 +175,7 @@ void CTAStrategyManager::UpdateLogTable(LogData data)
 	ui.tableWidget_3->setItem(rowCount, 1, new QTableWidgetItem(str2qstr_new(data.msg)));
 	ui.tableWidget_3->setItem(rowCount, 2, new QTableWidgetItem(str2qstr_new(data.gatewayname)));
 }
-
+/*
 void CTAStrategyManager::pushLogData(std::string msg)
 {
 	
@@ -185,4 +185,4 @@ void CTAStrategyManager::pushLogData(std::string msg)
 	data.logTime= Utils::getCurrentSystemTime();
 	this->UpdateLogTable(data);
 
-}
+}*/

@@ -6,7 +6,7 @@
 #include<io.h>
 #include<direct.h>
 #include<fstream>
-#include"./cta_backtester/BackteserEngine.h"
+#include"./cta_backtester/BacktesterEngine.h"
 #include <stdlib.h>
 #include<string>
 #include<algorithm>

@@ -415,12 +415,12 @@ void CtaEngine::initStrategy(std::string name)
 		}
 		else
 		{
-			this->writeCtaLog("请勿重复初始化", temp->gatewayname);
+			this->writeCtaLog("请勿重复初始化");
 		}
 	}
 	else
 	{
-		this->writeCtaLog("策略实例不存在", "");
+		this->writeCtaLog("策略实例不存在");
 	}
 	m_strategymtx.unlock();
 }
@@ -463,7 +463,7 @@ void CtaEngine::stopStrategy(std::string name)
 	}
 	else
 	{
-		this->writeCtaLog("策略实例不存在", "");
+		this->writeCtaLog("策略实例不存在");
 	}
 	m_strategymtx.unlock();
 }
@@ -486,7 +486,7 @@ void CtaEngine::initallStrategy()
 		}
 		else
 		{
-			this->writeCtaLog("请勿重复初始化", temp->gatewayname);
+			this->writeCtaLog("请勿重复初始化");
 		}
 	}
 	m_strategymtx.unlock();
@@ -780,7 +780,7 @@ void CtaEngine::autoConnect(std::shared_ptr<Event>e)
 		{
 			m_connectstatus = false;
 
-			writeCtaLog("CTP接口主动断开连接！", "CTP");
+			writeCtaLog("CTP接口主动断开连接！");
 			m_gatewaymanager->close("CTP");
 			m_riskmanager->clearTradeCount();
 		}
@@ -791,7 +791,7 @@ void CtaEngine::autoConnect(std::shared_ptr<Event>e)
 		if (m_connectstatus == false)
 		{
 			m_connectstatus = true;
-			writeCtaLog("CTP接口主动连接！", "CTP");
+			writeCtaLog("CTP接口主动连接！");
 
 			m_gatewaymanager->connect("CTP");
 		}
@@ -842,7 +842,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 			m_orderStrategymtx.lock();
 			m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 			m_orderStrategymtx.unlock();
-			writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+			writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
 			std::vector<std::string>result;
 			result.push_back(orderID);
 			return result;
@@ -857,7 +857,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 				m_orderStrategymtx.lock();
 				m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 				m_orderStrategymtx.unlock();
-				writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+				writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
 				std::vector<std::string>result;
 				result.push_back(orderID);
 				return result;
@@ -874,7 +874,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 					m_orderStrategymtx.lock();
 					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
 					std::vector<std::string>result;
 					result.push_back(orderID);
 					return result;
@@ -886,7 +886,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 					m_orderStrategymtx.lock();
 					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平今)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平今)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
 					std::vector<std::string>result;
 					result.push_back(orderID);
 					return result;
@@ -909,7 +909,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 					m_orderStrategymtx.lock();
 					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(平今和昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(平今和昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
 					result.push_back(orderID);
 					return result;
 				}
@@ -925,7 +925,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 			m_orderStrategymtx.lock();
 			m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 			m_orderStrategymtx.unlock();
-			writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+			writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
 			std::vector<std::string>result;
 			result.push_back(orderID);
 			return result;
@@ -941,7 +941,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 				m_orderStrategymtx.lock();
 				m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 				m_orderStrategymtx.unlock();
-				writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+				writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
 				std::vector<std::string>result;
 				result.push_back(orderID);
 				return result;
@@ -958,7 +958,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 					m_orderStrategymtx.lock();
 					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
 					std::vector<std::string>result;
 					result.push_back(orderID);
 					return result;
@@ -971,7 +971,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 					m_orderStrategymtx.lock();
 					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平今)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平今)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
 					std::vector<std::string>result;
 					result.push_back(orderID);
 					return result;
@@ -995,7 +995,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 					m_orderStrategymtx.lock();
 					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(平今和昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price), Strategy->gatewayname);
+					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(平今和昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
 					result.push_back(orderID);
 					return result;
 				}
@@ -1026,16 +1026,12 @@ void CtaEngine::cancelOrder(std::string orderID, std::string gatewayname)
 	}
 }
 
-void CtaEngine::writeCtaLog(std::string msg, std::string gatewayname)
+void CtaEngine::writeCtaLog(std::string msg)
 {
 	std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
 	e->msg = msg;
-	e->gatewayname = gatewayname;
+	e->gatewayname = "CtaEngine";
 	m_eventengine->Put(e);
-}
-void CtaEngine::writeCtaLog(std::string msg)
-{
-	writeCtaLog(msg, "BacktesterEngine");
 }
 
 void CtaEngine::PutEvent(std::shared_ptr<Event>e)

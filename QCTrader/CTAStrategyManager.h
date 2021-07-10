@@ -16,7 +16,7 @@ public:
 	void InitUI();
 	//void pushLogToCTAStrategyWindow(std::string msg);
 	void UpdateLogTable(LogData data);
-	void pushLogData(std::string msg);
+	//void pushLogData(std::string msg);
 
 private:
 	Ui::CTAStrategyManager ui;

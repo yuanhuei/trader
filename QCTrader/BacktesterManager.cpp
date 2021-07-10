@@ -1,7 +1,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include "BacktesterManager.h"
 #include"utility.h"
-#include"cta_backtester/BackteserEngine.h"
+#include"cta_backtester/BacktesterEngine.h"
 
 
 #include <qvalidator.h>
@@ -82,6 +82,12 @@ void BacktesterManager::InitUI()
 	ui.lineEdit_14->setValidator(validator);
 }
 
+void BacktesterManager::UpdateLogTable(LogData data)
+{
+	ui.textEdit->insertPlainText(QString::fromStdString(data.logTime + "    " + data.msg + "/n"));
+
+}
+
 
 void BacktesterManager::startBacktest_clicked()
 {
@@ -119,3 +125,6 @@ void BacktesterManager::startBacktest_clicked()
 	ui.pushButton_2->setEnabled(false);
 
 }
+
+
+

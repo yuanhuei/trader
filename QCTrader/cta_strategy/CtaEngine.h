@@ -64,7 +64,6 @@ public:
 	//策略所需函数
 	std::vector<std::string> sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy);
 	void cancelOrder(std::string orderID, std::string gatewayname);
-	void writeCtaLog(std::string msg, std::string gatewayname);
 	void writeCtaLog(std::string msg);
 
 	void PutEvent(std::shared_ptr<Event>e);

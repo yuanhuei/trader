@@ -148,7 +148,6 @@ public:
 
 
 	void writeCtaLog(std::string msg);
-	void writeCtaLog(std::string msg, std::string gatewayname);
 
 	//回测的变量
 	std::atomic_int m_limitorderCount;						//人工ORDERID

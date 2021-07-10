@@ -6,7 +6,7 @@
 #include"cta_strategy/StrategyTemplate.h"
 #include"gateway/gatewaymanager.h"
 #include"event_engine/eventengine.h"
-#include"./cta_backtester/BackteserEngine.h"
+#include"./cta_backtester/BacktesterEngine.h"
 class StrategyTemplate;
 /*
 class TradingResult

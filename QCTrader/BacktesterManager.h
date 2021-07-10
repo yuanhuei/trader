@@ -4,6 +4,7 @@
 #include "ui_BacktesterManager.h"
 #include<map>
 #include<string>
+#include"MainWindow.h"
 
 class BacktesterEngine;
 class MainWindow;
@@ -23,6 +24,8 @@ public:
 	std::map<std::string, std::map<std::string, float>>  m_ctaStrategyMap;
 
 	MainWindow* m_mainwindow;
+
+	void UpdateLogTable(LogData data);
 
 private:
 	Ui::BacktesterManager ui;

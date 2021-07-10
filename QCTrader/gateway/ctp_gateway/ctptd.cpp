@@ -71,6 +71,7 @@ void CTPTD::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CThostFtd
 {
 	if (pRspUserLogin == nullptr)
 	{
+		m_ctpgateway->write_log("返回空指针");
 		return;
 	}
 	if (!IsErrorRspInfo(pRspInfo))
@@ -101,6 +102,7 @@ void CTPTD::OnRspUserLogout(CThostFtdcUserLogoutField* pUserLogout, CThostFtdcRs
 {
 	if (pUserLogout == nullptr)
 	{
+		m_ctpgateway->write_log("返回空指针");
 		return;
 	}
 	//登出回报
@@ -123,6 +125,7 @@ void CTPTD::OnRspOrderInsert(CThostFtdcInputOrderField* pInputOrder, CThostFtdcR
 	//错误发单柜台
 	if (pInputOrder == nullptr)
 	{
+		 m_ctpgateway->write_log("返回空指针");
 		return;
 	}
 	m_ctpgateway->write_error("交易委托失败", pRspInfo);
@@ -133,11 +136,13 @@ void CTPTD::OnErrRtnOrderInsert(CThostFtdcInputOrderField* pInputOrder, CThostFt
 	if (pInputOrder == nullptr)
 	{
 		//空指针
+		m_ctpgateway->write_log("返回空指针");
 		return;
 	}
 	//发单错误回报(交易所)
+	m_ctpgateway->write_error("交易委托失败", pRspInfo);
 
-	m_ctpgateway->write_error("交易委托失败",pRspInfo);
+
 }
 
 void CTPTD::OnRspOrderAction(CThostFtdcInputOrderActionField* pInputOrderAction, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)//验证无问题
@@ -145,9 +150,11 @@ void CTPTD::OnRspOrderAction(CThostFtdcInputOrderActionField* pInputOrderAction,
 	//撤单错误回报(柜台)
 	if (pInputOrderAction == nullptr)
 	{
+		m_ctpgateway->write_log("返回空指针");
 		return;
 	}
-	m_ctpgateway->write_error("交易撤单失败",pRspInfo);
+	m_ctpgateway->write_error("交易撤单失败", pRspInfo);
+
 }
 
 /*
@@ -476,6 +483,7 @@ void CTPTD::OnRspError(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bI
 		return;
 	}
 	m_ctpgateway->write_error("用户请求出错", pRspInfo);
+
 }
 
 void CTPTD::OnRtnTrade(CThostFtdcTradeField* pTrade)
@@ -557,15 +565,13 @@ void CTPTD::OnErrRtnOrderAction(CThostFtdcOrderActionField* pOrderAction, CThost
 		return;
 	}
 	//撤单错误回报(交易所)
-	std::shared_ptr<Event_Error>e = std::make_shared<Event_Error>();
-	e->errorID = pRspInfo->ErrorID;
-	e->errorMsg = pRspInfo->ErrorMsg;
-	m_ctpgateway->write_error("撤单错误",pRspInfo);
+	if(IsErrorRspInfo(pRspInfo))
+		m_ctpgateway->write_error("撤单错误",pRspInfo);
 }
 
 
 bool CTPTD::IsErrorRspInfo(CThostFtdcRspInfoField* pRspInfo)
-{
+{//错误代码为 0 时，表示操作成功
 	bool bResult = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	return bResult;
 }

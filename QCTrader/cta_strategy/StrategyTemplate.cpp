@@ -61,7 +61,7 @@ void StrategyTemplate::onInit()
 
 	//默认使用bar 需要使用tick自己修改
 	std::string strategyname = m_strategyName;
-	m_ctaEngine->writeCtaLog("策略初始化" + strategyname, gatewayname);
+	m_ctaEngine->writeCtaLog("策略初始化" + strategyname);
 	std::vector<BarData>datalist = loadBar(m_symbol, initDays);
 	for (std::vector<BarData>::iterator it = datalist.begin(); it != datalist.end(); it++)
 	{
@@ -122,7 +122,7 @@ void StrategyTemplate::onInit()
 void StrategyTemplate::onStart()
 {
 	std::string strategyname = m_strategyName;
-	m_ctaEngine->writeCtaLog("策略开始" + strategyname, gatewayname);
+	m_ctaEngine->writeCtaLog("策略开始" + strategyname);
 	trading = true;
 	putEvent();
 }
@@ -130,7 +130,7 @@ void StrategyTemplate::onStart()
 void StrategyTemplate::onStop()
 {
 	std::string strategyname = m_strategyName;
-	m_ctaEngine->writeCtaLog("策略停止" + strategyname, gatewayname);
+	m_ctaEngine->writeCtaLog("策略停止" + strategyname);
 	trading = false;
 	putEvent();
 	//savepostomongo();

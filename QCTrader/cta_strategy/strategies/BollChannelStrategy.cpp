@@ -113,18 +113,18 @@ void BollChannelStrategy::on_5min_bar(BarData data)
  
 void BollChannelStrategy::onOrder(std::shared_ptr<Event_Order>e)
 {
-	m_ctaEngine->writeCtaLog("委托单提交成功","CTP");
+	m_ctaEngine->writeCtaLog("委托单提交成功");
 }
 //成交回调
 void BollChannelStrategy::onTrade(std::shared_ptr<Event_Trade>e)
 {
-	m_ctaEngine->writeCtaLog("订单成交","CTP");
+	m_ctaEngine->writeCtaLog("订单成交");
 }
 
 void BollChannelStrategy::onInit()
 {
 	//加载历史数据初始化
-	m_ctaEngine->writeCtaLog("策略初始化:" + m_strategyName, gatewayname);
+	m_ctaEngine->writeCtaLog("策略初始化:" + m_strategyName);
 	std::vector<BarData>datalist = loadBar(m_symbol, initDays=10);
 	for (std::vector<BarData>::iterator it = datalist.begin(); it != datalist.end(); it++)
 	{

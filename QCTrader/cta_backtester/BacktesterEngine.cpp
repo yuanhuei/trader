@@ -1,4 +1,4 @@
-#include "BackteserEngine.h"
+#include "BacktesterEngine.h"
 #include"utility.h"
 #include"qcstructs.h"
 #include"json11.hpp"
@@ -176,16 +176,13 @@ void BacktesterEngine::runBacktesting()
 	writeCtaLog("策略回测完成");
 }
 
-void BacktesterEngine::writeCtaLog(std::string msg, std::string gatewayname)
+
+void BacktesterEngine::writeCtaLog(std::string msg)
 {
 	std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
 	e->msg = msg;
-	e->gatewayname = gatewayname;
+	e->gatewayname = "BacktesterEngine";
 	m_eventengine->Put(e);
-}
-void BacktesterEngine::writeCtaLog(std::string msg)
-{
-	writeCtaLog(msg, "BacktesterEngine");
 }
 
 std::vector<BarData> BacktesterEngine::LoadHistoryData()

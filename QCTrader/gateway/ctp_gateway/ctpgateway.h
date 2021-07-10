@@ -50,12 +50,12 @@ public:
 
 private:
 	//事件驱动
-	EventEngine* m_eventengine = nullptr;
+	//EventEngine* m_eventengine = nullptr;
 	//行情和交易
 	CTPMD* m_MDSPI;
 	CTPTD* m_TDSPI;
 	//接口名
-	std::string m_gatewayname;
+	//std::string m_gatewayname;
 	//查询相关变量
 	std::atomic_int m_qrycount=0;
 	const int m_maxqry = 4;									//超过4就再从0开始
