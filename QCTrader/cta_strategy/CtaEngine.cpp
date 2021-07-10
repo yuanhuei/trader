@@ -218,14 +218,14 @@ void CtaEngine::loadStrategy()
 
 	//读取策略配置文件（存放策略配置参数，包括策略名，合约，类名还有配置参数
 	ReadStrategyConfFileJson();
-	//读取变量文件信息，这里的文件名称包含策略名和合约，与StrategyTemplate::sync_data()写的文件名称要一致
+	
 	std::map<std::string, std::map<std::string, float>>::iterator iter;
 	for (iter = m_strategyConfigInfo_map.begin(); iter!=m_strategyConfigInfo_map.end(); iter++)
 	{
 		QString str = QString::fromStdString(iter->first).section("_", 0, 1);
 		//循环读取策略数据文件（存放策略变量,例如仓位）
 		std::string strfileName = "./Strategy/cta_strategy_data_" + str.toStdString() + ".json";
-		
+		//读取变量文件信息，这里的文件名称包含策略名和合约，与StrategyTemplate::sync_data()写的文件名称要一致
 		ReadStrategyDataJson(strfileName);
 
 	}

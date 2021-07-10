@@ -427,6 +427,7 @@ std::map<std::string, std::map<std::string, float>> ReadStrategyConfFileJson(std
     }
 
     in.close();
+    ctaEngine->writeCtaLog("策略配置加载完成");
     return  strategyConfigInfo_map;
 }
 

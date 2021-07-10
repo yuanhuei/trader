@@ -19,6 +19,7 @@ BacktesterManager::BacktesterManager(QWidget *parent)
 	m_mainwindow = (MainWindow*)parent;
 	m_backtesterEngine = m_mainwindow->m_backtesterEngine;
 	
+	m_backtesterEngine->writeCtaLog((str2qstr_new("初始化CTA回测引擎")).toStdString());
 
 }
 
@@ -61,7 +62,7 @@ void BacktesterManager::InitUI()
 	ui.widget_4->plotLayout()->addElement(0, 0, new QCPTextElement(ui.widget_4, str2qstr_new("盈亏分布")));
 
 	//读取策略名和配置
-	std::string strName = "./Strategy/cta_strategy_setting.json_backtester";
+	std::string strName = "./Strategy/cta_strategy_setting_backtester.json";
 	m_ctaStrategyMap=ReadStrategyConfFileJson(strName, m_backtesterEngine);
 
 	std::map<std::string, std::map<std::string, float>>::iterator iter;
@@ -84,7 +85,7 @@ void BacktesterManager::InitUI()
 
 void BacktesterManager::UpdateLogTable(LogData data)
 {
-	ui.textEdit->insertPlainText(QString::fromStdString(data.logTime + "    " + data.msg + "/n"));
+	ui.textEdit->insertPlainText(QString::fromStdString(data.logTime + "    " + data.msg + "\n"));
 
 }
 

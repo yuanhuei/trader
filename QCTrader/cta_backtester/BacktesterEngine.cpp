@@ -52,7 +52,6 @@ BacktesterEngine::BacktesterEngine(EventEngine* eventengine)
 
 
 	m_eventengine = eventengine;
-
 }
 
 BacktesterEngine::~BacktesterEngine()

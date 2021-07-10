@@ -37,7 +37,7 @@ void CTAStrategyManager::InitUI()
 	//读取策略配置文件
 	//ReadStrategyConfFileJson();
 
-
+	m_ctaEngine->writeCtaLog("策略配置文件加载完成");
 	
 	//设置策略配置表
 	m_StrategyConf = new QStandardItemModel;
