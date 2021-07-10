@@ -34,7 +34,7 @@ void riskmanager::loadSetting()
 		{
 			//如果打不开文件
 			std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-			e->msg = "无法读取本地配置文件";
+			e->msg = "无法读取本地风险配置文件";
 			e->gatewayname = "riskmanager";
 			this->onLog(e);
 			return;
@@ -59,7 +59,7 @@ void riskmanager::loadSetting()
 	else
 	{
 		std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-		e->msg = "无法读取本地配置文件";
+		e->msg = "无法读取风险本地配置文件";
 		e->gatewayname = "riskmanager";
 		this->onLog(e);
 	}

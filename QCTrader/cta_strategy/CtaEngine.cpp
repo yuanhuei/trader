@@ -772,6 +772,8 @@ void CtaEngine::showLog(std::shared_ptr<Event>e)
 //设置了定时器，非交易时间断开连接，交易时间自动连接
 void CtaEngine::autoConnect(std::shared_ptr<Event>e)
 {
+
+
 	auto nowtime2 = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 	if (((nowtime2 > Utils::timetounixtimestamp(2, 31, 0)) && (nowtime2 < Utils::timetounixtimestamp(8, 50, 0)))
 		|| ((nowtime2 > Utils::timetounixtimestamp(15, 01, 0)) && (nowtime2 < Utils::timetounixtimestamp(20, 50, 0))))
@@ -790,6 +792,18 @@ void CtaEngine::autoConnect(std::shared_ptr<Event>e)
 		//连接
 		if (m_connectstatus == false)
 		{
+			//如果没有策略初始化完成，先不连接，
+			bool bInited = false;
+			m_strategymtx.lock();
+			for (std::map<std::string, StrategyTemplate*>::iterator iter = m_strategymap.begin(); iter != m_strategymap.end(); iter++)
+			{
+				if (iter->second->inited == true)
+					bInited = true;
+			}
+			m_strategymtx.unlock();
+			if (bInited == false)
+				return;
+
 			m_connectstatus = true;
 			writeCtaLog("CTP接口主动连接！");
 
