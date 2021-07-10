@@ -119,7 +119,7 @@ void CTPTD::OnRspUserLogout(CThostFtdcUserLogoutField* pUserLogout, CThostFtdcRs
 
 	}
 }
-
+//报单录入请求，录入错误时对应响应OnRspOrderInsert、OnErrRtnOrderInsert，正确时对应回报OnRtnOrder、OnRtnTrade。
 void CTPTD::OnRspOrderInsert(CThostFtdcInputOrderField* pInputOrder, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)//验证无问题
 {
 	//错误发单柜台
@@ -242,10 +242,11 @@ void CTPTD::OnRspQryTradingAccount(CThostFtdcTradingAccountField* pTradingAccoun
 //持仓查询回调函数
 void CTPTD::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* pInvestorPosition, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
-	
+	//如果查询时客户没有任何持仓记录，API也会回调该函数。只是pInvestorPosition指针为空，bIsLast字段为true。
 	if (pInvestorPosition == nullptr)
 	{
 		//空指针
+		//m_ctpgateway->write_log("返回为空，无仓位");
 		return;
 	}
 	std::string symboldirection = pInvestorPosition->InstrumentID;//合约名

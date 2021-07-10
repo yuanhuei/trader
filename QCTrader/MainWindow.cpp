@@ -47,7 +47,7 @@ MainWindow::~MainWindow()
 
 
 	m_gatewaymanager->exit();
-	delete m_riskmanager;
+	//delete m_riskmanager;
 	delete m_ctaEngine;
 	delete m_ctaBacktesterManager;
 	delete m_gatewaymanager;
@@ -145,7 +145,7 @@ void MainWindow::LoadEngine()
 
 	m_gatewaymanager = new Gatewaymanager(m_eventengine);//接口管理器
 
-	m_riskmanager = new riskmanager(m_eventengine); //风险管理器
+	//m_riskmanager = new riskmanager(m_eventengine); //风险管理器
 
 	m_ctaEngine = new CtaEngine(m_gatewaymanager, m_eventengine, m_riskmanager);//cta管理器
 

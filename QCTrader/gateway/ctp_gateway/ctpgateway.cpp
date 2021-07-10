@@ -68,7 +68,7 @@ void CTPGateway::connect()
 			configmap.insert(std::make_pair(line.substr(0, pos), line.substr(pos + 1, line.size() - 1)));
 		}
 		m_MDSPI->connect(configmap["username"], configmap["password"], configmap["brokerid"], configmap["mdipaddress"]);
-		m_TDSPI->connect(configmap["userR"], configmap["password"], configmap["brokerid"], configmap["tdipaddress"], configmap["authcode"], configmap["productname"], configmap["productinfo"]);
+		m_TDSPI->connect(configmap["username"], configmap["password"], configmap["brokerid"], configmap["tdipaddress"], configmap["authcode"], configmap["productname"], configmap["productinfo"]);
 		write_log("连接请求已发送");
 
 	}
