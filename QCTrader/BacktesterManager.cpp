@@ -32,22 +32,37 @@ BacktesterManager::~BacktesterManager()
 void BacktesterManager::InitUI()
 {
 	//设置QCustomplot组件
-	QVector<double>x(101), y(101);
-	for (int i = 0; i < 101; ++i)
-	{
-		x[i] = i / 50.0 - 1;
-		y[i] = x[i] * x[i];
-	}
-	ui.widget->setWindowTitle("acout");
-	ui.widget->windowTitle();
 	ui.widget->addGraph();
-	ui.widget->graph(0)->setData(x, y);
 	ui.widget->xAxis->setLabel("x");
 	ui.widget->yAxis->setLabel("y");
-	ui.widget->xAxis->setRange(0, 1);
+	ui.widget->xAxis->setRange(0, 1000);
 	ui.widget->yAxis->setRange(0, 10000);
 	ui.widget->replot();
 	ui.widget->show();
+
+	ui.widget_2->addGraph();
+	ui.widget_2->xAxis->setLabel("x");
+	ui.widget_2->yAxis->setLabel("y");
+	ui.widget_2->xAxis->setRange(0, 10000);
+	ui.widget_2->yAxis->setRange(-10000, 0);
+	ui.widget_2->replot();
+	ui.widget_2->show();
+
+	ui.widget_3->addGraph();
+	ui.widget_3->xAxis->setLabel("x");
+	ui.widget_3->yAxis->setLabel("y");
+	ui.widget_3->xAxis->setRange(0, 1000);
+	ui.widget_3->yAxis->setRange(-500, 10000);
+	ui.widget_3->replot();
+	ui.widget_3->show();
+
+	ui.widget_4->addGraph();
+	ui.widget_4->xAxis->setLabel("x");
+	ui.widget_4->yAxis->setLabel("y");
+	ui.widget_4->xAxis->setRange(0, 1000);
+	ui.widget_4->yAxis->setRange(-500, 10000);
+	ui.widget_4->replot();
+	ui.widget_4->show();
 
 
 	ui.widget->plotLayout()->insertRow(0);
@@ -75,7 +90,7 @@ void BacktesterManager::InitUI()
 	}
 
 
-
+	//设置只能输入数字
 	QValidator* validator = new QIntValidator(0, 9999, this);
 	ui.lineEdit_9->setValidator(validator);
 	ui.lineEdit_10->setValidator(validator);
@@ -125,28 +140,35 @@ void BacktesterManager::ProcecssTesterFisnishedEvent(std::shared_ptr<Event>e)
 
 	//画图
 	//账户净值
+	//净值回撤
+	// 每日盈亏
+	// 盈亏分布
 	int nDay = m_backtesterEngine->m_daily_resultMap.size();
-	QVector<double> x(nDay), y(nDay),;
+	QVector<double> x(nDay), balance_y(nDay),drawdown_y(nDay),pnl_y(nDay),pnl_distribution_y(nDay);
 	int n = 0;
 	x[n] = 0;
 	for (auto &iter: m_backtesterEngine->m_daily_resultMap)
 	{
-		y[n] = iter.second->m_balance;
+		balance_y[n] = iter.second->m_balance;
+		drawdown_y[n] = iter.second->m_drawdown;
+		pnl_y[n] = iter.second->m_net_pnl;
+		balance_y[n] = iter.second->m_balance;
+
 		x[n++] = n++ ;
 		
 	}
-	ui.widget->graph(0)->setData(x,y);
+	ui.widget->graph(0)->setData(x, balance_y);
 	ui.widget->replot();
 	ui.widget->show();
-
-	//净值回撤
-	 
-	// 每日盈亏
-	
-	// 盈亏分布
-	
-
-
+	ui.widget_2->graph(0)->setData(x, drawdown_y);
+	ui.widget_2->replot();
+	ui.widget_2->show();
+	ui.widget_3->graph(0)->setData(x, pnl_y);
+	ui.widget_3->replot();
+	ui.widget_3->show();
+	//ui.widget_4->graph(0)->setData(x, pnl_distribution_y);
+	ui.widget_4->replot();
+	ui.widget_4->show();
 	// 
 	// 
 	//开始回测按钮重新打开
@@ -183,9 +205,9 @@ void BacktesterManager::startBacktest_clicked()
 
 
 	Interval iInterval = Interval(ui.comboBox_2->currentIndex());
-	QDateTime starDate, endDate;
-	starDate=ui.dateEdit->dateTime();
-	endDate = ui.dateEdit_2->dateTime();
+	QDate starDate, endDate;
+	starDate=ui.dateEdit->dateTime().date();
+	endDate = ui.dateEdit_2->dateTime().date();
 
 	float rate = ui.lineEdit_10->text().toFloat();//费率
 	float slippage = ui.lineEdit_10->text().toFloat();//交易滑点

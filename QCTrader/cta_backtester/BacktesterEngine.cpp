@@ -376,7 +376,7 @@ void BacktesterEngine::CrossLimitOrder(const BarData& data)
 				}
 				m_orderStrategymap[iter->first]->onTrade(trade);
 
-				savetraderecord(m_orderStrategymap[trade->orderID]->getparam("name"), trade);
+				savetraderecord(m_orderStrategymap[trade->orderID]->getparam("name"), trade,m_eventengine);
 
 				Settlement(trade, m_orderStrategymap);
 

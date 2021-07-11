@@ -7,6 +7,8 @@
 #include <iostream>  
 #include <fstream>  
 #include"./cta_strategy/strategies/BollChannelStrategy.h"
+#include"../utility.h"
+
 
 extern mongoc_uri_t* g_uri;
 extern mongoc_client_pool_t* g_pool;
@@ -627,7 +629,7 @@ void CtaEngine::processTradeEvent(std::shared_ptr<Event>e)
 		m_orderStrategymap[eTrade->orderID]->onTrade(eTrade);
 
 		//保存交易记录
-		savetraderecord(m_orderStrategymap[eTrade->orderID]->m_strategyName, eTrade);
+		savetraderecord(m_orderStrategymap[eTrade->orderID]->m_strategyName, eTrade,m_eventengine);
 		//保存仓位信息到配置文件
 		m_orderStrategymap[eTrade->orderID]->sync_data();
 	}

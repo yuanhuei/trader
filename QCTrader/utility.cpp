@@ -11,6 +11,7 @@
 #include <iostream>  
 #include <fstream>  
 #include"CTAAPI.h"
+#include"event_engine/eventengine.h"
 
 QString str2qstr_new(std::string str)
 {
@@ -26,7 +27,7 @@ std::string time_t2str(time_t datetime)
         (int)ptm->tm_hour, (int)ptm->tm_min, (int)ptm->tm_sec);
     return std::string(date);
 }
-void savetraderecord(std::string strategyname, std::shared_ptr<Event_Trade>etrade)
+void savetraderecord(std::string strategyname, std::shared_ptr<Event_Trade>etrade,EventEngine* eventEngine)
 {
     //交易记录
     if (_access("./traderecord", 0) != -1)
@@ -39,7 +40,7 @@ void savetraderecord(std::string strategyname, std::shared_ptr<Event_Trade>etrad
             std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
             e->msg = "无法保存交易记录";
             e->gatewayname = "CTP";
-            m_eventengine->Put(e);
+            eventEngine->Put(e);
             return;
         }
         std::string symbol = etrade->symbol;
