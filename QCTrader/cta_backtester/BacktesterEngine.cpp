@@ -17,32 +17,57 @@
 extern mongoc_uri_t* g_uri;
 extern mongoc_client_pool_t* g_pool;
 
-TradingResult::TradingResult(double entryPrice, std::string entryDt, double exitPrice, 
-	std::string exitDt, double volume, double rate, double slippage, double size)
+DailyTradingResult::DailyTradingResult(QDate date, double price)
 {
-	//清算
-	m_entryPrice = entryPrice;  //开仓价格
-	m_exitPrice = exitPrice;    // 平仓价格
-	m_entryDt = entryDt;        // 开仓时间datetime
-	m_exitDt = exitDt;          // 平仓时间
-	m_volume = volume;			//交易数量（ + / -代表方向）
-	m_turnover = (entryPrice + exitPrice) * size * abs(volume);   //成交金额
-	m_commission = m_turnover * rate;                                // 手续费成本
-	m_slippage = slippage * 2 * size * abs(volume);                        // 滑点成本
-	m_pnl = ((m_exitPrice - m_entryPrice) * volume * size - m_commission - m_slippage);  //净盈亏
 }
-TradingResult::TradingResult(double entryPrice, std::string entryDt, double exitPrice,
-	std::string exitDt, double volume, double size)
+DailyTradingResult::~DailyTradingResult()
 {
-	//清算
-	m_entryPrice = entryPrice;  //开仓价格
-	m_exitPrice = exitPrice;    // 平仓价格
-	m_entryDt = entryDt;        // 开仓时间datetime
-	m_exitDt = exitDt;          // 平仓时间
-	m_volume = volume;			//交易数量（ + / -代表方向）
-	m_pnl = ((m_exitPrice - m_entryPrice) * volume * size);  //净盈亏
 }
 
+void DailyTradingResult::add_trade(Event_Trade trade)
+{
+
+	m_trades.push_back(trade);
+}
+
+void DailyTradingResult::calculate_pnl (float pre_close,float start_pos,int size,float rate,float slippage)
+{
+	if (pre_close != -1)//输入为-1表示不知道之前的收盘价
+		m_pre_close = pre_close;
+	else
+		m_pre_close = 1;
+
+	m_start_pos = start_pos;
+	m_end_pos = start_pos;
+
+	m_holding_pnl = m_start_pos * (m_close_price - m_pre_close) * size;
+
+	//Trading pnl is the pnl from new trade during the day
+	m_trade_count = m_trades.size();
+	for (int i = 0; i < m_trade_count; i++)
+	{
+		int pos_change;
+		if (m_trades[i].direction == DIRECTION_LONG)
+			pos_change = m_trades[i].volume;
+		else
+			pos_change = -m_trades[i].volume;
+
+		m_end_pos += pos_change;
+
+		m_turnover = m_trades[i].volume * size * m_trades[i].price;
+		m_trading_pnl += pos_change * (m_close_price - m_trades[i].price) * size;
+		m_slippage += m_trades[i].volume * size * slippage;
+
+		m_turnover += m_turnover;
+		m_commission += m_turnover * rate;
+	}
+
+	// Net pnl takes account of commissionand slippage cost
+	m_total_pnl = m_trading_pnl + m_holding_pnl;
+	m_net_pnl = m_total_pnl - m_commission - m_slippage;
+
+
+}
 
 BacktesterEngine::BacktesterEngine(EventEngine* eventengine)
 {
@@ -156,25 +181,162 @@ void BacktesterEngine::runBacktesting()
 //推送数据
 	 
 	 //std::vector<BarData>datalist = loadBar(m_symbol, initDays);
-	 for (std::vector<BarData>::iterator it = vector_history_data.begin(); it != vector_history_data.end(); it++)
+	 bool bTrading = false;
+	 for (int i=0;i< vector_history_data.size();i++)
 	 {
-		 m_strategy->onBar(*it);
-		 if (m_strategy->inited)
+		 if (bTrading)
 		 {
-			 m_strategy->trading = true;//初始化完成后开始执行策略
-			 writeCtaLog("策略初始化完成，开始回测策略");
+			 m_barDate = vector_history_data[i].date;//赋值当前推送bar的时间给m_barDate方便传递参数
+			 CrossLimitOrder(vector_history_data[i]);//检查价格是否触发之前的order
+			 m_strategy->onBar(vector_history_data[i]);//调用策略的onBar函数推送bar数据
+			 update_daily_close(vector_history_data[i].close);//更新m_daily_results map的收盘价，为后面计算做准备
 		 }
-		
+		 else
+		 {
+			 if (m_strategy->inited)
+			 {
+				 m_strategy->trading = true;//初始化完成后开始执行策略
+				 writeCtaLog("策略初始化完成，开始回测策略");
+				 bTrading = true;
+			 }
+		 }
 	 }
+	 if (m_strategy->inited==false)
+		 writeCtaLog("策略初始化无法完成，不能回测");
 	 
 
 //计算统计结果
+	 m_result_df = calculate_result();
+	 result_statistics = calculate_statistics(output = False);
 
+	// Clear thread object handler.
+	//self.thread = None
+
+	//Put backtesting done event
+	event = Event(EVENT_BACKTESTER_BACKTESTING_FINISHED)
+	self.event_engine.put(event)
 
 //推送回测完成信号
 	writeCtaLog("策略回测完成");
 }
+void BacktesterEngine::update_daily_close(float price)
+{
+	QDate date;
+	date.fromString(QString::fromStdString(m_barDate), "yyyy/mm/dd");//把字符串时间转换成QDate类型
+	std::map<QDate, std::shared_ptr<DailyTradingResult> >::iterator iter = m_daily_resultMap.find(date);
+	if (iter!= m_daily_resultMap.end())//已经有这天的数据
+	{
+		//更新closeprice
+		iter->second->m_close_price = price;
+	}
+	else
+	{
+		m_daily_resultMap[date] = std::make_shared<DailyTradingResult>(date, price);
+	}
 
+}
+
+void BacktesterEngine::calculate_result()
+{
+	writeCtaLog("开始计算逐日盯市盈亏");
+
+	if (m_tradeMap.size() == 0)
+	{
+		writeCtaLog("成交记录为空，无法计算");
+		return;	
+	}
+	std::map<std::string, std::shared_ptr<Event_Trade>>::iterator iter;
+	for (iter = m_tradeMap.begin(); iter!=m_tradeMap.end(); iter++)
+	{
+		std::string tradetime = iter->second->tradeTime;
+		QDate date;
+		date=QDateTime::fromString(QString::fromStdString(tradetime), "yyyy/mm/dd hh:mm::ss").date();
+		
+		m_daily_resultMap[date]->add_trade(iter->second);
+	}
+
+
+	// Calculate daily result by iteration.
+	int	pre_close = 0;
+	int start_pos = 0;
+
+	//std::map<QDate, std::shared_ptr<DailyTradingResult>>::iterator iter;
+	for(std::map<QDate, std::shared_ptr<DailyTradingResult>>::iterator iter= m_daily_resultMap.begin();iter!= m_daily_resultMap.end();iter++)
+	{
+		iter->second->calculate_pnl(pre_close, start_pos, size,  rate, slippage));//->calculate_pnl();
+		pre_close = iter->second->m_close_price;
+		start_pos = iter->second->m_end_pos;
+
+	}
+}
+std::map<std::string, double> BacktesterEngine::calculate_statistics(bool bOutput = false)
+{
+
+
+}
+
+void BacktesterEngine::CrossLimitOrder(const BarData& data)
+{
+	double	buyCrossPrice = data.low;
+	double	sellCrossPrice = data.high;
+	double	buyBestCrossPrice = data.open;
+	double	sellBestCrossPrice = data.open;
+	std::unique_lock<std::mutex>lck(m_ordermapmtx);
+	for (std::map<std::string, std::shared_ptr<Event_Order>>::iterator iter = m_WorkingOrdermap.begin(); iter != m_WorkingOrdermap.end();)
+	{
+		if (data.symbol == iter->second->symbol)
+		{
+			bool buyCross = (iter->second->direction == DIRECTION_LONG && iter->second->price >= buyCrossPrice);
+			bool sellCross = (iter->second->direction == DIRECTION_SHORT && iter->second->price <= sellCrossPrice);
+
+			//如果发生了成交
+			if (buyCross || sellCross)
+			{
+				m_tradeCount += 1;
+				std::string tradeID = iter->first;
+				std::shared_ptr<Event_Trade>trade = std::make_shared<Event_Trade>();
+				trade->symbol = iter->second->symbol;
+				trade->tradeID = tradeID;
+				trade->orderID = iter->second->orderID;
+				trade->direction = iter->second->direction;
+				trade->offset = iter->second->offset;
+				trade->volume = iter->second->totalVolume;
+				trade->tradeTime = time_t2str(m_datetime);
+				std::unique_lock<std::mutex>lck2(m_orderStrategymtx);
+				if (buyCross)
+				{
+					trade->price = std::min(iter->second->price, buyBestCrossPrice);
+					m_orderStrategymap[iter->first]->changeposmap(iter->second->symbol, m_orderStrategymap[iter->first]->getpos(iter->second->symbol) + trade->volume);
+				}
+				else if (sellCross)
+				{
+					trade->price = std::max(iter->second->price, sellBestCrossPrice);
+					m_orderStrategymap[iter->first]->changeposmap(iter->second->symbol, m_orderStrategymap[iter->first]->getpos(iter->second->symbol) - trade->volume);
+				}
+				m_orderStrategymap[iter->first]->onTrade(trade);
+
+				savetraderecord(m_orderStrategymap[trade->orderID]->getparam("name"), trade);
+
+				Settlement(trade, m_orderStrategymap);
+
+				iter->second->tradedVolume = iter->second->totalVolume;
+				iter->second->status = STATUS_ALLTRADED;
+				m_Ordermap[iter->first]->status = STATUS_ALLTRADED;
+
+				m_orderStrategymap[iter->first]->onOrder(iter->second);
+				m_WorkingOrdermap.erase(iter++); //#1 
+			}
+			else
+			{
+				iter++;
+			}
+		}
+		else
+		{
+			iter++;
+		}
+	}
+}
 
 void BacktesterEngine::writeCtaLog(std::string msg)
 {
@@ -408,7 +570,7 @@ std::vector<TickData> BacktesterEngine::loadTick(std::string symbol, int days)
 {
 	//QDateTime startDay
 	QDateTime endDay = QDateTime::currentDateTime();
-	QDateTime startDay = endDay.addDays(0 - days);
+	QDateTime startDay = endDay.addDays(qint64(0 - days));
 
 	std::vector<TickData> tickData = loadTickbyDateTime(symbol, startDay, endDay);
 	return tickData;
@@ -418,7 +580,7 @@ std::vector<BarData> BacktesterEngine::loadBar(std::string symbol, int days)
 {
 	//QDateTime startDay
 	QDateTime endDay = QDateTime::currentDateTime();
-	QDateTime startDay = endDay.addDays(0 - days);
+	QDateTime startDay = endDay.addDays(qint64(0 - days));
 	return loadBarbyDateTime(symbol, startDay, endDay);
 }
 

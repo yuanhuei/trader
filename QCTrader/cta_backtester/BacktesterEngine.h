@@ -2,6 +2,7 @@
 #include "CTAAPI.h"
 #include<string>
 #include<map>
+#include<vector>
 #include<set>
 #include"qcstructs.h"
 #include<QDateTime>
@@ -25,23 +26,35 @@ struct UnitResult
 };
 
 
-class TradingResult
+class DailyTradingResult
 {
 public:
-	TradingResult(double entryPrice, std::string entryDt, double exitPrice, 
-		std::string exitDt, double volume, double rate, double slippage, double size);
-	TradingResult(double entryPrice, std::string entryDt, double exitPrice,
-		std::string exitDt, double volume,double size);
-	double m_entryPrice;  //开仓价格
-	double m_exitPrice;   // 平仓价格
-	std::string m_entryDt;   // 开仓时间datetime
-	std::string  m_exitDt;  // 平仓时间
-	double	m_volume;//交易数量（ + / -代表方向）
-	double	m_pnl;  //净盈亏
+	DailyTradingResult(QDate date, double price);
+	//DailyTradingResult(double entryPrice, std::string entryDt, double exitPrice,
+		//std::string exitDt, double volume,double size);
+	void add_trade(Event_Trade trade);
+	void calculate_pnl(float pre_close, float start_pos, int size, float rate, float slippage);
 
-	double m_turnover;
-	double m_commission;
-	double m_slippage;
+
+	QDate date = date;
+	double m_close_price;//今天收盘价
+	double	m_pre_close = 0;//前一天的收盘价
+
+	 std::vector<Event_Trade> m_trades;
+	int m_trade_count = 0;
+
+	int m_start_pos = 0;
+	int m_end_pos = 0;
+
+	double m_turnover = 0;
+	double m_commission = 0;//手续费
+	double m_slippage = 0;//滑点
+
+	double	m_trading_pnl = 0;
+	double	m_holding_pnl = 0;
+	double	m_total_pnl = 0;
+	double		m_net_pnl = 0;
+
 };
 
 typedef std::map<std::string, UnitResult> Result;//key是合约 value是一个结果单位
@@ -70,9 +83,11 @@ public:
 	float	m_size = 1;
 	float m_pricetick = 0;
 	float m_capital = 1000000;
-	//floatself.risk_free: float = 0.02;
+	float risk_free= 0.02;
 	//mode = BacktestingMode.BAR;
 	//self.inverse = False
+	std::string m_barDate;
+
 
 
 	TickData m_tick;
@@ -82,7 +97,6 @@ public:
 	Interval m_iInterval=MINUTE;
 	int m_days = 0;
 	//self.callback = None
-	std::vector<BarData> vector_history_data;
 
 	int m_stop_order_count = 0;
 	//stop_orders = {}
@@ -91,15 +105,26 @@ public:
 	int m_limit_order_count = 0;
 	//self.limit_orders = {}
 	//self.active_limit_orders = {}
+	std::map<std::string, std::shared_ptr<Event_Order>>m_Ordermap;			std::mutex m_ordermapmtx;	//所有的单，不会删除
+	std::map<std::string, std::shared_ptr<Event_Order>>m_WorkingOrdermap;								//工作中的单   和workingordermap用一个锁
 
 	int m_trade_count = 0;
 	//trades = {}
+	std::map<std::string, std::shared_ptr<Event_Order>>m_tradeMap;//成交单					//std::mutex m_tradelistmtx;//清算缓存
+	std::map<std::string, Result>m_result;											std::mutex m_resultmtx;			//缓存结果
+
+	std::vector<BarData> vector_history_data;
+
 
 	//logs = []
 
-	//daily_results = {}
+	std::map<QDate, std::shared_ptr<DailyTradingResult>> m_daily_resultMap;
 	//daily_df = None
+	//m_result_df;
+	std::map<std::string,double> m_result_statistics;
 
+	void calculate_result();
+	std::map<std::string, double> calculate_statistics(bool bOutput = false);
 
 	//提供给Strategytemplate调用的接口
 	std::vector<std::string> sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy);
@@ -120,6 +145,10 @@ public:
 
 	//回测函数
 	std::vector<BarData> LoadHistoryData();				//读取回测用的历史数据
+	void update_daily_close(float price);
+
+
+
 	void processTickEvent(std::shared_ptr<Event>e);					//处理tick事件
 	void processBarEvent(std::shared_ptr<Event>e);					//处理bar事件
 	void CrossLimitOrder(const TickData& data);
@@ -131,18 +160,19 @@ public:
 	void RecordPNL(const BarData& data);
 
 	void StartBacktesting(
-		std::string strStrategyName ,
+		std::string strStrategyName,
 		std::string strStrategyClassName,
-		std::string strSymbol ,
-		Interval iInterval ,
+		std::string strSymbol,
+		Interval iInterval,
 		QDateTime starDate,
 		QDateTime	endDate,
-		float rate ,
-		float slippage ,
-		float contractsize ,
-		float pricetick ,
+		float rate,
+		float slippage,
+		float contractsize,
+		float pricetick,
 		float capital,
 		std::map<std::string, float>  ctaStrategyMap);
+
 
 	void runBacktesting();
 
@@ -160,8 +190,7 @@ public:
 	std::map<std::string, double>symbol_rate;						//合约乘数，本地硬盘读取	只读不写，不用加锁
 	std::map<std::string, double>m_slippage;
 	std::map<std::string, HINSTANCE>dllmap;																//存放策略dll容器		只读不写，不用加锁
-	std::map<std::string, std::shared_ptr<Event_Order>>m_Ordermap;			std::mutex m_ordermapmtx;	//所有的单，不会删除
-	std::map<std::string, std::shared_ptr<Event_Order>>m_WorkingOrdermap;								//工作中的单   和workingordermap用一个锁
+
 	//key 是OrderID  value 是策略对象 用途是为了保证这个单是这个策略发出去的  成交回报计算持仓正确加载对应的策略上，以防多个策略交易同一个合约出现BUG
 	std::map<std::string, StrategyTemplate*>m_orderStrategymap;	            std::mutex m_orderStrategymtx;
 	std::map<std::string, StrategyTemplate*>m_strategymap;					std::mutex m_strategymtx;	//存策略名和策略对象指针
@@ -172,8 +201,6 @@ public:
 	std::vector<TickData>m_Tickdatavector;									std::mutex m_HistoryDatamtx;//历史数据加锁
 	std::vector<BarData>m_Bardatavector;
 
-	std::map<std::string, std::map<std::string, std::vector<Event_Trade>>>m_tradelist_memory;					std::mutex m_tradelistmtx;//清算缓存
-	std::map<std::string, Result>m_result;											std::mutex m_resultmtx;			//缓存结果
 	//回测时间
 	time_t startDatetime;
 	time_t endDatetime;
