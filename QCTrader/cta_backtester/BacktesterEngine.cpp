@@ -268,7 +268,13 @@ std::map<std::string, double> BacktesterEngine::calculate_statistics(bool bOutpu
 
 	int iProfit_days = 0;
 	int iLoss_days = 0;
-	double preBalance = m_capital;
+	double preBalance =m_capital;
+	double max_drawdown=0;
+	double max_ddpercent = 0;
+	double total_commission = 0;
+	double	total_slippage = 0;
+	double	total_turnover = 0;
+	double total_trade_count = 0;
 	for (auto &iter: m_daily_resultMap)
 	{
 		if (iter.second->m_net_pnl > 0)
@@ -281,30 +287,39 @@ std::map<std::string, double> BacktesterEngine::calculate_statistics(bool bOutpu
 		iter.second->m_drawdown = iter.second->m_balance - iter.second->m_highlevel;
 		iter.second->m_ddpercent = iter.second->m_drawdown / iter.second->m_highlevel;
 		preBalance = iter.second->m_balance;
-		
+
+		max_drawdown = std::min(iter.second->m_drawdown, max_drawdown);
+		max_ddpercent = std::min(iter.second->m_ddpercent, max_ddpercent);
+
+		total_commission = iter.second->m_commission + total_commission;
+		total_slippage = iter.second->m_slippage + total_slippage;
+		total_turnover = iter.second->m_turnover + total_turnover;
+		total_trade_count = iter.second->m_trade_count + total_trade_count;
 	}
+	double lastBalance = preBalance;
 	m_result_statistics["profit_days"] = iProfit_days;
 
 	m_result_statistics["loss_days"] = iLoss_days;
-		m_result_statistics["end_balance"] =
+	m_result_statistics["end_balance"] = lastBalance;
 
 
-		m_result_statistics["max_drawdown"] =
-		m_result_statistics["max_ddpercent"] =
-		m_result_statistics["max_drawdown_end"] =
+	m_result_statistics["max_drawdown"] = max_drawdown;
+	m_result_statistics["max_ddpercent"] = max_ddpercent;
+		//m_result_statistics["max_drawdown_end"] =
 
-		m_result_statistics["total_net_pnl"] =
-		m_result_statistics["daily_net_pnl"] =
-		m_result_statistics["total_commission"] =
+	m_result_statistics["total_net_pnl"] = preBalance - m_capital;
+	m_result_statistics["daily_net_pnl"] = (preBalance - m_capital)/m_daily_resultMap.size();
 
-		m_result_statistics["daily_commission"] =
-		m_result_statistics["total_slippage"] =
-		m_result_statistics["total_turnover"] =
+	m_result_statistics["total_commission"] = total_commission;
+		m_result_statistics["daily_commission"] = total_commission/ m_daily_resultMap.size();
+
+		m_result_statistics["total_slippage"] = total_slippage;
+		m_result_statistics["total_turnover"] = total_turnover;
 
 
-		m_result_statistics["total_trade_count"] =
-		m_result_statistics["daily_trade_count"] =
-		m_result_statistics["total_return"] =
+		m_result_statistics["total_trade_count"] = total_trade_count;
+		m_result_statistics["daily_trade_count"] = total_trade_count/ m_daily_resultMap.size();
+		m_result_statistics["total_return"] = (lastBalance - m_capital) / m_capital;
 
 		m_result_statistics["annual_return"] =
 		m_result_statistics["daily_return"] =
