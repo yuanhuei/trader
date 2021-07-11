@@ -72,10 +72,6 @@ void DailyTradingResult::calculate_pnl (float pre_close,float start_pos,int size
 BacktesterEngine::BacktesterEngine(EventEngine* eventengine)
 {
 
-
-
-
-
 	m_eventengine = eventengine;
 }
 
@@ -146,7 +142,7 @@ void BacktesterEngine::StartBacktesting(
 	m_endDay = endDate;
 	m_iInterval = iInterval;
 	m_rate = rate;
-	m_fSlippage = slippage;
+	m_slippage = slippage;
 	m_size = contractsize;
 	m_pricetick = pricetick;
 	m_capital = capital;
@@ -206,17 +202,15 @@ void BacktesterEngine::runBacktesting()
 	 
 
 //计算统计结果
-	 m_result_df = calculate_result();
-	 result_statistics = calculate_statistics(output = False);
+	 calculate_result();
+	 calculate_statistics(true);
 
 	// Clear thread object handler.
 	//self.thread = None
+ //推送回测完成信号
+	 std::shared_ptr<Event_TesterFinished>e = std::make_shared<Event_TesterFinished>();
+	 m_eventengine->Put(e);
 
-	//Put backtesting done event
-	event = Event(EVENT_BACKTESTER_BACKTESTING_FINISHED)
-	self.event_engine.put(event)
-
-//推送回测完成信号
 	writeCtaLog("策略回测完成");
 }
 void BacktesterEngine::update_daily_close(float price)
@@ -245,28 +239,25 @@ void BacktesterEngine::calculate_result()
 		writeCtaLog("成交记录为空，无法计算");
 		return;	
 	}
-	std::map<std::string, std::shared_ptr<Event_Trade>>::iterator iter;
-	for (iter = m_tradeMap.begin(); iter!=m_tradeMap.end(); iter++)
+	//遍历trapmap，将成交记录根据日期加入到m_daily_resultMap中
+	for (std::map<std::string, std::shared_ptr<Event_Trade>>::iterator iter = m_tradeMap.begin(); iter!=m_tradeMap.end(); iter++)
 	{
 		std::string tradetime = iter->second->tradeTime;
 		QDate date;
 		date=QDateTime::fromString(QString::fromStdString(tradetime), "yyyy/mm/dd hh:mm::ss").date();
 		
-		m_daily_resultMap[date]->add_trade(iter->second);
+		m_daily_resultMap[date]->add_trade(*iter->second);
 	}
 
-
-	// Calculate daily result by iteration.
+	// Calculate daily result by iteration.初始化价格，仓位
 	int	pre_close = 0;
 	int start_pos = 0;
-
-	//std::map<QDate, std::shared_ptr<DailyTradingResult>>::iterator iter;
+	//计算每日的利润和损失
 	for(std::map<QDate, std::shared_ptr<DailyTradingResult>>::iterator iter= m_daily_resultMap.begin();iter!= m_daily_resultMap.end();iter++)
 	{
-		iter->second->calculate_pnl(pre_close, start_pos, size,  rate, slippage));//->calculate_pnl();
-		pre_close = iter->second->m_close_price;
-		start_pos = iter->second->m_end_pos;
-
+		iter->second->calculate_pnl(pre_close, start_pos, m_size,  m_rate, m_slippage);
+		pre_close=iter->second->m_close_price;
+		start_pos=iter->second->m_end_pos;
 	}
 }
 std::map<std::string, double> BacktesterEngine::calculate_statistics(bool bOutput = false)

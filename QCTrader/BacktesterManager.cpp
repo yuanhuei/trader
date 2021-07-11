@@ -2,6 +2,7 @@
 #include "BacktesterManager.h"
 #include"utility.h"
 #include"cta_backtester/BacktesterEngine.h"
+#include"event_engine/eventengine.h"
 
 
 #include <qvalidator.h>
@@ -88,8 +89,29 @@ void BacktesterManager::UpdateLogTable(LogData data)
 	ui.textEdit->insertPlainText(QString::fromStdString(data.logTime + "    " + data.msg + "\n"));
 
 }
+void BacktesterManager::RegisterEvent()
+{
+	m_mainwindow->m_eventengine->RegEvent(EVENT_CTABACKTESTERFINISHED, std::bind(&BacktesterManager::ProcecssTesterFisnishedEvent, this, std::placeholders::_1));
+}
+
+void BacktesterManager::ProcecssTesterFisnishedEvent(std::shared_ptr<Event>e)
+{
 
 
+	ui.pushButton->setEnabled(true);//开始回测按钮重新打开
+	/*
+	statistics = self.backtester_engine.get_result_statistics()
+		self.statistics_monitor.set_data(statistics)
+
+		df = self.backtester_engine.get_result_df()
+		self.chart.set_data(df)
+
+		self.trade_button.setEnabled(True)
+		self.order_button.setEnabled(True)
+		self.daily_button.setEnabled(True)
+	*/
+
+}
 void BacktesterManager::startBacktest_clicked()
 {
 	std::string strStrategyName = ui.comboBox->currentText().toStdString();

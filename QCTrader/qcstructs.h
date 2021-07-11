@@ -351,6 +351,7 @@ public:
 //»Ø²âÊÂ¼þ
 #define EVENT_BACKTEST_TICK "ebacktesttick"
 #define EVENT_BACKTEST_BAR "ebacktestbar"
+#define EVENT_CTABACKTESTERFINISHED "backtessterfinished"
 
 ///////////////////////////////////////
 
@@ -367,6 +368,12 @@ public:
 	}
 private:
 	std::string m_eventtype;
+};
+class  Event_TesterFinished :public Event
+{
+public:
+	Event_TesterFinished() :Event(EVENT_CTABACKTESTERFINISHED)
+	{}
 };
 
 class  Event_Exit :public Event

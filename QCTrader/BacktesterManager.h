@@ -26,6 +26,9 @@ public:
 	MainWindow* m_mainwindow;
 
 	void UpdateLogTable(LogData data);
+	void RegisterEvent();
+	void ProcecssTesterFisnishedEvent(std::shared_ptr<Event>e);
+
 
 private:
 	Ui::BacktesterManager ui;

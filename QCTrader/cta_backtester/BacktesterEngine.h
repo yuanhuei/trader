@@ -79,7 +79,7 @@ public:
 	QDateTime m_startDay;
 	QDateTime	m_endDay;
 	float	m_rate = 0;
-	float	m_fSlippage = 0;
+	float	m_slippage = 0;
 	float	m_size = 1;
 	float m_pricetick = 0;
 	float m_capital = 1000000;
@@ -110,7 +110,7 @@ public:
 
 	int m_trade_count = 0;
 	//trades = {}
-	std::map<std::string, std::shared_ptr<Event_Order>>m_tradeMap;//成交单					//std::mutex m_tradelistmtx;//清算缓存
+	std::map<std::string, std::shared_ptr<Event_Trade>>m_tradeMap;//成交单					//std::mutex m_tradelistmtx;//清算缓存
 	std::map<std::string, Result>m_result;											std::mutex m_resultmtx;			//缓存结果
 
 	std::vector<BarData> vector_history_data;
@@ -188,7 +188,7 @@ public:
 	std::condition_variable m_cv;
 	std::map<std::string, double>symbol_size;						//合约乘数，本地硬盘读取	只读不写，不用加锁
 	std::map<std::string, double>symbol_rate;						//合约乘数，本地硬盘读取	只读不写，不用加锁
-	std::map<std::string, double>m_slippage;
+	//std::map<std::string, double>m_slippage;
 	std::map<std::string, HINSTANCE>dllmap;																//存放策略dll容器		只读不写，不用加锁
 
 	//key 是OrderID  value 是策略对象 用途是为了保证这个单是这个策略发出去的  成交回报计算持仓正确加载对应的策略上，以防多个策略交易同一个合约出现BUG
