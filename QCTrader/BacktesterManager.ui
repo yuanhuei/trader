@@ -268,202 +268,138 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_17">
-             <item>
-              <widget class="QLabel" name="label_16">
-               <property name="text">
-                <string>首个交易日</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_15">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_19">
-             <item>
-              <widget class="QLabel" name="label_19">
-               <property name="text">
-                <string>最后交易日</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_20">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_26">
-             <item>
-              <widget class="QLabel" name="label_33">
-               <property name="text">
-                <string>总交易日</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_34">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_18">
-             <item>
-              <widget class="QLabel" name="label_17">
-               <property name="text">
-                <string>盈利交易日</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_18">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_20">
-             <item>
-              <widget class="QLabel" name="label_21">
-               <property name="text">
-                <string>亏损交易日</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_22">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_25">
-             <item>
-              <widget class="QLabel" name="label_31">
-               <property name="text">
-                <string>起始资金</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_32">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_24">
-             <item>
-              <widget class="QLabel" name="label_29">
-               <property name="text">
-                <string>结束资金</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_30">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_23">
-             <item>
-              <widget class="QLabel" name="label_27">
-               <property name="text">
-                <string>总收益率</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_28">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_27">
-             <item>
-              <widget class="QLabel" name="label_35">
-               <property name="text">
-                <string>年化收益率</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_36">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_22">
-             <item>
-              <widget class="QLabel" name="label_25">
-               <property name="text">
-                <string>最大回撤</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_26">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_21">
-             <item>
-              <widget class="QLabel" name="label_23">
-               <property name="text">
-                <string>百分比最大回撤</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_24">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            <widget class="QTableWidget" name="tableWidget">
+             <row>
+              <property name="text">
+               <string>首个交易日</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>新建行</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>总交易日</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>盈利交易日</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>亏损交易日</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>起始资金</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>结束资金</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>总收益率</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>年化收益</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>最大回撤</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>百分比最大回撤</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>新建行</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>总盈亏</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>总手续费</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>总滑点</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>总成交金额</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>总成交笔数</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>日均盈亏</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>日均手续费</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>日均滑点</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>日均成交金额</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>日均成交笔数</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>日均收益率</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>收益标准差</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Sharpe Ratio</string>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>收益回撤比</string>
+              </property>
+             </row>
+            </widget>
            </item>
           </layout>
          </widget>

@@ -27,7 +27,7 @@ public:
 
 	void UpdateLogTable(LogData data);
 	void RegisterEvent();
-	void ::ProcecssTesterFisnishedEvent(std::shared_ptr<Event>e)
+	void ProcecssTesterFisnishedEvent(std::shared_ptr<Event>e);
 
 
 private:

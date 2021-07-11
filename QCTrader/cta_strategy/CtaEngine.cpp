@@ -1056,7 +1056,7 @@ void CtaEngine::PutEvent(std::shared_ptr<Event>e)
 {
 	m_eventengine->Put(e);
 }
-
+/*
 void CtaEngine::savetraderecord(std::string strategyname, std::shared_ptr<Event_Trade>etrade)
 {
 	//½»Ò×¼ÇÂ¼
@@ -1085,7 +1085,7 @@ void CtaEngine::savetraderecord(std::string strategyname, std::shared_ptr<Event_
 		f.close();
 	}
 }
-
+*/
 std::vector<TickData> CtaEngine::loadTick( std::string symbol, int days)
 {
 	std::vector<TickData>datavector;

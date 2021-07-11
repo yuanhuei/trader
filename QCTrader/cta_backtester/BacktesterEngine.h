@@ -127,7 +127,7 @@ public:
 	std::map<QDate, std::shared_ptr<DailyTradingResult>> m_daily_resultMap;
 	//daily_df = None
 	//m_result_df;
-	std::map<std::string,std::string> m_result_statistics;
+	std::map < std::string, std::string> m_result_statistics;
 
 	void calculate_result();
 	std::map<std::string, double> calculate_statistics(bool bOutput = false);

@@ -44,8 +44,8 @@ void BacktesterManager::InitUI()
 	ui.widget->graph(0)->setData(x, y);
 	ui.widget->xAxis->setLabel("x");
 	ui.widget->yAxis->setLabel("y");
-	ui.widget->xAxis->setRange(-1, 1);
-	ui.widget->yAxis->setRange(0, 1);
+	ui.widget->xAxis->setRange(0, 1);
+	ui.widget->yAxis->setRange(0, 10000);
 	ui.widget->replot();
 	ui.widget->show();
 
@@ -96,9 +96,61 @@ void BacktesterManager::RegisterEvent()
 
 void BacktesterManager::ProcecssTesterFisnishedEvent(std::shared_ptr<Event>e)
 {
+	//输出回测统计信息
+	ui.tableWidget->setItem(0, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["start_date"])));
+	ui.tableWidget->setItem(1, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["end_date"])));
+	ui.tableWidget->setItem(2, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["total_days"])));
+	ui.tableWidget->setItem(3, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["profit_days"])));
+	ui.tableWidget->setItem(4, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["loss_days"])));
+	ui.tableWidget->setItem(5, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["end_balance"])));
+	ui.tableWidget->setItem(6, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["max_drawdown"])));
+	ui.tableWidget->setItem(7, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["max_ddpercent"])));
+	ui.tableWidget->setItem(8, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["total_net_pnl"])));
+	ui.tableWidget->setItem(9, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["daily_net_pnl"])));
+	ui.tableWidget->setItem(10, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["total_commission"])));
+	ui.tableWidget->setItem(11, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["daily_commission"])));
+
+	ui.tableWidget->setItem(11, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["total_slippage"])));
+	ui.tableWidget->setItem(12, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["total_turnover"])));
+	ui.tableWidget->setItem(13, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["total_trade_count"])));
+	ui.tableWidget->setItem(14, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["daily_trade_count"])));
+	ui.tableWidget->setItem(15, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["total_return"])));
+	ui.tableWidget->setItem(16, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["annual_return"])));
+	ui.tableWidget->setItem(17, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["daily_return"])));
+
+	//ui.tableWidget->setItem(14, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["return_std"])));
+	//ui.tableWidget->setItem(15, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["sharpe_ratio"])));
+	//ui.tableWidget->setItem(16, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["return_drawdown_ratio"])));
+	//ui.tableWidget->setItem(17, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["return_std"])));
+
+	//画图
+	//账户净值
+	int nDay = m_backtesterEngine->m_daily_resultMap.size();
+	QVector<double> x(nDay), y(nDay),;
+	int n = 0;
+	x[n] = 0;
+	for (auto &iter: m_backtesterEngine->m_daily_resultMap)
+	{
+		y[n] = iter.second->m_balance;
+		x[n++] = n++ ;
+		
+	}
+	ui.widget->graph(0)->setData(x,y);
+	ui.widget->replot();
+	ui.widget->show();
+
+	//净值回撤
+	 
+	// 每日盈亏
+	
+	// 盈亏分布
+	
 
 
-	ui.pushButton->setEnabled(true);//开始回测按钮重新打开
+	// 
+	// 
+	//开始回测按钮重新打开
+	ui.pushButton->setEnabled(true);
 	/*
 	statistics = self.backtester_engine.get_result_statistics()
 		self.statistics_monitor.set_data(statistics)

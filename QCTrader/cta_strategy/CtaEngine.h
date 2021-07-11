@@ -82,7 +82,7 @@ public:
 	void changesupposedpos(std::string name, std::string symbol, double pos);			//通过策略面板控制持仓
 
 	//交易留底
-	void savetraderecord(std::string strategyname, std::shared_ptr<Event_Trade>etrade);
+	//void savetraderecord(std::string strategyname, std::shared_ptr<Event_Trade>etrade);
 
 	void ReadStrategyConfFileJson();
 	void ReadStrategyDataJson(std::string strfileName);

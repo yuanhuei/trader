@@ -213,6 +213,8 @@ void BacktesterEngine::runBacktesting()
 
 	writeCtaLog("策略回测完成");
 }
+
+
 void BacktesterEngine::update_daily_close(float price)
 {
 	QDate date;
@@ -260,6 +262,7 @@ void BacktesterEngine::calculate_result()
 		start_pos=iter->second->m_end_pos;
 	}
 }
+
 std::map<std::string, double> BacktesterEngine::calculate_statistics(bool bOutput = false)
 {
 	m_result_statistics["start_date"] = m_startDay.toString().toStdString();
@@ -275,6 +278,7 @@ std::map<std::string, double> BacktesterEngine::calculate_statistics(bool bOutpu
 	double	total_slippage = 0;
 	double	total_turnover = 0;
 	double total_trade_count = 0;
+	double daily_return = 0;
 	for (auto &iter: m_daily_resultMap)
 	{
 		if (iter.second->m_net_pnl > 0)
@@ -295,6 +299,8 @@ std::map<std::string, double> BacktesterEngine::calculate_statistics(bool bOutpu
 		total_slippage = iter.second->m_slippage + total_slippage;
 		total_turnover = iter.second->m_turnover + total_turnover;
 		total_trade_count = iter.second->m_trade_count + total_trade_count;
+
+		daily_return = iter.second->m_return + daily_return;
 	}
 	double lastBalance = preBalance;
 	m_result_statistics["profit_days"] = iProfit_days;
@@ -311,23 +317,23 @@ std::map<std::string, double> BacktesterEngine::calculate_statistics(bool bOutpu
 	m_result_statistics["daily_net_pnl"] = (preBalance - m_capital)/m_daily_resultMap.size();
 
 	m_result_statistics["total_commission"] = total_commission;
-		m_result_statistics["daily_commission"] = total_commission/ m_daily_resultMap.size();
+	m_result_statistics["daily_commission"] = total_commission/ m_daily_resultMap.size();
 
-		m_result_statistics["total_slippage"] = total_slippage;
-		m_result_statistics["total_turnover"] = total_turnover;
+	m_result_statistics["total_slippage"] = total_slippage;
+	m_result_statistics["total_turnover"] = total_turnover;
 
 
-		m_result_statistics["total_trade_count"] = total_trade_count;
-		m_result_statistics["daily_trade_count"] = total_trade_count/ m_daily_resultMap.size();
-		m_result_statistics["total_return"] = (lastBalance - m_capital) / m_capital;
+	m_result_statistics["total_trade_count"] = total_trade_count;
+	m_result_statistics["daily_trade_count"] = total_trade_count/ m_daily_resultMap.size();
+	m_result_statistics["total_return"] = (lastBalance - m_capital) / m_capital;
 
-		m_result_statistics["annual_return"] =
-		m_result_statistics["daily_return"] =
-		m_result_statistics["return_std"] =
+	m_result_statistics["annual_return"] = (lastBalance - m_capital)*240 / m_capital;
+	m_result_statistics["daily_return"] =daily_return/ m_daily_resultMap.size();
+		//m_result_statistics["return_std"] =
 
-		m_result_statistics["sharpe_ratio"] =
-		m_result_statistics["return_drawdown_ratio"] =
-		m_result_statistics["return_std"] =
+		//m_result_statistics["sharpe_ratio"] =
+		//m_result_statistics["return_drawdown_ratio"] =
+		//m_result_statistics["return_std"] =
 }
 
 void BacktesterEngine::CrossLimitOrder(const BarData& data)
@@ -403,7 +409,7 @@ void BacktesterEngine::writeCtaLog(std::string msg)
 
 std::vector<BarData> BacktesterEngine::LoadHistoryData()
 {
-	vector_history_data = loadBarbyDateTime(m_symbol, m_startDay, m_endDay);
+	vector_history_data = loadBarbyDateTime(m_symbol, QDateTime(m_startDay), QDateTime(m_endDay));
 	return vector_history_data;
 }	
 

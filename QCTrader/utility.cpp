@@ -16,7 +16,44 @@ QString str2qstr_new(std::string str)
 {
 	return QString::fromLocal8Bit(str.c_str());
 }
+std::string time_t2str(time_t datetime)
+{
+    auto tt = datetime;
+    struct tm* ptm = localtime(&tt);
+    char date[60] = { 0 };
+    sprintf(date, "%d-%02d-%02d      %02d:%02d:%02d",
+        (int)ptm->tm_year + 1900, (int)ptm->tm_mon + 1, (int)ptm->tm_mday,
+        (int)ptm->tm_hour, (int)ptm->tm_min, (int)ptm->tm_sec);
+    return std::string(date);
+}
+void savetraderecord(std::string strategyname, std::shared_ptr<Event_Trade>etrade)
+{
+    //交易记录
+    if (_access("./traderecord", 0) != -1)
+    {
+        std::fstream f;
+        f.open("./traderecord/" + strategyname + ".csv", std::ios::app | std::ios::out);
+        if (!f.is_open())
+        {
+            //如果打不开文件
+            std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
+            e->msg = "无法保存交易记录";
+            e->gatewayname = "CTP";
+            m_eventengine->Put(e);
+            return;
+        }
+        std::string symbol = etrade->symbol;
+        std::string direction = etrade->direction;
+        std::string offset = etrade->offset;
+        std::string tradetime = etrade->tradeTime;
+        std::string volume = Utils::doubletostring(etrade->volume);
+        std::string price = Utils::doubletostring(etrade->price);
 
+        f << strategyname << "," << tradetime << "," << symbol << "," << direction << "," << offset << "," << price << "," << volume << "\n";
+
+        f.close();
+    }
+}
 ArrayManager::ArrayManager(int iSize)
 {
     m_iSize = iSize;
