@@ -124,22 +124,22 @@ void BacktesterEngine::StartBacktesting(
 	std::string strStrategyClassName,
 	std::string strSymbol,
 	Interval iInterval,
-	QDateTime starDate,
-	QDateTime	endDate,
+	QDate startDay,
+	QDate	endDay,
 	float rate,
 	float slippage,
 	float contractsize,
 	float pricetick,
 	float capital,
-	 std::map<std::string, float>  ctaStrategyMap)
+	std::map<std::string, float>  ctaStrategyMap)
 {
 	m_strategyName = strStrategyName;
 	m_strategy_classname = strStrategyClassName;
 	//vt_symbol;
 	m_symbol = strSymbol;
 	//exchange;
-	m_startDay = starDate;
-	m_endDay = endDate;
+	m_startDay = startDay;
+	m_endDay = endDay;
 	m_iInterval = iInterval;
 	m_rate = rate;
 	m_slippage = slippage;
@@ -262,8 +262,57 @@ void BacktesterEngine::calculate_result()
 }
 std::map<std::string, double> BacktesterEngine::calculate_statistics(bool bOutput = false)
 {
+	m_result_statistics["start_date"] = m_startDay.toString().toStdString();
+	m_result_statistics["end_date"] = m_endDay.toString().toStdString();
+	m_result_statistics["total_days"] = int(m_daily_resultMap.size());
+
+	int iProfit_days = 0;
+	int iLoss_days = 0;
+	double preBalance = m_capital;
+	for (auto &iter: m_daily_resultMap)
+	{
+		if (iter.second->m_net_pnl > 0)
+			iProfit_days++;
+		else if (iter.second->m_net_pnl < 0)
+			iLoss_days++;
+		iter.second->m_balance += iter.second->m_net_pnl+ preBalance;
+		iter.second->m_highlevel = std::max(preBalance, iter.second->m_balance);
+		iter.second->m_return = iter.second->m_net_pnl / preBalance;
+		iter.second->m_drawdown = iter.second->m_balance - iter.second->m_highlevel;
+		iter.second->m_ddpercent = iter.second->m_drawdown / iter.second->m_highlevel;
+		preBalance = iter.second->m_balance;
+		
+	}
+	m_result_statistics["profit_days"] = iProfit_days;
+
+	m_result_statistics["loss_days"] = iLoss_days;
+		m_result_statistics["end_balance"] =
 
 
+		m_result_statistics["max_drawdown"] =
+		m_result_statistics["max_ddpercent"] =
+		m_result_statistics["max_drawdown_end"] =
+
+		m_result_statistics["total_net_pnl"] =
+		m_result_statistics["daily_net_pnl"] =
+		m_result_statistics["total_commission"] =
+
+		m_result_statistics["daily_commission"] =
+		m_result_statistics["total_slippage"] =
+		m_result_statistics["total_turnover"] =
+
+
+		m_result_statistics["total_trade_count"] =
+		m_result_statistics["daily_trade_count"] =
+		m_result_statistics["total_return"] =
+
+		m_result_statistics["annual_return"] =
+		m_result_statistics["daily_return"] =
+		m_result_statistics["return_std"] =
+
+		m_result_statistics["sharpe_ratio"] =
+		m_result_statistics["return_drawdown_ratio"] =
+		m_result_statistics["return_std"] =
 }
 
 void BacktesterEngine::CrossLimitOrder(const BarData& data)

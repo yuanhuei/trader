@@ -55,6 +55,12 @@ public:
 	double	m_total_pnl = 0;
 	double		m_net_pnl = 0;
 
+	double	m_balance;//资金
+	double m_highlevel;//资金最大值
+		
+	double  m_return;//每日回报
+	double 	m_drawdown;//每日回测
+	double  m_ddpercent;//回测百分比
 };
 
 typedef std::map<std::string, UnitResult> Result;//key是合约 value是一个结果单位
@@ -76,8 +82,8 @@ public:
 	std::string	m_symbol;
 
 	std::string  exchange;
-	QDateTime m_startDay;
-	QDateTime	m_endDay;
+	QDate m_startDay;
+	QDate	m_endDay;
 	float	m_rate = 0;
 	float	m_slippage = 0;
 	float	m_size = 1;
@@ -121,7 +127,7 @@ public:
 	std::map<QDate, std::shared_ptr<DailyTradingResult>> m_daily_resultMap;
 	//daily_df = None
 	//m_result_df;
-	std::map<std::string,double> m_result_statistics;
+	std::map<std::string,std::string> m_result_statistics;
 
 	void calculate_result();
 	std::map<std::string, double> calculate_statistics(bool bOutput = false);
@@ -164,8 +170,8 @@ public:
 		std::string strStrategyClassName,
 		std::string strSymbol,
 		Interval iInterval,
-		QDateTime starDate,
-		QDateTime	endDate,
+		QDate startDay,
+		QDate	endDay,
 		float rate,
 		float slippage,
 		float contractsize,
