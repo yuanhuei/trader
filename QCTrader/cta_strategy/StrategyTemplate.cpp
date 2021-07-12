@@ -298,7 +298,7 @@ void StrategyTemplate::savepostomongo()
 		m_MongoCxx->updateData(query, update, "StrategyPos", "pos");
 	}
 }
-
+/*
 void StrategyTemplate::loadposfrommongo()
 {
 	std::vector<std::string>result;
@@ -334,12 +334,13 @@ void StrategyTemplate::loadposfrommongo()
 		}
 	}
 }
-
+*/
 int StrategyTemplate::getpos()
 {
 	return m_Pos;
 
 }
+
 double StrategyTemplate::getpos(std::string symbol)
 {
 	double position;
@@ -364,7 +365,7 @@ std::map<std::string, double> StrategyTemplate::getposmap()
 	m_Pos_mapmtx.unlock();
 	return map;
 }
-
+/*
 std::map<std::string, std::string> StrategyTemplate::GetVarPlotMap()
 {
 	std::unique_lock<std::mutex>lck(m_VarPlotmtx);
@@ -376,7 +377,7 @@ std::map<std::string, std::string> StrategyTemplate::GetIndicatorMap()
 	std::unique_lock<std::mutex>lck(m_VarPlotmtx);
 	return m_indicatorPlot;
 }
-
+*/
 void StrategyData::insertparam(std::string key, std::string value)
 {
 	m_mtx.lock();

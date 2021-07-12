@@ -22,6 +22,10 @@ BacktesterManager::BacktesterManager(QWidget *parent)
 	
 	m_backtesterEngine->writeCtaLog((str2qstr_new("初始化CTA回测引擎")).toStdString());
 
+	qRegisterMetaType<LogData>("LogData");//注册到元系统中 UpdatePriceTableData
+	connect(this, SIGNAL(UpdateLogSignal()), this, SLOT(UpdateTesterResult()));
+
+
 }
 
 BacktesterManager::~BacktesterManager()
@@ -108,8 +112,11 @@ void BacktesterManager::RegisterEvent()
 {
 	m_mainwindow->m_eventengine->RegEvent(EVENT_CTABACKTESTERFINISHED, std::bind(&BacktesterManager::ProcecssTesterFisnishedEvent, this, std::placeholders::_1));
 }
-
 void BacktesterManager::ProcecssTesterFisnishedEvent(std::shared_ptr<Event>e)
+{
+	emit UpdateTesterResultSignal;
+}
+void BacktesterManager::UpdateTesterResult()
 {
 	//输出回测统计信息
 	ui.tableWidget->setItem(0, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["start_date"])));

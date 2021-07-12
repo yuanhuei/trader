@@ -845,12 +845,12 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 			std::vector<std::string>result;
 			return result;
 		}
-
+		/*
 		if (Strategy->getparam("currency") != "Null" && Strategy->getparam("productClass") != "Null")
 		{
 			req.currency = Strategy->getparam("currency");
 			req.productClass = Strategy->getparam("productClass");
-		}
+		}*/
 		req.priceType = PRICETYPE_LIMITPRICE;//限价单
 		if (orderType == CTAORDER_BUY)
 		{
@@ -870,17 +870,19 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 		else if (orderType == CTAORDER_SELL)
 		{
 			req.direction = DIRECTION_SHORT;//平多
-			if (m_gatewaymanager->getContract(symbol)->exchange != EXCHANGE_SHFE)
-			{
-				req.offset = OFFSET_CLOSE;
-				std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
-				m_orderStrategymtx.lock();
-				m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
-				m_orderStrategymtx.unlock();
-				writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
-				std::vector<std::string>result;
-				result.push_back(orderID);
-				return result;
+			//if (m_gatewaymanager->getContract(symbol)->exchange != EXCHANGE_SHFE)
+			//{
+			req.offset = OFFSET_CLOSE;
+			std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
+			m_orderStrategymtx.lock();
+			m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
+			m_orderStrategymtx.unlock();
+			writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
+			std::vector<std::string>result;
+			result.push_back(orderID);
+			return result;
+			//先不处理平昨，平今的问题	
+			/*
 			}
 			else
 			{
@@ -933,7 +935,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 					result.push_back(orderID);
 					return result;
 				}
-			}
+			}*/
 		}
 		else if (orderType == CTAORDER_SHORT)
 		{
@@ -954,8 +956,8 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 		{
 			//平空
 			req.direction = DIRECTION_LONG;
-			if (m_gatewaymanager->getContract(symbol)->exchange != EXCHANGE_SHFE)
-			{
+			//if (m_gatewaymanager->getContract(symbol)->exchange != EXCHANGE_SHFE)
+			{//
 				req.offset = OFFSET_CLOSE;
 				std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
 				m_orderStrategymtx.lock();
@@ -965,6 +967,7 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 				std::vector<std::string>result;
 				result.push_back(orderID);
 				return result;
+				/*
 			}
 			else
 			{
@@ -1019,11 +1022,12 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 					result.push_back(orderID);
 					return result;
 				}
+			}*/
 			}
 		}
+		std::vector<std::string>v;
+		return v;
 	}
-	std::vector<std::string>v;
-	return v;
 }
 
 void CtaEngine::cancelOrder(std::string orderID, std::string gatewayname)

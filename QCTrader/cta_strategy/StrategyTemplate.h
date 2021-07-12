@@ -130,8 +130,8 @@ public:
 	std::map<std::string, double>getposmap();					//获取全部持仓，给算法交易设置用
 
 	//提供给backtestengine的外部接口
-	std::map<std::string, std::string> GetVarPlotMap();
-	std::map<std::string, std::string> GetIndicatorMap();
+	//std::map<std::string, std::string> GetVarPlotMap();
+	//std::map<std::string, std::string> GetIndicatorMap();
 
 
 	//算法交易
@@ -159,7 +159,7 @@ public:
 	StrategyData *m_strategydata;
 
 	/**********************************_(:з」∠)_回测用***********************************************/
-	std::map<std::string, std::string>m_VarPlot;	std::map<std::string, std::string>m_indicatorPlot;			std::mutex m_VarPlotmtx;
+	//std::map<std::string, std::string>m_VarPlot;	std::map<std::string, std::string>m_indicatorPlot;			std::mutex m_VarPlotmtx;
 private:
 
 	/*******************************************************/

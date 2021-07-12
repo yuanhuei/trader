@@ -28,6 +28,8 @@ public:
 	void UpdateLogTable(LogData data);
 	void RegisterEvent();
 	void ProcecssTesterFisnishedEvent(std::shared_ptr<Event>e);
+signals:
+	void UpdateTesterResultSignal();
 
 
 private:
@@ -35,4 +37,5 @@ private:
 
 private slots:
 	void startBacktest_clicked();
+	void UpdateTesterResult();
 };

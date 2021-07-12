@@ -80,41 +80,7 @@ BacktesterEngine::~BacktesterEngine()
 
 }
 
-
-
-void BacktesterEngine::processTickEvent(std::shared_ptr<Event>e)
-{
-
-}
-void BacktesterEngine::processBarEvent(std::shared_ptr<Event>e)
-{
-
-}
 void BacktesterEngine::CrossLimitOrder(const TickData& data)
-{
-
-}
-void BacktesterEngine::CrossLimitOrder(const BarData& data)
-{
-
-}
-void BacktesterEngine::Settlement(std::shared_ptr<Event_Trade>etrade, std::map<std::string, StrategyTemplate*>orderStrategymap)
-{
-
-}
-void BacktesterEngine::RecordCapital(const TickData& data)
-{
-
-}
-void BacktesterEngine::RecordCapital(const BarData& data)
-{
-
-}
-void BacktesterEngine::RecordPNL(const TickData& data)
-{
-
-}
-void BacktesterEngine::RecordPNL(const BarData& data)
 {
 
 }
@@ -151,8 +117,9 @@ void BacktesterEngine::StartBacktesting(
 	//std::thread tRunBacktest(runBacktesting);
 	std::thread  m_thread;
 	m_thread =std::thread(std::bind(&BacktesterEngine::runBacktesting, this));
-
-
+	//防止主线程退出了,子线程还没退出
+	if(m_thread.joinable())
+		m_thread.detach();
 }
 void BacktesterEngine::runBacktesting()
 {
@@ -298,7 +265,7 @@ std::map<std::string, double> BacktesterEngine::calculate_statistics(bool bOutpu
 		total_commission = iter.second->m_commission + total_commission;
 		total_slippage = iter.second->m_slippage + total_slippage;
 		total_turnover = iter.second->m_turnover + total_turnover;
-		total_trade_count = iter.second->m_trade_count + total_trade_count;
+		total_trade_count = iter.second->m_trades.size() + total_trade_count;
 
 		daily_return = iter.second->m_return + daily_return;
 	}
@@ -342,60 +309,54 @@ void BacktesterEngine::CrossLimitOrder(const BarData& data)
 	double	sellCrossPrice = data.high;
 	double	buyBestCrossPrice = data.open;
 	double	sellBestCrossPrice = data.open;
-	std::unique_lock<std::mutex>lck(m_ordermapmtx);
 	for (std::map<std::string, std::shared_ptr<Event_Order>>::iterator iter = m_WorkingOrdermap.begin(); iter != m_WorkingOrdermap.end();)
 	{
-		if (data.symbol == iter->second->symbol)
+		bool buyCross = (iter->second->direction == DIRECTION_LONG && iter->second->price >= buyCrossPrice);
+		bool sellCross = (iter->second->direction == DIRECTION_SHORT && iter->second->price <= sellCrossPrice);
+
+		//如果发生了成交
+		if (buyCross || sellCross)
 		{
-			bool buyCross = (iter->second->direction == DIRECTION_LONG && iter->second->price >= buyCrossPrice);
-			bool sellCross = (iter->second->direction == DIRECTION_SHORT && iter->second->price <= sellCrossPrice);
-
-			//如果发生了成交
-			if (buyCross || sellCross)
+			m_tradeCount += 1;
+			std::string tradeID = iter->first;
+			std::shared_ptr<Event_Trade>trade = std::make_shared<Event_Trade>();
+			trade->symbol = iter->second->symbol;
+			trade->tradeID = tradeID;
+			trade->orderID = iter->second->orderID;
+			trade->direction = iter->second->direction;
+			trade->offset = iter->second->offset;
+			trade->volume = iter->second->totalVolume;
+			trade->tradeTime = data.date + " " + data.time;
+			if (buyCross)
 			{
-				m_tradeCount += 1;
-				std::string tradeID = iter->first;
-				std::shared_ptr<Event_Trade>trade = std::make_shared<Event_Trade>();
-				trade->symbol = iter->second->symbol;
-				trade->tradeID = tradeID;
-				trade->orderID = iter->second->orderID;
-				trade->direction = iter->second->direction;
-				trade->offset = iter->second->offset;
-				trade->volume = iter->second->totalVolume;
-				trade->tradeTime = time_t2str(m_datetime);
-				std::unique_lock<std::mutex>lck2(m_orderStrategymtx);
-				if (buyCross)
-				{
-					trade->price = std::min(iter->second->price, buyBestCrossPrice);
-					m_orderStrategymap[iter->first]->changeposmap(iter->second->symbol, m_orderStrategymap[iter->first]->getpos(iter->second->symbol) + trade->volume);
-				}
-				else if (sellCross)
-				{
-					trade->price = std::max(iter->second->price, sellBestCrossPrice);
-					m_orderStrategymap[iter->first]->changeposmap(iter->second->symbol, m_orderStrategymap[iter->first]->getpos(iter->second->symbol) - trade->volume);
-				}
-				m_orderStrategymap[iter->first]->onTrade(trade);
-
-				savetraderecord(m_orderStrategymap[trade->orderID]->getparam("name"), trade,m_eventengine);
-
-				Settlement(trade, m_orderStrategymap);
-
-				iter->second->tradedVolume = iter->second->totalVolume;
-				iter->second->status = STATUS_ALLTRADED;
-				m_Ordermap[iter->first]->status = STATUS_ALLTRADED;
-
-				m_orderStrategymap[iter->first]->onOrder(iter->second);
-				m_WorkingOrdermap.erase(iter++); //#1 
+				trade->price = std::min(iter->second->price, buyBestCrossPrice);
+				m_strategy->setPos(m_strategy->getpos() + trade->volume);
 			}
-			else
+			else if (sellCross)
 			{
-				iter++;
+				trade->price = std::max(iter->second->price, sellBestCrossPrice);
+				m_strategy->setPos(m_strategy->getpos() - trade->volume);
 			}
+			//回调策略onTrade函数，通知成交
+			m_tradeCount++;
+			m_strategy->onTrade(trade);
+
+			savetraderecord(m_strategy->m_strategyName, trade,m_eventengine);
+
+			//Settlement(trade, m_orderStrategymap);
+			//处理ordermap
+			iter->second->tradedVolume = iter->second->totalVolume;
+			iter->second->status = STATUS_ALLTRADED;
+			m_Ordermap[iter->first]->status = STATUS_ALLTRADED;
+
+			m_strategy->onOrder(iter->second);
+			m_WorkingOrdermap.erase(iter++); 
 		}
 		else
 		{
 			iter++;
 		}
+		
 	}
 }
 
@@ -649,8 +610,6 @@ std::vector<BarData> BacktesterEngine::loadBar(std::string symbol, int days)
 //提供给Strategytemplate
 std::vector<std::string> BacktesterEngine::sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy)
 {
-	std::unique_lock<std::mutex>lck(m_ordermapmtx);
-	std::unique_lock<std::mutex>lck2(m_orderStrategymtx);
 	std::shared_ptr<Event_Order> req = std::make_shared<Event_Order>();
 	req->symbol = symbol;
 	req->price = price;
@@ -667,7 +626,6 @@ std::vector<std::string> BacktesterEngine::sendOrder(std::string symbol, std::st
 		m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
 		m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
 
-		m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 		std::vector<std::string>result;
 		result.push_back(orderID);
 		return result;
@@ -681,7 +639,6 @@ std::vector<std::string> BacktesterEngine::sendOrder(std::string symbol, std::st
 		m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
 		m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
 
-		m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 		std::vector<std::string>result;
 		result.push_back(orderID);
 		return result;
@@ -698,7 +655,6 @@ std::vector<std::string> BacktesterEngine::sendOrder(std::string symbol, std::st
 		m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
 		m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
 
-		m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 		std::vector<std::string>result;
 		result.push_back(orderID);
 		return result;
@@ -712,7 +668,6 @@ std::vector<std::string> BacktesterEngine::sendOrder(std::string symbol, std::st
 		req->orderID = orderID;
 		m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
 		m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
-		m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
 		std::vector<std::string>result;
 		result.push_back(orderID);
 		return result;
@@ -721,7 +676,6 @@ std::vector<std::string> BacktesterEngine::sendOrder(std::string symbol, std::st
 
 void BacktesterEngine::cancelOrder(std::string orderID, std::string gatewayname)
 {
-	std::unique_lock<std::mutex>lck(m_ordermapmtx);
 	if (m_WorkingOrdermap.find(orderID) != m_WorkingOrdermap.end())
 	{
 		std::shared_ptr<Event_Order>order = m_WorkingOrdermap[orderID];
