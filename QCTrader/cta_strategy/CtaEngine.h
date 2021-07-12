@@ -62,7 +62,9 @@ public:
 	~CtaEngine();
 
 	//策略所需函数
-	std::vector<std::string> sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy);
+	//std::vector<std::string> sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy);
+	std::vector<std::string>sendOrder(std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy);
+
 	void cancelOrder(std::string orderID, std::string gatewayname);
 	void writeCtaLog(std::string msg);
 
@@ -101,6 +103,8 @@ private:
 	//缓存  和   变量锁   多线程安全
 	//key 是OrderID  value 是策略对象 用途是为了保证这个单是这个策略发出去的  成交回报计算持仓正确加载对应的策略上，以防多个策略交易同一个合约出现BUG
 	std::map<std::string, StrategyTemplate*>m_orderStrategymap;		std::mutex m_orderStrategymtx;
+	//策略和策略下的订单的map,
+	std::map<std::string, std::vector<std::string>> m_stragegyOrderMap; std::mutex m_stragegyOrderMapmtx;
 	//key 合约名 value 持仓对象   用来缓存每一个合约的今仓昨仓是多少
 	std::map<std::string, PositionBuffer>m_symbolpositionbuffer;	std::mutex m_symbolpositionmtx;
 
@@ -109,7 +113,11 @@ private:
 	//key 策略名+合约名, value 为策略指针    用来把界面选中的策略名 对应的的策略对象启动
 	std::map<std::string, StrategyTemplate*>m_strategymap;			std::mutex m_strategymtx;
 
+	std::map<std::string, OrderReq> m_stop_order_map;//orderid:: orderReq
+	int m_stop_order_count=1;
 
+	void check_stop_order(TickData tickDate);
+	std::vector<std::string>sendStopOrder(std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy);
 
 	//处理函数
 	void procecssTickEvent(std::shared_ptr<Event>e);

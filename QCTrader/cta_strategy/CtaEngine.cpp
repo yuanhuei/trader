@@ -830,7 +830,7 @@ void CtaEngine::registerEvent()
 }
 /******************策略调用***************************/
 
-std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy)
+std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string strDirection,std::string strOffset,double price, double volume, StrategyTemplate* Strategy)
 {
 	if (Strategy->trading == true)
 	{
@@ -852,179 +852,19 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string ord
 			req.productClass = Strategy->getparam("productClass");
 		}*/
 		req.priceType = PRICETYPE_LIMITPRICE;//限价单
-		if (orderType == CTAORDER_BUY)
-		{
-			req.direction = DIRECTION_LONG;//做多
-			req.offset = OFFSET_OPEN;//开仓
-			//
-			//发单
-			std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
-			m_orderStrategymtx.lock();
-			m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
-			m_orderStrategymtx.unlock();
-			writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
-			std::vector<std::string>result;
-			result.push_back(orderID);
-			return result;
-		}
-		else if (orderType == CTAORDER_SELL)
-		{
-			req.direction = DIRECTION_SHORT;//平多
-			//if (m_gatewaymanager->getContract(symbol)->exchange != EXCHANGE_SHFE)
-			//{
-			req.offset = OFFSET_CLOSE;
-			std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
-			m_orderStrategymtx.lock();
-			m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
-			m_orderStrategymtx.unlock();
-			writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
-			std::vector<std::string>result;
-			result.push_back(orderID);
-			return result;
-			//先不处理平昨，平今的问题	
-			/*
-			}
-			else
-			{
-				//区分平今平昨
-				//先判断昨仓够不够用
-				if ((m_symbolpositionbuffer[symbol].longydposition - volume) >= 0)
-				{
-					//昨仓够用直接平昨
-					req.offset = OFFSET_CLOSEYESTERDAY;
-					std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
-					m_orderStrategymtx.lock();
-					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
-					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
-					std::vector<std::string>result;
-					result.push_back(orderID);
-					return result;
-				}
-				else if (m_symbolpositionbuffer[symbol].longydposition == 0)
-				{
-					req.offset = OFFSET_CLOSETODAY;
-					std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
-					m_orderStrategymtx.lock();
-					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
-					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平今)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
-					std::vector<std::string>result;
-					result.push_back(orderID);
-					return result;
-				}
-				else
-				{
-					//昨仓不够用，分开平，先平昨再平今
-					req.offset = OFFSET_CLOSEYESTERDAY;
-					req.volume = m_symbolpositionbuffer[symbol].longydposition;
-					std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
-					m_orderStrategymtx.lock();
-					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
-					m_orderStrategymtx.unlock();
-					std::vector<std::string>result;
-					result.push_back(orderID);
-					//再平今仓
-					req.offset = OFFSET_CLOSETODAY;
-					req.volume = volume - req.volume;
-					orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
-					m_orderStrategymtx.lock();
-					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
-					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(平今和昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
-					result.push_back(orderID);
-					return result;
-				}
-			}*/
-		}
-		else if (orderType == CTAORDER_SHORT)
-		{
-			//做空
-			req.direction = DIRECTION_SHORT;
-			req.offset = OFFSET_OPEN;
-			//发单
-			std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
-			m_orderStrategymtx.lock();
-			m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
-			m_orderStrategymtx.unlock();
-			writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
-			std::vector<std::string>result;
-			result.push_back(orderID);
-			return result;
-		}
-		else if (orderType == CTAORDER_COVER)
-		{
-			//平空
-			req.direction = DIRECTION_LONG;
-			//if (m_gatewaymanager->getContract(symbol)->exchange != EXCHANGE_SHFE)
-			{//
-				req.offset = OFFSET_CLOSE;
-				std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
-				m_orderStrategymtx.lock();
-				m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
-				m_orderStrategymtx.unlock();
-				writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
-				std::vector<std::string>result;
-				result.push_back(orderID);
-				return result;
-				/*
-			}
-			else
-			{
-				//区分平今平昨
-				//先判断昨仓够不够用
-				if ((m_symbolpositionbuffer[symbol].shortydposition - volume) >= 0)
-				{
-					//只平昨
-					req.offset = OFFSET_CLOSEYESTERDAY;
-					std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
-					m_orderStrategymtx.lock();
-					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
-					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
-					std::vector<std::string>result;
-					result.push_back(orderID);
-					return result;
-				}
-				else if (m_symbolpositionbuffer[symbol].shortydposition == 0)
-				{
-					//只平今
-					req.offset = OFFSET_CLOSETODAY;
-					std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
-					m_orderStrategymtx.lock();
-					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
-					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(只平今)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
-					std::vector<std::string>result;
-					result.push_back(orderID);
-					return result;
-				}
-				else
-				{
-					//平今也平昨
-					//昨仓不够用，分开平，先平昨再平今
-					req.offset = OFFSET_CLOSEYESTERDAY;
-					req.volume = m_symbolpositionbuffer[symbol].shortydposition;
-					std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
-					m_orderStrategymtx.lock();
-					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
-					m_orderStrategymtx.unlock();
-					std::vector<std::string>result;
-					result.push_back(orderID);
-					//再平今仓
-					req.offset = OFFSET_CLOSETODAY;
-					req.volume = volume - req.volume;
-					orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
-					m_orderStrategymtx.lock();
-					m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
-					m_orderStrategymtx.unlock();
-					writeCtaLog("策略" + Strategy->m_strategyName + "发出委托(平今和昨)" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
-					result.push_back(orderID);
-					return result;
-				}
-			}*/
-			}
-		}
+
+		//发单
+		std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
+		m_orderStrategymtx.lock();
+		m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
+		m_orderStrategymtx.unlock();
+		writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
+		std::vector<std::string>result;
+		result.push_back(orderID);
+		return result;
+	}
+	else
+	{
 		std::vector<std::string>v;
 		return v;
 	}
@@ -1049,6 +889,90 @@ void CtaEngine::cancelOrder(std::string orderID, std::string gatewayname)
 		}
 	}
 }
+std::vector<std::string>CtaEngine::sendStopOrder(std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* pStrategy)
+{
+	
+	OrderReq stop_order;
+	stop_order.symbol = symbol;
+	stop_order.direction = strDirection;
+	stop_order.offset = strOffset;
+	stop_order.price = price;
+	stop_order.volume = volume;
+	stop_order.strateyName = pStrategy->m_strategyName;
+	m_stop_order_count++;
+	std::string orderID = "stop_order_id" + std::to_string(m_stop_order_count);
+	//stop_order.orderID
+	m_stop_order_map.insert(std::pair <std::string, OrderReq > (orderID, stop_order));
+
+	m_stragegyOrderMap[pStrategy->m_strategyName].push_back(orderID);
+	pStrategy->onStopOrder(stop_order);
+	std::vector<std::string> orderidVector;
+	orderidVector.push_back(orderID);
+	
+	//self.put_stop_order_event(stop_order)
+	return orderidVector;
+}
+void CtaEngine::check_stop_order(TickData tickData)
+{
+	for (auto &iter : m_stop_order_map)
+	{
+		OrderReq stopOrder = iter.second;
+		std::string orderID = iter.first;
+		bool long_triggered = false;
+		bool short_triggered = false;
+		if (stopOrder.symbol != tickData.symbol)
+			continue;
+		if (stopOrder.direction == DIRECTION_LONG && tickData.lastprice > stopOrder.price)
+			long_triggered = true;
+		if (stopOrder.direction == DIRECTION_SHORT && tickData.lastprice <= stopOrder.price)
+			short_triggered = true;
+
+		if (long_triggered || short_triggered)
+		{
+			StrategyTemplate* pStrategy = m_strategymap[stopOrder.strateyName];
+			/*To get excuted immediately after stop order is
+				# triggered, use limit price if available, otherwise
+				# use ask_price_5 or bid_price_5*/
+			double price;
+			if (stopOrder.direction == DIRECTION_LONG)
+				if (tickData.upperLimit > 0)
+					price = tickData.upperLimit;
+				else
+					price = tickData.askprice5;
+			else
+				if (tickData.lowerLimit > 0)
+					price = tickData.upperLimit;
+				else
+					price = tickData.askprice5;
+
+			std::string orderReturn=sendOrder(stopOrder.symbol, stopOrder.direction, stopOrder.offset, price, stopOrder.volume,  pStrategy);
+
+			
+			m_stop_order_map.erase(orderID);
+			m_orderStrategymap.erase(orderID);
+
+				if vt_orderids:
+			# Remove from relation map.
+				self.stop_orders.pop(stop_order.stop_orderid)
+
+				strategy_vt_orderids = self.strategy_orderid_map[strategy.strategy_name]
+				if stop_order.stop_orderid in strategy_vt_orderids :
+			strategy_vt_orderids.remove(stop_order.stop_orderid)
+
+				# Change stop order status to cancelledand update to strategy.
+				stop_order.status = StopOrderStatus.TRIGGERED
+				stop_order.vt_orderids = vt_orderids
+
+				self.call_strategy_func(
+					strategy, strategy.on_stop_order, stop_order
+				)
+				self.put_stop_order_event(stop_order)
+
+		}
+	}
+
+}
+
 
 void CtaEngine::writeCtaLog(std::string msg)
 {

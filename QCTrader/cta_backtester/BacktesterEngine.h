@@ -113,7 +113,7 @@ public:
 	std::map<std::string, double> calculate_statistics(bool bOutput = false);
 
 	//提供给Strategytemplate调用的接口
-	std::vector<std::string> sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy);
+	std::vector<std::string> sendOrder(std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy);
 	void cancelOrder(std::string orderID, std::string gatewayname);
 
 	void PutEvent(std::shared_ptr<Event>e);

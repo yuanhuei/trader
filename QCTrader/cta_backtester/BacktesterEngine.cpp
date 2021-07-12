@@ -608,70 +608,24 @@ std::vector<BarData> BacktesterEngine::loadBar(std::string symbol, int days)
 
 
 //提供给Strategytemplate
-std::vector<std::string> BacktesterEngine::sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy)
+std::vector<std::string> BacktesterEngine::sendOrder(std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy)
 {
 	std::shared_ptr<Event_Order> req = std::make_shared<Event_Order>();
 	req->symbol = symbol;
 	req->price = price;
 	req->totalVolume = volume;
 	req->status = STATUS_WAITING;
-	if (orderType == CTAORDER_BUY)
-	{
-		req->direction = DIRECTION_LONG;//做多
-		req->offset = OFFSET_OPEN;//开仓
-		//
+
 		//发单
-		std::string orderID = Utils::doubletostring(m_limitorderCount++); //
-		req->orderID = orderID;
-		m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
-		m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
+	std::string orderID = Utils::doubletostring(m_limitorderCount++); //
+	req->orderID = orderID;
+	m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
+	m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
 
-		std::vector<std::string>result;
-		result.push_back(orderID);
-		return result;
-	}
-	else if (orderType == CTAORDER_SELL)
-	{
-		req->direction = DIRECTION_SHORT;//平多
-		req->offset = OFFSET_CLOSE;
-		std::string orderID = Utils::doubletostring(m_limitorderCount++); //
-		req->orderID = orderID;
-		m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
-		m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
-
-		std::vector<std::string>result;
-		result.push_back(orderID);
-		return result;
-	}
-	else if (orderType == CTAORDER_SHORT)
-	{
-		//做空
-		req->direction = DIRECTION_SHORT;
-		req->offset = OFFSET_OPEN;
-		//发单
-
-		std::string orderID = Utils::doubletostring(m_limitorderCount++); //
-		req->orderID = orderID;
-		m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
-		m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
-
-		std::vector<std::string>result;
-		result.push_back(orderID);
-		return result;
-	}
-	else if (orderType == CTAORDER_COVER)
-	{
-		//平空
-		req->direction = DIRECTION_LONG;
-		req->offset = OFFSET_CLOSE;
-		std::string orderID = Utils::doubletostring(m_limitorderCount++); //
-		req->orderID = orderID;
-		m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
-		m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
-		std::vector<std::string>result;
-		result.push_back(orderID);
-		return result;
-	}
+	std::vector<std::string>result;
+	result.push_back(orderID);
+	return result;
+	
 }
 
 void BacktesterEngine::cancelOrder(std::string orderID, std::string gatewayname)

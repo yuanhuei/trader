@@ -78,6 +78,26 @@ struct OrderReq
 	std::string strateyName;
 };
 
+struct StopOrderReq
+{
+	std::string symbol;
+	std::string exchange;
+	std::string  strategyName;
+	std::string orderID;
+
+	double price;
+	double volume;
+	std::string priceType;
+	std::string direction;
+	std::string offset;
+	std::string productClass;
+	std::string currency;
+	std::string expiry;
+	double strikePrice;
+	std::string optionType;
+	std::string strateyName;
+};
+
 struct CancelOrderReq
 {
 	std::string symbol;

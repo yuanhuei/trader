@@ -102,6 +102,7 @@ public:
 	//成交回调
 	virtual void onTrade(std::shared_ptr<Event_Trade>e);
 
+	virtual void onStopOrder(OrderReq data);
 	//发单函数
 
 	//做多
@@ -114,7 +115,7 @@ public:
 	std::vector<std::string> buycover(double price, double volume);
 
 	//总报单开平函数公用
-	std::vector<std::string> sendOrder(std::string orderType, double price, double volume);
+	std::vector<std::string> sendOrder(std::string strDirection, std::string strOffset, double price, double volume);
 	//撤所有单，停止策略时使用
 	void cancelallorder();
 	//撤单函数

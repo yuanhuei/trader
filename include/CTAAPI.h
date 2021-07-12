@@ -12,7 +12,7 @@ class StrategyTemplate;
 class CTAAPI
 {
 public:
-	virtual std::vector<std::string> sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy) = 0;
+	virtual std::vector<std::string> sendOrder(std::string symbol, std::string strDirection,std::string strOffset, double price, double volume, StrategyTemplate* Strategy) = 0;
 	virtual void cancelOrder(std::string orderID,std::string gatewayname) = 0;
 	virtual void writeCtaLog(std::string msg)=0;
 	virtual void PutEvent(std::shared_ptr<Event>e)=0;
