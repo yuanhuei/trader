@@ -63,12 +63,13 @@ public:
 
 	//策略所需函数
 	//std::vector<std::string> sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy);
-	std::vector<std::string>sendOrder(std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy);
+	std::vector<std::string>sendOrder(bool bStopOrder,std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy);
 
 	void cancelOrder(std::string orderID, std::string gatewayname);
 	void writeCtaLog(std::string msg);
 
 	void PutEvent(std::shared_ptr<Event>e);
+
 	std::vector<TickData> loadTick(std::string symbol, int days);
 	std::vector<BarData> loadBar(std::string symbol, int days);
 
@@ -113,15 +114,18 @@ private:
 	//key 策略名+合约名, value 为策略指针    用来把界面选中的策略名 对应的的策略对象启动
 	std::map<std::string, StrategyTemplate*>m_strategymap;			std::mutex m_strategymtx;
 
-	std::map<std::string, OrderReq> m_stop_order_map;//orderid:: orderReq
+	std::map<std::string, std::shared_ptr<Event_StopOrder>> m_stop_order_map; std::mutex m_stop_order_mtx; //orderid:: orderReq
 	int m_stop_order_count=1;
+	std::map<std::string, StrategyTemplate*>m_StoporderStrategymap;		std::mutex m_StoporderStrategymtx;
 
 	void check_stop_order(TickData tickDate);
-	std::vector<std::string>sendStopOrder(std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy);
+	std::vector<std::string>sendStopOrder(std::string symbol, std::string strDirection,std::string strOffset, double price, double volume, StrategyTemplate* Strategy);
 
 	//处理函数
 	void procecssTickEvent(std::shared_ptr<Event>e);
 	void processOrderEvent(std::shared_ptr<Event>e);
+	void processStopOrderEvent(std::shared_ptr<Event>e);
+
 	void processTradeEvent(std::shared_ptr<Event>e);
 	void processPositionEvent(std::shared_ptr<Event>e);
 

@@ -176,7 +176,7 @@ void StrategyTemplate::onTrade(std::shared_ptr<Event_Trade>e)
 {
 	putEvent();
 }
-void StrategyTemplate::onStopOrder(OrderReq data)
+void StrategyTemplate::onStopOrder(std::shared_ptr<Event_StopOrder>e)
 {
 	putEvent();
 

@@ -34,6 +34,7 @@
 #define STATUS_ALLTRADED "orderalltraded"
 #define STATUS_CANCELLED "ordercanceld"
 #define STATUS_WAITING "orderwaiting"
+#define STATUS_TRIGGED "ordertrigged"
 
 typedef enum
 {
@@ -360,6 +361,7 @@ public:
 #define EVENT_TICK "etick"
 #define EVENT_TRADE "etrade"
 #define EVENT_ORDER "eorder"
+#define EVENT_STOP_ORDER "stoporder"
 #define EVENT_POSITION "ePosition"
 #define EVENT_ACCOUNT "eAccount"
 #define EVENT_CONTRACT "eContract"
@@ -502,6 +504,33 @@ public:
 
 	int frontID;//前置机编号
 	int sessionID;//连接编号
+
+
+};
+class   Event_StopOrder :public Event
+{
+public:
+	Event_StopOrder() :Event(EVENT_STOP_ORDER)
+	{}
+	//编号相关
+	std::string symbol;
+	std::string exchange;
+	std::string orderID;//订单编号
+	std::string gatewayname;
+	//报单相关
+	std::string direction;//方向
+	std::string offset;//开平方向
+	double price; //报单价格
+	double totalVolume;//报单总量
+	double tradedVolume;//成交数量
+	std::string status;//报单状态
+
+	std::string orderTime;//发单时间
+	std::string cancelTime;//撤单时间
+
+	int frontID;//前置机编号
+	int sessionID;//连接编号
+	std::string strategyName;
 
 };
 

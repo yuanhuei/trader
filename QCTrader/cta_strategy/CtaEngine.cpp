@@ -606,7 +606,16 @@ void CtaEngine::processOrderEvent(std::shared_ptr<Event>e)
 	}
 	m_orderStrategymtx.unlock();
 }
-
+void CtaEngine::processStopOrderEvent(std::shared_ptr<Event>e)
+{
+	std::shared_ptr<Event_StopOrder> eOrder = std::static_pointer_cast<Event_StopOrder>(e);
+	m_StoporderStrategymtx.lock();
+	if (m_StoporderStrategymap.find(eOrder->orderID) != m_StoporderStrategymap.end())
+	{
+		m_StoporderStrategymap[eOrder->orderID]->onStopOrder(eOrder);
+	}
+	m_StoporderStrategymtx.unlock();
+}
 void CtaEngine::processTradeEvent(std::shared_ptr<Event>e)
 {
 	std::shared_ptr<Event_Trade> eTrade = std::static_pointer_cast<Event_Trade>(e);
@@ -823,6 +832,8 @@ void CtaEngine::registerEvent()
 {
 	m_eventengine->RegEvent(EVENT_TICK, std::bind(&CtaEngine::procecssTickEvent, this, std::placeholders::_1));
 	m_eventengine->RegEvent(EVENT_ORDER, std::bind(&CtaEngine::processOrderEvent, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_STOP_ORDER, std::bind(&CtaEngine::processOrderEvent, this, std::placeholders::_1));
+
 	m_eventengine->RegEvent(EVENT_TRADE, std::bind(&CtaEngine::processTradeEvent, this, std::placeholders::_1));
 	m_eventengine->RegEvent(EVENT_POSITION, std::bind(&CtaEngine::processPositionEvent, this, std::placeholders::_1));
 	m_eventengine->RegEvent(EVENT_TIMER, std::bind(&CtaEngine::autoConnect, this, std::placeholders::_1));
@@ -830,9 +841,9 @@ void CtaEngine::registerEvent()
 }
 /******************策略调用***************************/
 
-std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string strDirection,std::string strOffset,double price, double volume, StrategyTemplate* Strategy)
+std::vector<std::string>CtaEngine::sendOrder(bool bStopOrder, std::string symbol, std::string strDirection,std::string strOffset,double price, double volume, StrategyTemplate* pStrategy)
 {
-	if (Strategy->trading == true)
+	if (pStrategy->trading == true)
 	{
 		OrderReq req;
 		req.symbol = symbol;
@@ -851,14 +862,21 @@ std::vector<std::string>CtaEngine::sendOrder(std::string symbol, std::string str
 			req.currency = Strategy->getparam("currency");
 			req.productClass = Strategy->getparam("productClass");
 		}*/
+		if (bStopOrder)
+			sendStopOrder(symbol, strDirection, strOffset, price, volume, pStrategy);
+		else
+		{
 		req.priceType = PRICETYPE_LIMITPRICE;//限价单
+		}
 
 		//发单
 		std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
+
 		m_orderStrategymtx.lock();
-		m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, Strategy));
+		m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, pStrategy));
 		m_orderStrategymtx.unlock();
-		writeCtaLog("策略" + Strategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
+
+		writeCtaLog("策略" + pStrategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
 		std::vector<std::string>result;
 		result.push_back(orderID);
 		return result;
@@ -892,49 +910,58 @@ void CtaEngine::cancelOrder(std::string orderID, std::string gatewayname)
 std::vector<std::string>CtaEngine::sendStopOrder(std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* pStrategy)
 {
 	
-	OrderReq stop_order;
-	stop_order.symbol = symbol;
-	stop_order.direction = strDirection;
-	stop_order.offset = strOffset;
-	stop_order.price = price;
-	stop_order.volume = volume;
-	stop_order.strateyName = pStrategy->m_strategyName;
+	std::shared_ptr<Event_StopOrder> ptr_stop_order=std::make_shared<Event_StopOrder>();
+
+	ptr_stop_order->symbol = symbol;
+	ptr_stop_order->direction = strDirection;
+	ptr_stop_order->offset = strOffset;
+	ptr_stop_order->price = price;
+	ptr_stop_order->totalVolume = volume;
+	ptr_stop_order->strategyName = pStrategy->m_strategyName;
 	m_stop_order_count++;
 	std::string orderID = "stop_order_id" + std::to_string(m_stop_order_count);
 	//stop_order.orderID
-	m_stop_order_map.insert(std::pair <std::string, OrderReq > (orderID, stop_order));
+	m_stop_order_mtx.lock();
+	m_stop_order_map.insert(std::pair <std::string, std::shared_ptr<Event_StopOrder>> (orderID, ptr_stop_order));
+	m_stop_order_mtx.unlock();
 
-	m_stragegyOrderMap[pStrategy->m_strategyName].push_back(orderID);
-	pStrategy->onStopOrder(stop_order);
+	m_StoporderStrategymtx.lock();
+	m_StoporderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, pStrategy));
+	m_StoporderStrategymtx.unlock();
+
+	//m_stragegyOrderMap[pStrategy->m_strategyName].push_back(orderID);不在m_stragegyOrderMap中保存
+	//pStrategy->onStopOrder(ptr_stop_order);
 	std::vector<std::string> orderidVector;
 	orderidVector.push_back(orderID);
 	
-	//self.put_stop_order_event(stop_order)
+	PutEvent(ptr_stop_order);
 	return orderidVector;
 }
+
 void CtaEngine::check_stop_order(TickData tickData)
 {
+	m_stop_order_mtx.lock();
 	for (auto &iter : m_stop_order_map)
 	{
-		OrderReq stopOrder = iter.second;
+		std::shared_ptr<Event_StopOrder> stopOrder = iter.second;
 		std::string orderID = iter.first;
 		bool long_triggered = false;
 		bool short_triggered = false;
-		if (stopOrder.symbol != tickData.symbol)
+		if (stopOrder->symbol != tickData.symbol)
 			continue;
-		if (stopOrder.direction == DIRECTION_LONG && tickData.lastprice > stopOrder.price)
+		if (stopOrder->direction == DIRECTION_LONG && tickData.lastprice > stopOrder->price)
 			long_triggered = true;
-		if (stopOrder.direction == DIRECTION_SHORT && tickData.lastprice <= stopOrder.price)
+		if (stopOrder->direction == DIRECTION_SHORT && tickData.lastprice <= stopOrder->price)
 			short_triggered = true;
 
 		if (long_triggered || short_triggered)
 		{
-			StrategyTemplate* pStrategy = m_strategymap[stopOrder.strateyName];
+			StrategyTemplate* pStrategy = m_strategymap[stopOrder->strategyName];
 			/*To get excuted immediately after stop order is
 				# triggered, use limit price if available, otherwise
 				# use ask_price_5 or bid_price_5*/
 			double price;
-			if (stopOrder.direction == DIRECTION_LONG)
+			if (stopOrder->direction == DIRECTION_LONG)
 				if (tickData.upperLimit > 0)
 					price = tickData.upperLimit;
 				else
@@ -945,31 +972,23 @@ void CtaEngine::check_stop_order(TickData tickData)
 				else
 					price = tickData.askprice5;
 
-			std::string orderReturn=sendOrder(stopOrder.symbol, stopOrder.direction, stopOrder.offset, price, stopOrder.volume,  pStrategy);
+			std::vector<std::string> orderReturn=sendOrder(false,stopOrder->symbol, stopOrder->direction, stopOrder->offset, price, stopOrder->totalVolume,  pStrategy);
 
-			
-			m_stop_order_map.erase(orderID);
-			m_orderStrategymap.erase(orderID);
+			if (orderReturn.size() > 0)
+			{
+				m_stop_order_map.erase(orderID);
+				//m_orderStrategymap.erase(orderID);
 
-				if vt_orderids:
-			# Remove from relation map.
-				self.stop_orders.pop(stop_order.stop_orderid)
+				stopOrder->status = STATUS_TRIGGED;
+				stopOrder->orderID = orderReturn[0];
+				//pStrategy->onStopOrder(stopOrder);
 
-				strategy_vt_orderids = self.strategy_orderid_map[strategy.strategy_name]
-				if stop_order.stop_orderid in strategy_vt_orderids :
-			strategy_vt_orderids.remove(stop_order.stop_orderid)
-
-				# Change stop order status to cancelledand update to strategy.
-				stop_order.status = StopOrderStatus.TRIGGERED
-				stop_order.vt_orderids = vt_orderids
-
-				self.call_strategy_func(
-					strategy, strategy.on_stop_order, stop_order
-				)
-				self.put_stop_order_event(stop_order)
+				PutEvent(stopOrder);
+			}
 
 		}
 	}
+	m_stop_order_mtx.unlock();
 
 }
 

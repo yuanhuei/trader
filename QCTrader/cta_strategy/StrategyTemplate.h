@@ -102,7 +102,7 @@ public:
 	//成交回调
 	virtual void onTrade(std::shared_ptr<Event_Trade>e);
 
-	virtual void onStopOrder(OrderReq data);
+	virtual void onStopOrder(std::shared_ptr<Event_StopOrder>e);
 	//发单函数
 
 	//做多
