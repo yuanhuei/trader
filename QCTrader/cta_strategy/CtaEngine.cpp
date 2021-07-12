@@ -863,23 +863,26 @@ std::vector<std::string>CtaEngine::sendOrder(bool bStopOrder, std::string symbol
 			req.productClass = Strategy->getparam("productClass");
 		}*/
 		if (bStopOrder)
-			sendStopOrder(symbol, strDirection, strOffset, price, volume, pStrategy);
+		{
+			return sendStopOrder(symbol, strDirection, strOffset, price, volume, pStrategy);
+		}
 		else
 		{
-		req.priceType = PRICETYPE_LIMITPRICE;//限价单
+			req.priceType = PRICETYPE_LIMITPRICE;//限价单
+			//发单
+			std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
+
+			m_orderStrategymtx.lock();
+			m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, pStrategy));
+			m_orderStrategymtx.unlock();
+
+			writeCtaLog("策略" + pStrategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
+			std::vector<std::string>result;
+			result.push_back(orderID);
+			return result;
 		}
 
-		//发单
-		std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
 
-		m_orderStrategymtx.lock();
-		m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, pStrategy));
-		m_orderStrategymtx.unlock();
-
-		writeCtaLog("策略" + pStrategy->m_strategyName + "发出委托" + symbol + req.direction + Utils::doubletostring(volume) + " @ " + Utils::doubletostring(price));
-		std::vector<std::string>result;
-		result.push_back(orderID);
-		return result;
 	}
 	else
 	{

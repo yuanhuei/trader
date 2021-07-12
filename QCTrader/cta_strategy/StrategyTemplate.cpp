@@ -182,33 +182,34 @@ void StrategyTemplate::onStopOrder(std::shared_ptr<Event_StopOrder>e)
 
  }
 //做多
-std::vector<std::string> StrategyTemplate::buy(double price, double volume)
+std::vector<std::string> StrategyTemplate::buy(bool bStopOrder, double price, double volume)
 {
-	return sendOrder(DIRECTION_LONG, OFFSET_OPEN, price, volume);
+	return sendOrder(bStopOrder,DIRECTION_LONG, OFFSET_OPEN, price, volume);
+
 }
 //平多
-std::vector<std::string> StrategyTemplate::sell(double price, double volume)
+std::vector<std::string> StrategyTemplate::sell(bool bStopOrder, double price, double volume)
 {
-	return sendOrder(DIRECTION_SHORT, OFFSET_CLOSE, price, volume);
+	return sendOrder(bStopOrder, DIRECTION_SHORT, OFFSET_CLOSE, price, volume);
 }
 //做空
-std::vector<std::string> StrategyTemplate::sellshort(double price, double volume)
+std::vector<std::string> StrategyTemplate::sellshort(bool bStopOrder, double price, double volume)
 {
-	return sendOrder(DIRECTION_SHORT, OFFSET_OPEN, price, volume);
+	return sendOrder(bStopOrder, DIRECTION_SHORT, OFFSET_OPEN, price, volume);
 }
 //平空
-std::vector<std::string> StrategyTemplate::buycover(double price, double volume)
+std::vector<std::string> StrategyTemplate::buycover(bool bStopOrder, double price, double volume)
 {
-	return sendOrder(DIRECTION_LONG, OFFSET_CLOSE, price, volume);
+	return sendOrder(bStopOrder, DIRECTION_LONG, OFFSET_CLOSE, price, volume);
 }
 
 //总报单开平函数公用
-std::vector<std::string> StrategyTemplate::sendOrder(std::string strDirection, std::string strOffset, double price, double volume)
+std::vector<std::string> StrategyTemplate::sendOrder(bool bStopOrder, std::string strDirection, std::string strOffset, double price, double volume)
 {
 	std::vector<std::string>orderIDv;
 	if (trading == true)
 	{
-		orderIDv = m_ctaEngine->sendOrder(m_symbol, strDirection, strOffset ,price, volume, this);
+		orderIDv = m_ctaEngine->sendOrder(bStopOrder,m_symbol, strDirection, strOffset ,price, volume, this);
 		for (std::vector<std::string>::iterator it = orderIDv.begin(); it != orderIDv.end(); it++)
 		{
 			m_orderlistmtx.lock();

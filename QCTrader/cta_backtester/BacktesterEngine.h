@@ -95,8 +95,12 @@ public:
 	int m_limit_order_count = 0;
 	//self.limit_orders = {}
 	//self.active_limit_orders = {}
-	std::map<std::string, std::shared_ptr<Event_Order>>m_Ordermap;				//所有的单，不会删除
-	std::map<std::string, std::shared_ptr<Event_Order>>m_WorkingOrdermap;		//工作中的单   
+
+	std::map<std::string, std::shared_ptr<Event_StopOrder>>m_stop_orders;				//所有的单，不会删除
+	std::map<std::string, std::shared_ptr<Event_StopOrder>>m_active_stop_orders;		   //工作中的单   
+
+	std::map<std::string, std::shared_ptr<Event_Order>>m_limit_orders;				//所有的单，不会删除
+	std::map<std::string, std::shared_ptr<Event_Order>>m_active_limit_orders;		//工作中的单   
 
 	//int m_trade_count = 0;
 	std::map<std::string, std::shared_ptr<Event_Trade>>m_tradeMap;//成交单					
@@ -113,8 +117,15 @@ public:
 	std::map<std::string, double> calculate_statistics(bool bOutput = false);
 
 	//提供给Strategytemplate调用的接口
-	std::vector<std::string> sendOrder(std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy);
+	std::vector<std::string> sendOrder(bool bStopOrder,std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy);
 	void cancelOrder(std::string orderID, std::string gatewayname);
+
+	void cross_limit_order();
+	void cross_stop_order();
+	std::vector<std::string> send_limit_order(std::string symbol, std::string strDirection, std::string strOffset, 
+		double price, double volume, StrategyTemplate* Strategy);
+	std::vector<std::string> send_stop_order(std::string symbol, std::string strDirection, std::string strOffset, 
+		double price, double volume, StrategyTemplate* Strategy);
 
 	void PutEvent(std::shared_ptr<Event>e);
 
@@ -132,7 +143,7 @@ public:
 	void update_daily_close(float price);
 
 
-	void CrossLimitOrder(const TickData& data);
+	void CrossStopOrder(const BarData& data);
 	void CrossLimitOrder(const BarData& data);
 
 	void StartBacktesting(
@@ -152,7 +163,7 @@ public:
 	void writeCtaLog(std::string msg);
 
 	//回测的变量
-	int m_limitorderCount=1;						//人工ORDERID
+	//int m_limitorderCount=1;						//人工ORDERID
 	int  m_tradeCount=0;							//成交次数
 	std::string m_backtestmode;								//bar模式还是tick模式
 };

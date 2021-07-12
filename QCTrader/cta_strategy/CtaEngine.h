@@ -116,6 +116,8 @@ private:
 
 	std::map<std::string, std::shared_ptr<Event_StopOrder>> m_stop_order_map; std::mutex m_stop_order_mtx; //orderid:: orderReq
 	int m_stop_order_count=1;
+	//因为stop order id的生成与其他orderid的生成是分开的，为了防止冲突，单独建立一个m_StoporderStrategymap保存
+	//stoporderid和策略的对应关系
 	std::map<std::string, StrategyTemplate*>m_StoporderStrategymap;		std::mutex m_StoporderStrategymtx;
 
 	void check_stop_order(TickData tickDate);

@@ -105,17 +105,17 @@ public:
 	virtual void onStopOrder(std::shared_ptr<Event_StopOrder>e);
 	//发单函数
 
-	//做多
-	std::vector<std::string> buy(double price, double volume);
+	//做多bStopOrder停止单 还是 限价单，CTP不支持停止单，实现了本地停止单的功能
+	std::vector<std::string> buy(bool bStopOrder, double price, double volume);
 	//平多
-	std::vector<std::string> sell(double price, double volume);
+	std::vector<std::string> sell(bool bStopOrder, double price, double volume);
 	//做空
-	std::vector<std::string> sellshort(double price, double volume);
+	std::vector<std::string> sellshort(bool bStopOrder, double price, double volume);
 	//平空
-	std::vector<std::string> buycover(double price, double volume);
+	std::vector<std::string> buycover(bool bStopOrder, double price, double volume);
 
 	//总报单开平函数公用
-	std::vector<std::string> sendOrder(std::string strDirection, std::string strOffset, double price, double volume);
+	std::vector<std::string> sendOrder(bool bStopOrder, std::string strDirection, std::string strOffset, double price, double volume);
 	//撤所有单，停止策略时使用
 	void cancelallorder();
 	//撤单函数

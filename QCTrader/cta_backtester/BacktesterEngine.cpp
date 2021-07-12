@@ -608,8 +608,15 @@ std::vector<BarData> BacktesterEngine::loadBar(std::string symbol, int days)
 
 
 //提供给Strategytemplate
-std::vector<std::string> BacktesterEngine::sendOrder(std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy)
+std::vector<std::string> BacktesterEngine::sendOrder(bool bStopOrder,std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy)
 {
+	
+	if (bStopOrder)
+		return send_stop_order(symbol, strDirection,strOffset,  price,  volume,  Strategy);
+	else
+		return send_limit_order(symbol, strDirection, strOffset, price, volume, Strategy);
+
+
 	std::shared_ptr<Event_Order> req = std::make_shared<Event_Order>();
 	req->symbol = symbol;
 	req->price = price;
@@ -627,6 +634,83 @@ std::vector<std::string> BacktesterEngine::sendOrder(std::string symbol, std::st
 	return result;
 	
 }
+std::vector<std::string> BacktesterEngine::send_limit_order(std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy)
+{
+	m_limit_order_count++;
+
+	std::shared_ptr<Event_Order> ptr_order = std::make_shared<Event_Order>();
+
+	ptr_order->symbol = symbol;
+	ptr_order->direction = strDirection;
+	ptr_order->offset = strOffset;
+	ptr_order->price = price;
+	ptr_order->totalVolume = volume;
+	//ptr_stop_order-> = pStrategy->m_strategyName;
+
+	//m_limit_order_count++;
+	std::string orderID = std::to_string(m_limit_order_count);
+	ptr_order->orderID = orderID;
+	//stop_order.orderID
+	m_active_limit_orders.insert(std::pair <std::string, std::shared_ptr<Event_Order>>(orderID, ptr_order));
+
+	m_limit_orders.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, ptr_order));
+
+
+	std::vector<std::string> orderidVector;
+	orderidVector.push_back(orderID);
+
+	return orderidVector;
+
+
+}
+std::vector<std::string> BacktesterEngine::send_stop_order(std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy)
+{
+	m_stop_order_count++;
+
+	std::shared_ptr<Event_StopOrder> ptr_stop_order = std::make_shared<Event_StopOrder>();
+
+	ptr_stop_order->symbol = symbol;
+	ptr_stop_order->direction = strDirection;
+	ptr_stop_order->offset = strOffset;
+	ptr_stop_order->price = price;
+	ptr_stop_order->totalVolume = volume;
+
+	std::string orderID = std::to_string(m_limit_order_count);
+	ptr_stop_order->orderID = orderID;
+
+	m_active_stop_orders.insert(std::pair <std::string, std::shared_ptr<Event_StopOrder>>(orderID, ptr_stop_order));
+
+	m_stop_orders.insert(std::pair<std::string, std::shared_ptr<Event_StopOrder>>(orderID, ptr_stop_order));
+
+	//m_stragegyOrderMap[pStrategy->m_strategyName].push_back(orderID);不在m_stragegyOrderMap中保存
+	//pStrategy->onStopOrder(ptr_stop_order);
+
+	std::vector<std::string> orderidVector;
+	orderidVector.push_back(orderID);
+
+	//PutEvent(ptr_stop_order);
+	return orderidVector;
+
+}
+void BacktesterEngine::cross_limit_order(const BarData& data)
+{
+	double long_cross_price ,short_cross_price, long_best_price, short_best_price;
+
+	if (m_backtestmode == BAR_MODE)
+	{
+		long_cross_price = data.low;
+		short_cross_price = data.high;
+		long_best_price = data.open;
+		short_best_price = data.open;
+	}
+
+
+}
+void BacktesterEngine::cross_stop_order(const BarData& data)
+{
+
+}
+
 
 void BacktesterEngine::cancelOrder(std::string orderID, std::string gatewayname)
 {
