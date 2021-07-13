@@ -178,6 +178,8 @@ private slots:
 	void menu_exit();
 	void menu_CTAStrategy();
 	void menu_CTABacktest();
+	void menu_ContractQueryclicked();
+
 	void symbol_ReturnPressed();
 	void SendOrder_clicked();
 

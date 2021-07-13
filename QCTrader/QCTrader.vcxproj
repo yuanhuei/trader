@@ -139,6 +139,7 @@
     <ClInclude Include="cta_backtester\BacktesterEngine.h" />
     <ClInclude Include="cta_strategy\CtaEngine.h" />
     <ClInclude Include="cta_strategy\strategies\BollChannelStrategy.h" />
+    <ClInclude Include="Debug\uic\ui_ContractQueryManager.h" />
     <ClInclude Include="Debug\uic\ui_CTAStrategyManager.h" />
     <ClInclude Include="Debug\uic\ui_MainWindow.h" />
     <QtMoc Include="qcustomplot-source\qcustomplot.h" />

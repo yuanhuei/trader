@@ -10,6 +10,7 @@
 #include"risk_manager/riskmanager.h"
 #include"BacktesterManager.h"
 #include"cta_backtester/BacktesterEngine.h"
+#include"ContractQueryManager.h"
 
 
 
@@ -700,6 +701,15 @@ void MainWindow::write_log(std::string msg, std::string gateway_name)
 	m_eventengine->Put(e);
 }
 
+
+void MainWindow::menu_ContractQueryclicked()
+{
+
+	ContractQueryManager e = new ContractQueryManager(this);
+	e.show();
+
+
+}
 void MainWindow::menu_CTAStrategy()
 {
 	if(m_ctaStrategyDailog== nullptr)

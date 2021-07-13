@@ -1,23 +1,127 @@
-<UI version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>ContractQueryManager</class>
- <widget class="QWidget" name="ContractQueryManager" >
-  <property name="objectName" >
-   <string notr="true">ContractQueryManager</string>
-  </property>
-  <property name="geometry" >
+ <widget class="QWidget" name="ContractQueryManager">
+  <property name="geometry">
    <rect>
-	<x>0</x>
-	<y>0</y>
-	<width>400</width>
-	<height>300</height>
+    <x>0</x>
+    <y>0</y>
+    <width>750</width>
+    <height>565</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>ContractQueryManager</string>
   </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <widget class="QWidget" name="horizontalLayoutWidget">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLineEdit" name="lineEdit"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>查询</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="widget" native="true">
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QTableWidget" name="tableWidget">
+         <column>
+          <property name="text">
+           <string>代码</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>交易所</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>名称</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>合约分类</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>合约乘数</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>价格跳动</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>最小委托量</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>交易接口</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections/>
-</UI>
+ <connections>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ContractQueryManager</receiver>
+   <slot>Query_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>696</x>
+     <y>33</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>608</x>
+     <y>-15</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>ContractQueryManager</receiver>
+   <slot>Query_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>360</x>
+     <y>29</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>391</x>
+     <y>-14</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>Query_clicked()</slot>
+ </slots>
+</ui>

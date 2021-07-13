@@ -2,7 +2,7 @@
 
 #include <QWidget>
 #include "ui_ContractQueryManager.h"
-
+class MainWindow;
 class ContractQueryManager : public QWidget
 {
 	Q_OBJECT
@@ -10,7 +10,11 @@ class ContractQueryManager : public QWidget
 public:
 	ContractQueryManager(QWidget *parent = Q_NULLPTR);
 	~ContractQueryManager();
+private slots:
+	void ContractQueryManager::Query_clicked();
+
 
 private:
 	Ui::ContractQueryManager ui;
+	MainWindow* m_mainwindow;
 };
