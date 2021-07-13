@@ -47,6 +47,8 @@ public:
 	std::map<std::string, std::shared_ptr<Event_Order>>m_ordermap; std::mutex m_ordermapmtx;//存放委托的map
 
 	void write_error(std::string msg, CThostFtdcRspInfoField* pRspInfo);//格式化错误信息，调用基类的write_log
+	std::string GetExchangeName(std::string strSymbol);
+	int  GetSymbolSize(std::string strSymbol);
 
 private:
 	//事件驱动

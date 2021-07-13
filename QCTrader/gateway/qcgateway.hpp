@@ -59,6 +59,8 @@ public:
 	virtual void qryAccount() = 0;																				//查询账户资金
 	virtual void qryPosition() = 0;																				//查询持仓
 	virtual void close() = 0;																					//断开API
+	virtual std::string GetExchangeName(std::string strSymbol) =0;
+	virtual int  GetSymbolSize(std::string strSymbol) =0;
 public:
 	EventEngine* m_eventengine;
 	std::string m_gatewayname;

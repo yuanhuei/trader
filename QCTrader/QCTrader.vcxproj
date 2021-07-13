@@ -97,6 +97,7 @@
     <ClCompile Include="..\include\MongoCxx.cpp" />
     <ClCompile Include="AlgorithmOrder.cpp" />
     <ClCompile Include="BacktesterManager.cpp" />
+    <ClCompile Include="ContractQueryManager.cpp" />
     <ClCompile Include="CTAStrategyManager.cpp" />
     <ClCompile Include="cta_backtester\BacktesterEngine.cpp" />
     <ClCompile Include="cta_strategy\CtaEngine.cpp" />
@@ -116,6 +117,7 @@
     <ClCompile Include="utility.cpp" />
     <QtRcc Include="QCTrader.qrc" />
     <QtUic Include="BacktesterManager.ui" />
+    <QtUic Include="ContractQueryManager.ui" />
     <QtUic Include="CTAStrategyManager.ui" />
     <QtUic Include="CTPConnectWidgets.ui" />
     <QtUic Include="MainWindow.ui" />
@@ -133,6 +135,7 @@
     <QtMoc Include="CTAStrategyManager.h" />
     <QtMoc Include="BacktesterManager.h" />
     <ClInclude Include="..\include\CTAAPI.h" />
+    <QtMoc Include="ContractQueryManager.h" />
     <ClInclude Include="cta_backtester\BacktesterEngine.h" />
     <ClInclude Include="cta_strategy\CtaEngine.h" />
     <ClInclude Include="cta_strategy\strategies\BollChannelStrategy.h" />

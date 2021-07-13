@@ -91,7 +91,8 @@ public:
 	void ReadStrategyDataJson(std::string strfileName);
 	void WriteStrategyDataJson(std::map<std::string, std::string>,std::string fileName);
 
-	//配置和变量参数配置文件读取后放到两个map中，两个map的key都是[StrategyName + "__" + vt_symbol + "__" + ClassName] 
+	//配置和变量参数配置文件读取后放到两个map中，第一个map的key是StrategyName + "__" + vt_symbol + "__" + ClassName] 
+	//第二个map的key 是StrategyName + "__" + vt_symbol
 	std::map<std::string, std::map<std::string, float>> m_strategyConfigInfo_map;
 	std::map<std::string, std::map<std::string, float>> m_strategyData_map;
 private:

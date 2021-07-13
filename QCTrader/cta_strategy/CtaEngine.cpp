@@ -310,24 +310,27 @@ void CtaEngine::loadStrategy()
 
 
 
-			//赋值参数给策略中的strategeData,策略中必须生成strategeData,里面包含了配置参数和变量参数，下面是根据配置文件更新。
+			//赋值配置参数给策略中的strategeData,策略中必须生成strategeData,里面包含了配置参数和变量参数，下面是根据配置文件更新。
 			for (std::map<std::string, float>::iterator it = settingMap.begin(); it != settingMap.end(); it++)
 			{
 				//遍历parameter
 				std::string value = std::to_string(it->second);
 				strategy_ptr->updateParam(it->first.c_str(), value.c_str());
 			}
-			//赋值变量给策略中的strategeData
-			if (m_strategyData_map.find(iter->first) != m_strategyData_map.end())
+			//赋值变量参数给策略中的strategeData
+			if (m_strategyData_map.size()> 0)
 			{
-				std::map<std::string, float>varMap = m_strategyData_map[iter->first];//变量map
-				for (std::map<std::string, float>::iterator it = varMap.begin(); it != varMap.end(); it++)
+				if (m_strategyData_map.find(iter->first) != m_strategyData_map.end())
 				{
-					//遍历var
-					std::string value = std::to_string(it->second);
-					strategy_ptr->updateVar(it->first.c_str(), value.c_str());
-				}
+					std::map<std::string, float>varMap = m_strategyData_map[iter->first];//变量map
+					for (std::map<std::string, float>::iterator it = varMap.begin(); it != varMap.end(); it++)
+					{
+						//遍历var
+						std::string value = std::to_string(it->second);
+						strategy_ptr->updateVar(it->first.c_str(), value.c_str());
+					}
 
+				}
 			}
 			/*
 			for (std::map<std::string, std::map<std::string, float>>::iterator it = m_strategyData_map.begin(); it != m_strategyData_map.end(); it++)
@@ -388,10 +391,13 @@ void CtaEngine::loadStrategy()
 			//m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strategy_ptr->getparam("name"), strategy_ptr));//策略名和策略
 			
 			//生成策略集
+			m_strategymtx.lock();
 			m_strategymap.insert(std::pair<std::string, StrategyTemplate*>(strName, strategy_ptr));
+			m_strategymtx.unlock();
 		}
 
 			//订阅合约
+		/*
 		std::set<std::string>::iterator iter;
 		for (iter=symbolSet.begin();iter!=symbolSet.end();iter++)
 		{
@@ -400,18 +406,16 @@ void CtaEngine::loadStrategy()
 			SubscribeReq req;
 			req.symbol = contract->symbol;
 			req.exchange = contract->exchange;
-			/*
+			
 			if (strategy_ptr->getparam("currency") != "Null" && strategy_ptr->getparam("productClass") != "Null")
 			{
 				req.currency = strategy_ptr->getparam("currency");
 				req.productClass = strategy_ptr->getparam("productClass");
-			}*/
+			}
 			m_gatewaymanager->subscribe(req, "CTP");// strategy_ptr->getparam("gatewayname"));
 		}
-
+		*/
 	}
-
-
 }
 //初始化
 void CtaEngine::initStrategy(std::string name)
@@ -425,6 +429,26 @@ void CtaEngine::initStrategy(std::string name)
 		if (temp->inited == false)
 		{
 			temp->onInit();
+			//订阅该策略针对合约的行情
+			std::shared_ptr<Event_Contract>contract = m_gatewaymanager->Find_Contract(temp->m_symbol);
+			if(contract!=nullptr)
+			{
+				SubscribeReq req;
+				req.symbol = contract->symbol;
+				req.exchange = contract->exchange;
+				/*
+				if (strategy_ptr->getparam("currency") != "Null" && strategy_ptr->getparam("productClass") != "Null")
+				{
+					req.currency = strategy_ptr->getparam("currency");
+					req.productClass = strategy_ptr->getparam("productClass");
+				}*/
+				m_gatewaymanager->subscribe(req, "CTP");// strategy_ptr->getparam("gatewayname"));
+				writeCtaLog("订阅策略的合约行情" + req.symbol = contract->symbol);
+			}
+			else
+			{
+				writeCtaLog("获取合约信息失败");
+			}
 		}
 		else
 		{
@@ -854,7 +878,7 @@ std::vector<std::string>CtaEngine::sendOrder(bool bStopOrder, std::string symbol
 	{
 		OrderReq req;
 		req.symbol = symbol;
-		req.exchange = m_gatewaymanager->getContract(symbol)->exchange;
+		req.exchange = m_gatewaymanager->GetExchangeName(symbol, "CTP");// getContract(symbol)->exchange;
 		req.price = price;
 		req.volume = volume;
 
@@ -877,7 +901,7 @@ std::vector<std::string>CtaEngine::sendOrder(bool bStopOrder, std::string symbol
 		{
 			req.priceType = PRICETYPE_LIMITPRICE;//限价单
 			//发单
-			std::string orderID = m_gatewaymanager->sendOrder(req, m_gatewaymanager->getContract(symbol)->gatewayname);
+			std::string orderID = m_gatewaymanager->sendOrder(req,"CTP");
 
 			m_orderStrategymtx.lock();
 			m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, pStrategy));

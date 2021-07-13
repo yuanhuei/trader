@@ -112,6 +112,9 @@
     <ClCompile Include="cta_backtester\BacktesterEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ContractQueryManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="event_engine\eventengine.h">
@@ -197,6 +200,9 @@
     <QtMoc Include="qcustomplot-source\qcustomplot.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="ContractQueryManager.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="CTPConnectWidgets.ui">
@@ -209,6 +215,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="BacktesterManager.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="ContractQueryManager.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

@@ -5,7 +5,7 @@
 Gatewaymanager::Gatewaymanager(EventEngine *eventengine)
 {
 	m_eventengine = eventengine;
-	m_eventengine->RegEvent(EVENT_CONTRACT, std::bind(&Gatewaymanager::getallContract, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_CONTRACT, std::bind(&Gatewaymanager::Process_contract_event, this, std::placeholders::_1));
 	Init();
 }
 
@@ -14,6 +14,15 @@ Gatewaymanager::~Gatewaymanager()
 	exit();
 }
 
+void Gatewaymanager::Process_contract_event(std::shared_ptr<Event>e)
+{
+	
+	//把所有的合约存到这个容器中
+	std::unique_lock<std::mutex>lck(contractmutex);
+	std::shared_ptr<Event_Contract> contract = std::static_pointer_cast<Event_Contract>(e);
+	m_contractmap.insert(std::pair<std::string, std::shared_ptr<Event_Contract>>(contract->symbol, contract));
+
+}
 void Gatewaymanager::Init()
 {
 
@@ -25,13 +34,25 @@ void Gatewaymanager::Init()
 	//IB
 	//std::shared_ptr<>ctpgateway = std::make_shared<CTPGateway>(m_eventengine, "IB");
 }
+std::string Gatewaymanager::GetExchangeName(std::string strSymbol, std::string strGatewayname)
+{
+	std::unique_lock<std::mutex>lck(gatewaymtx);
+	return m_gatewaymap[strGatewayname]->GetExchangeName(strSymbol);//连接指定的接口
+
+}
+int  Gatewaymanager::GetSymbolSize(std::string strSymbol, std::string strGatewayname)
+{
+	std::unique_lock<std::mutex>lck(gatewaymtx);
+	return m_gatewaymap[strGatewayname]->GetSymbolSize(strSymbol);//连接指定的接口
+}
+
 
 std::shared_ptr<Event_Contract>Gatewaymanager::getContract(std::string symbol)
 {
 	std::unique_lock<std::mutex>lck(contractmutex);
-	while (m_contractmap.find(symbol) == m_contractmap.end())
+	if (m_contractmap.find(symbol) == m_contractmap.end())
 	{
-		contractcv.wait(lck);
+		return nullptr;
 	}
 	return m_contractmap[symbol];//返回合约的对象指针
 }
@@ -49,13 +70,9 @@ std::shared_ptr<Event_Contract>Gatewaymanager::Find_Contract(std::string symbol)
 }
 
 
-void Gatewaymanager::getallContract(std::shared_ptr<Event>e)
+std::map<std::string, std::shared_ptr<Event_Contract>> Gatewaymanager::getAllContract()
 {
-	//把所有的合约存到这个容器中
-	std::unique_lock<std::mutex>lck(contractmutex);
-	std::shared_ptr<Event_Contract> contract = std::static_pointer_cast<Event_Contract>(e);
-	m_contractmap.insert(std::pair<std::string, std::shared_ptr<Event_Contract>>(contract->symbol, contract));
-	contractcv.notify_one();
+	return m_contractmap;
 }
 
 void Gatewaymanager::connect(std::string gatewayname)

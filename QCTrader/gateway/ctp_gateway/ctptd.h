@@ -112,6 +112,7 @@ private:
 
 	//
 	std::map<std::string, std::shared_ptr<Event_Position>>m_posBufferMap;		std::mutex m_positionbuffermtx;//缓存持仓
+public:
 	std::map<std::string, std::string>m_symbolExchangeMap;//合约和交易所的map,只读不写，不需要加锁
 	std::map<std::string, int>m_symbolSizeMap;//合约和合约乘数的map
 };

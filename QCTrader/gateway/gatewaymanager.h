@@ -22,9 +22,14 @@ public:
 	std::shared_ptr<Event_Contract>Find_Contract(std::string symbol);
 	std::shared_ptr<Event_Order>getorder(std::string gatewayname, std::string orderID);
 	void close(std::string gatewayname);
+	std::string GetExchangeName(std::string strSymbol, std::string strGatewayname);
+	int  GetSymbolSize(std::string strSymbol, std::string strGatewayname);
 	void exit();
+	std::map<std::string, std::shared_ptr<Event_Contract>>  getAllContract();
+
+
 private:
-	void getallContract(std::shared_ptr<Event>e);
+	void Process_contract_event(std::shared_ptr<Event>e);
 	EventEngine *m_eventengine;
 	std::map<std::string, std::shared_ptr<QCGateway>>m_gatewaymap;			std::mutex gatewaymtx;                               //保存gateway名称与gateway对象的对应关系
 	std::map<std::string, std::shared_ptr<Event_Contract>>m_contractmap;    std::mutex contractmutex;  std::condition_variable contractcv;//保存symbol和合约指针

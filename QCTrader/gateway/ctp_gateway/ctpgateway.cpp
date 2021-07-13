@@ -40,6 +40,21 @@ CTPGateway::~CTPGateway()
 		delete m_TDSPI;
 	}
 }
+std::string CTPGateway:: GetExchangeName(std::string strSymbol)
+{
+	std::string strExchange = "";
+	if (m_TDSPI->m_symbolExchangeMap.find(strSymbol) != m_TDSPI->m_symbolExchangeMap.end())
+		return m_TDSPI->m_symbolExchangeMap[strSymbol];
+	return strExchange;
+
+}
+int CTPGateway:: GetSymbolSize(std::string strSymbol)
+{
+	int iSize = 0;
+	if (m_TDSPI->m_symbolSizeMap.find(strSymbol) != m_TDSPI->m_symbolSizeMap.end())
+		return m_TDSPI->m_symbolSizeMap[strSymbol];
+	return iSize;
+}
 
 void CTPGateway::connect()
 {
