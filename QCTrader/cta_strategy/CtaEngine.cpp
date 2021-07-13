@@ -60,6 +60,7 @@ CtaEngine::~CtaEngine()
 	delete m_portfolio;
 }
 //读取策略配置文件
+
 void CtaEngine::ReadStrategyConfFileJson()
 {
 	Json::Reader reader;
@@ -80,11 +81,14 @@ void CtaEngine::ReadStrategyConfFileJson()
 		for (int i = 0; i < root.size(); i++)
 		{
 			//读取策略名称和合约名称
+			std::string StrategyName = "";
+			std::string vt_symbol = "";
+			std::string ClassName = "";
 
-			std::string StrategyName = root[i]["strategy_name"].asString();
-			std::string vt_symbol = root[i]["vt_symbol"].asString();
-			std::string ClassName = root[i]["class_name"].asString();
-			if ((StrategyName.length() < 1 || vt_symbol.length()) < 1 || ClassName.length() < 1)
+			StrategyName = root[i]["strategy_name"].asString();
+			vt_symbol = root[i]["vt_symbol"].asString();
+			ClassName = root[i]["class_name"].asString();
+			if ((StrategyName.length() < 1 || (vt_symbol.length()) < 1 || ClassName.length() < 1))
 			{
 				this->writeCtaLog("配置文件策略信息不全");
 				return;
@@ -123,6 +127,7 @@ void CtaEngine::ReadStrategyConfFileJson()
 
 	in.close();
 }
+
 //读取策略数据文件
 void CtaEngine::ReadStrategyDataJson(std::string strfileName)
 {
@@ -148,7 +153,7 @@ void CtaEngine::ReadStrategyDataJson(std::string strfileName)
 			std::string StrategyName = root[i]["strategy_name"].asString();
 			std::string vt_symbol = root[i]["vt_symbol"].asString();
 			std::string ClassName = root[i]["class_name"].asString();
-			if ((StrategyName.length() < 1 || vt_symbol.length()) < 1 || ClassName.length() < 1)
+			if ((StrategyName.length() < 1 || (vt_symbol.length()) < 1 || ClassName.length() < 1))
 			{
 				this->writeCtaLog("策略数据文件信息不全");
 				return;
@@ -222,7 +227,8 @@ void CtaEngine::loadStrategy()
 	//命名规则为cta_strategy_data_" + str.toStdString() + ".json" str是策略名加策略类名
 
 	//读取策略配置文件（存放策略配置参数，包括策略名，合约，类名还有配置参数
-	ReadStrategyConfFileJson();
+	//ReadStrategyConfFileJson();
+	m_strategyConfigInfo_map = Global_FUC::ReadStrategyConfFileJson("./Strategy/cta_strategy_setting.json",this);
 	
 	std::map<std::string, std::map<std::string, float>>::iterator iter;
 	for (iter = m_strategyConfigInfo_map.begin(); iter!=m_strategyConfigInfo_map.end(); iter++)

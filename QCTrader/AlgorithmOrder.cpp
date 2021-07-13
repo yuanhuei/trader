@@ -60,7 +60,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 				{
 					orderID_Vector_Map[symbol].clear();
 					std::vector<std::string>v;
-					v = m_strategy_ptr->buy(Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+					v = m_strategy_ptr->buy(false,Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 					for (std::vector<std::string>::iterator it = v.begin(); it != v.end(); it++)
 					{
 						orderID_Vector_Map[symbol].push_back(*it);
@@ -69,7 +69,7 @@ void algorithmOrder::checkPositions_Tick(const TickData *Tick)
 				else
 				{
 					std::vector<std::string>v;
-					v = m_strategy_ptr->buy( Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
+					v = m_strategy_ptr->buy( false,Tick->askprice1, std::min(m_supposedPos[symbol] - m_strategy_ptr->getpos(symbol), m_unitLimit));
 					orderID_Vector_Map.insert(std::pair<std::string, std::vector<std::string>>(symbol, v));
 				}
 				m_orderIDvmtx.unlock();

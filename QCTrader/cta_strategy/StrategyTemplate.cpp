@@ -41,7 +41,7 @@ void StrategyTemplate::updateSetting()
 void StrategyTemplate::sync_data()
 {
 	std::string strFileName = m_strategyName + "_" + m_symbol;
-	WriteStrategyDataJson(m_strategydata->getallvar(), strFileName);
+	Global_FUC::WriteStrategyDataJson(m_strategydata->getallvar(), strFileName);
 }
 void StrategyTemplate::setPos(int pos)
 {
@@ -182,23 +182,23 @@ void StrategyTemplate::onStopOrder(std::shared_ptr<Event_StopOrder>e)
 
  }
 //做多
-std::vector<std::string> StrategyTemplate::buy(bool bStopOrder, double price, double volume)
+std::vector<std::string> StrategyTemplate::buy(double price, double volume,bool bStopOrder )
 {
 	return sendOrder(bStopOrder,DIRECTION_LONG, OFFSET_OPEN, price, volume);
 
 }
 //平多
-std::vector<std::string> StrategyTemplate::sell(bool bStopOrder, double price, double volume)
+std::vector<std::string> StrategyTemplate::sell(double price, double volume, bool bStopOrder )
 {
 	return sendOrder(bStopOrder, DIRECTION_SHORT, OFFSET_CLOSE, price, volume);
 }
 //做空
-std::vector<std::string> StrategyTemplate::sellshort(bool bStopOrder, double price, double volume)
+std::vector<std::string> StrategyTemplate::sellshort(double price, double volume, bool bStopOrder )
 {
 	return sendOrder(bStopOrder, DIRECTION_SHORT, OFFSET_OPEN, price, volume);
 }
 //平空
-std::vector<std::string> StrategyTemplate::buycover(bool bStopOrder, double price, double volume)
+std::vector<std::string> StrategyTemplate::buycover(double price, double volume, bool bStopOrder )
 {
 	return sendOrder(bStopOrder, DIRECTION_LONG, OFFSET_CLOSE, price, volume);
 }
@@ -289,7 +289,7 @@ void StrategyTemplate::checkSymbol(const char* symbolname)
 	//读取
 	changeposmap(symbolname, 0);
 }
-
+/*
 void StrategyTemplate::savepostomongo()
 {
 	//需要update
@@ -303,7 +303,7 @@ void StrategyTemplate::savepostomongo()
 		m_MongoCxx->updateData(query, update, "StrategyPos", "pos");
 	}
 }
-/*
+
 void StrategyTemplate::loadposfrommongo()
 {
 	std::vector<std::string>result;

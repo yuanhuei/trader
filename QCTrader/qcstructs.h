@@ -41,7 +41,8 @@
 #define STATUS_TRIGGED "ordertrigged"
 #define STATUS_REGECTED "orderrejected"
 
-
+#define BAR_MODE "barmode"
+#define TICK_MODE "tickmode"
 
 typedef enum
 {

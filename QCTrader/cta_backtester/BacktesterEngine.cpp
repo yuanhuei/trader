@@ -230,7 +230,7 @@ void BacktesterEngine::calculate_result()
 	}
 }
 
-std::map<std::string, double> BacktesterEngine::calculate_statistics(bool bOutput = false)
+void BacktesterEngine::calculate_statistics(bool bOutput )
 {
 	m_result_statistics["start_date"] = m_startDay.toString().toStdString();
 	m_result_statistics["end_date"] = m_endDay.toString().toStdString();

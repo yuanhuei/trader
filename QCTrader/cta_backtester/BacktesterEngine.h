@@ -6,7 +6,7 @@
 #include<set>
 #include"qcstructs.h"
 #include<QDateTime>
-#include <QCTrader/cta_strategy/StrategyTemplate.h>
+#include "../cta_strategy/StrategyTemplate.h"
 
 class StrategyTemplate;
 class EventEngine;
@@ -88,8 +88,9 @@ public:
 	Interval m_iInterval=MINUTE;
 	int m_days = 0;
 	//self.callback = None
-
-	std::string m_backtestmode = BAR_MODE;								//bar模式还是tick模式
+	// 
+	//bar模式还是tick模式
+	std::string m_backtestmode = BAR_MODE;								
 
 	int m_stop_order_count = 0;
 	//stop_orders = {}
@@ -119,7 +120,7 @@ public:
 	std::map < std::string, std::string> m_result_statistics;
 
 	void calculate_result();
-	std::map<std::string, double> calculate_statistics(bool bOutput = false);
+	void calculate_statistics(bool bOutput = false);
 
 	//提供给Strategytemplate调用的接口
 	std::vector<std::string> sendOrder(bool bStopOrder,std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy);

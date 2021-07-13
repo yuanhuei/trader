@@ -13,6 +13,7 @@ BollChannelStrategy::BollChannelStrategy(CTAAPI* ctaEngine, std::string strategy
 	m_BarGenerate = new BarGenerator(on_func1, 5, on_fun2, iInterval);
 	m_ArrayManager = new ArrayManager();
 
+
 }
 
 BollChannelStrategy::~BollChannelStrategy()

@@ -152,12 +152,9 @@
     <ClInclude Include="gateway\ctp_gateway\ctpmd.h" />
     <ClInclude Include="gateway\ctp_gateway\ctptd.h" />
     <ClInclude Include="gateway\gatewaymanager.h" />
-    <QtMoc Include="SpinBoxDelegate.h" />
     <ClInclude Include="json11.hpp" />
-    <ClInclude Include="main_engine\mainengine.h" />
     <ClInclude Include="portfolio.h" />
     <ClInclude Include="qcstructs.h" />
-    <QtMoc Include="ReadOnlyDelegate.h" />
     <ClInclude Include="risk_manager\riskmanager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,18 +1,17 @@
 [
 {
 
-        "strategy_name": "MyBollingStrategy",
+        "strategy_name": "BollChannelStrategy",
         "vt_symbol": "FG2109.INE",
-        "class_name": "MyBollingStrategy",
+        "class_name": "BollChannelStrategy",
         "setting": {
             
-            "bollWindow5min": 26,
-            "bollWindow15min": 26,
-            "bollWindow30min": 52,
-            "entryDev": 2,
-            "initDays": 15,
-            "fixedSize": 1,
-            "DayTrendStatus": 1
+            "boll_window": 26,
+            "boll_dev": 4,
+            "cci_window": 11,
+            "atr_window": 32,
+            "sl_multiplier": 6,
+            "fixed_size": 1
         }
 
 },

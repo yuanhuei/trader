@@ -117,9 +117,6 @@
     <ClInclude Include="event_engine\eventengine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="main_engine\mainengine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="gateway\ctp_gateway\ctpgateway.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -185,12 +182,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="ReadOnlyDelegate.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="SpinBoxDelegate.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="CTPConnectWidgets.h">
       <Filter>Header Files</Filter>
     </QtMoc>

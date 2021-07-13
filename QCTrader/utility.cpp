@@ -83,7 +83,7 @@
                 //读取策略名称和合约名称
 
                 StrategyName = root[i]["strategy_name"].asString();
-                // std::string vt_symbol = root[i]["vt_symbol"].asString();
+                std::string vt_symbol = root[i]["vt_symbol"].asString();
                 ClassName = root[i]["class_name"].asString();
                 if (StrategyName.length() < 1 || ClassName.length() < 1)
                 {
@@ -113,7 +113,7 @@
 
                 }
                 //插入到策略配置map中
-                strategyConfigInfo_map[StrategyName + "_" + ClassName] = settingMap;
+                strategyConfigInfo_map[StrategyName + "_" + vt_symbol +"_" + ClassName] = settingMap;
             }
         }
         else

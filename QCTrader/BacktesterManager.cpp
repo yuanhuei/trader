@@ -24,7 +24,7 @@ BacktesterManager::BacktesterManager(QWidget *parent)
 
 	qRegisterMetaType<LogData>("LogData");//注册到元系统中 UpdatePriceTableData
 	connect(this, SIGNAL(UpdateLogSignal()), this, SLOT(UpdateTesterResult()));
-
+	InitUI();
 
 }
 
@@ -83,7 +83,7 @@ void BacktesterManager::InitUI()
 
 	//读取策略名和配置
 	std::string strName = "./Strategy/cta_strategy_setting_backtester.json";
-	m_ctaStrategyMap=ReadStrategyConfFileJson(strName, m_backtesterEngine);
+	m_ctaStrategyMap= Global_FUC::ReadStrategyConfFileJson(strName, m_backtesterEngine);
 
 	std::map<std::string, std::map<std::string, float>>::iterator iter;
 	for (iter = m_ctaStrategyMap.begin(); iter != m_ctaStrategyMap.end(); iter++)
@@ -114,7 +114,7 @@ void BacktesterManager::RegisterEvent()
 }
 void BacktesterManager::ProcecssTesterFisnishedEvent(std::shared_ptr<Event>e)
 {
-	emit UpdateTesterResultSignal;
+	emit UpdateTesterResultSignal();
 }
 void BacktesterManager::UpdateTesterResult()
 {

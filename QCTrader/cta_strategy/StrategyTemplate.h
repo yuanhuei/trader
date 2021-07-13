@@ -12,8 +12,8 @@
 #include"MongoCxx.h"
 #include"../include/libmongoc-1.0/mongoc.h"
 #include"../include/libbson-1.0/bson.h"
-#define BAR_MODE "barmode"
-#define TICK_MODE "tickmode"
+
+
 
 class algorithmOrder;
 class MongoCxx;
@@ -106,13 +106,13 @@ public:
 	//发单函数
 
 	//做多bStopOrder停止单 还是 限价单，CTP不支持停止单，实现了本地停止单的功能
-	std::vector<std::string> buy(bool bStopOrder, double price, double volume);
+	std::vector<std::string> buy(double price, double volume,bool bStopOrder = false);
 	//平多
-	std::vector<std::string> sell(bool bStopOrder, double price, double volume);
+	std::vector<std::string> sell(double price, double volume, bool bStopOrder = false);
 	//做空
-	std::vector<std::string> sellshort(bool bStopOrder, double price, double volume);
+	std::vector<std::string> sellshort(double price, double volume, bool bStopOrder = false);
 	//平空
-	std::vector<std::string> buycover(bool bStopOrder, double price, double volume);
+	std::vector<std::string> buycover(double price, double volume, bool bStopOrder = false);
 
 	//总报单开平函数公用
 	std::vector<std::string> sendOrder(bool bStopOrder, std::string strDirection, std::string strOffset, double price, double volume);
@@ -143,8 +143,8 @@ public:
 	std::vector<BarData>loadBar(std::string symbol, int days);
 
 	//利用mongocxx模板保存和读取mongodb，已经没使用了，使用json文件保存变量
-	virtual void savepostomongo();
-	virtual void loadposfrommongo();
+	//virtual void savepostomongo();
+	//virtual void loadposfrommongo();
 	MongoCxx *m_MongoCxx;
 
 	//CTA管理器
