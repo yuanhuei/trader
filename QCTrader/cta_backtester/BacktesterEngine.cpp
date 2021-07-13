@@ -80,10 +80,7 @@ BacktesterEngine::~BacktesterEngine()
 
 }
 
-void BacktesterEngine::CrossLimitOrder(const TickData& data)
-{
 
-}
 
 void BacktesterEngine::StartBacktesting(
 	std::string strStrategyName,
@@ -150,7 +147,10 @@ void BacktesterEngine::runBacktesting()
 		 if (bTrading)
 		 {
 			 m_barDate = vector_history_data[i].date;//赋值当前推送bar的时间给m_barDate方便传递参数
-			 CrossLimitOrder(vector_history_data[i]);//检查价格是否触发之前的order
+			 m_datetime = QDateTime::fromString(QString::fromStdString(vector_history_data[i].date + " " + vector_history_data[i].time),"yy/nn/dd hh:mm:ss");
+			 cross_limit_order(vector_history_data[i]);//检查价格是否触发之前的order
+			 cross_stop_order(vector_history_data[i]);//检查价格是否触发之前的order
+
 			 m_strategy->onBar(vector_history_data[i]);//调用策略的onBar函数推送bar数据
 			 update_daily_close(vector_history_data[i].close);//更新m_daily_results map的收盘价，为后面计算做准备
 		 }
@@ -303,62 +303,7 @@ std::map<std::string, double> BacktesterEngine::calculate_statistics(bool bOutpu
 		//m_result_statistics["return_std"] =
 }
 
-void BacktesterEngine::CrossLimitOrder(const BarData& data)
-{
-	double	buyCrossPrice = data.low;
-	double	sellCrossPrice = data.high;
-	double	buyBestCrossPrice = data.open;
-	double	sellBestCrossPrice = data.open;
-	for (std::map<std::string, std::shared_ptr<Event_Order>>::iterator iter = m_WorkingOrdermap.begin(); iter != m_WorkingOrdermap.end();)
-	{
-		bool buyCross = (iter->second->direction == DIRECTION_LONG && iter->second->price >= buyCrossPrice);
-		bool sellCross = (iter->second->direction == DIRECTION_SHORT && iter->second->price <= sellCrossPrice);
 
-		//如果发生了成交
-		if (buyCross || sellCross)
-		{
-			m_tradeCount += 1;
-			std::string tradeID = iter->first;
-			std::shared_ptr<Event_Trade>trade = std::make_shared<Event_Trade>();
-			trade->symbol = iter->second->symbol;
-			trade->tradeID = tradeID;
-			trade->orderID = iter->second->orderID;
-			trade->direction = iter->second->direction;
-			trade->offset = iter->second->offset;
-			trade->volume = iter->second->totalVolume;
-			trade->tradeTime = data.date + " " + data.time;
-			if (buyCross)
-			{
-				trade->price = std::min(iter->second->price, buyBestCrossPrice);
-				m_strategy->setPos(m_strategy->getpos() + trade->volume);
-			}
-			else if (sellCross)
-			{
-				trade->price = std::max(iter->second->price, sellBestCrossPrice);
-				m_strategy->setPos(m_strategy->getpos() - trade->volume);
-			}
-			//回调策略onTrade函数，通知成交
-			m_tradeCount++;
-			m_strategy->onTrade(trade);
-
-			savetraderecord(m_strategy->m_strategyName, trade,m_eventengine);
-
-			//Settlement(trade, m_orderStrategymap);
-			//处理ordermap
-			iter->second->tradedVolume = iter->second->totalVolume;
-			iter->second->status = STATUS_ALLTRADED;
-			m_Ordermap[iter->first]->status = STATUS_ALLTRADED;
-
-			m_strategy->onOrder(iter->second);
-			m_WorkingOrdermap.erase(iter++); 
-		}
-		else
-		{
-			iter++;
-		}
-		
-	}
-}
 
 void BacktesterEngine::writeCtaLog(std::string msg)
 {
@@ -616,23 +561,23 @@ std::vector<std::string> BacktesterEngine::sendOrder(bool bStopOrder,std::string
 	else
 		return send_limit_order(symbol, strDirection, strOffset, price, volume, Strategy);
 
+/*
+std::shared_ptr<Event_Order> req = std::make_shared<Event_Order>();
+req->symbol = symbol;
+req->price = price;
+req->totalVolume = volume;
+req->status = STATUS_WAITING;
 
-	std::shared_ptr<Event_Order> req = std::make_shared<Event_Order>();
-	req->symbol = symbol;
-	req->price = price;
-	req->totalVolume = volume;
-	req->status = STATUS_WAITING;
+	//发单
+std::string orderID = Utils::doubletostring(m_limit_order_count++); //
+req->orderID = orderID;
+m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
+m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
 
-		//发单
-	std::string orderID = Utils::doubletostring(m_limitorderCount++); //
-	req->orderID = orderID;
-	m_WorkingOrdermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
-	m_Ordermap.insert(std::pair<std::string, std::shared_ptr<Event_Order>>(orderID, req));
+std::vector<std::string>result;
+result.push_back(orderID);
+return result;*/
 
-	std::vector<std::string>result;
-	result.push_back(orderID);
-	return result;
-	
 }
 std::vector<std::string> BacktesterEngine::send_limit_order(std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy)
 {
@@ -645,6 +590,7 @@ std::vector<std::string> BacktesterEngine::send_limit_order(std::string symbol, 
 	ptr_order->offset = strOffset;
 	ptr_order->price = price;
 	ptr_order->totalVolume = volume;
+	ptr_order->status = STATUS_SUBMITTING;
 	//ptr_stop_order-> = pStrategy->m_strategyName;
 
 	//m_limit_order_count++;
@@ -694,7 +640,8 @@ std::vector<std::string> BacktesterEngine::send_stop_order(std::string symbol, s
 }
 void BacktesterEngine::cross_limit_order(const BarData& data)
 {
-	double long_cross_price ,short_cross_price, long_best_price, short_best_price;
+	double long_cross_price, short_cross_price, long_best_price, short_best_price,trade_price,pos_change;
+	bool bLong_cross, bShort_cross;
 
 	if (m_backtestmode == BAR_MODE)
 	{
@@ -703,32 +650,229 @@ void BacktesterEngine::cross_limit_order(const BarData& data)
 		long_best_price = data.open;
 		short_best_price = data.open;
 	}
+	std::map<std::string, std::shared_ptr<Event_Order>>::iterator iter;
+	for (iter= m_active_limit_orders.begin();iter!= m_active_limit_orders.end();)
+	{
+		std::shared_ptr<Event_Order> limitOrder = iter->second;
 
+		if (limitOrder->status == STATUS_SUBMITTING)//和上面的send_limit_order部分赋值对应
+		{
+			limitOrder->status = STATUS_NOTRADED;
+			m_strategy->onOrder(limitOrder);
+
+		}
+		if ((limitOrder->direction == DIRECTION_LONG && limitOrder->price > long_cross_price) && long_cross_price > 0)
+			bLong_cross = true;
+		if ((limitOrder->direction == DIRECTION_SHORT && limitOrder->price <= short_cross_price) && short_cross_price > 0)
+			bShort_cross = true;
+		if (bLong_cross == false && bShort_cross == false)
+		{
+			//不满足条件的跳过
+			iter++;
+			continue;
+		}
+		limitOrder->tradedVolume = limitOrder->totalVolume;
+		limitOrder->status = STATUS_ALLTRADED;
+		m_strategy->onOrder(limitOrder);
+
+		m_tradeCount++;
+		if (bLong_cross)
+		{
+			trade_price = std::min(limitOrder->price, long_best_price);
+			pos_change = limitOrder->tradedVolume;
+		}
+		else
+		{
+			trade_price = std::max(limitOrder->price, short_best_price);
+			pos_change = -limitOrder->tradedVolume;
+		}
+		std::shared_ptr<Event_Trade> ptr_trade = std::make_shared<Event_Trade>();
+		ptr_trade->symbol = limitOrder->symbol;
+		ptr_trade->exchange = limitOrder->exchange;
+		ptr_trade->orderID = limitOrder->orderID;
+		ptr_trade->tradeID = std::to_string(m_tradeCount);
+		ptr_trade->direction = limitOrder->direction;
+		ptr_trade->offset = limitOrder->offset;
+		ptr_trade->volume = limitOrder->tradedVolume;
+		ptr_trade->gatewayname = limitOrder->gatewayname;
+		ptr_trade->tradeTime = m_datetime.toString().toStdString();
+
+		m_strategy->setPos(m_strategy->getpos() + pos_change);
+		m_strategy->onTrade(ptr_trade);
+		//满足条件的处理完了删除这个节点
+		m_active_limit_orders.erase(iter++);
+	}
 
 }
 void BacktesterEngine::cross_stop_order(const BarData& data)
 {
+	double long_cross_price, short_cross_price, long_best_price, short_best_price, trade_price, pos_change;
+	bool bLong_cross, bShort_cross;
+
+	if (m_backtestmode == BAR_MODE)
+	{
+		long_cross_price = data.high;
+		short_cross_price = data.low;
+		long_best_price = data.open;
+		short_best_price = data.open;
+	}
+	std::map<std::string, std::shared_ptr<Event_StopOrder>>::iterator iter;
+	for (iter= m_active_stop_orders.begin();iter!= m_active_stop_orders.end();)
+	{
+		std::shared_ptr<Event_StopOrder> stopOrder = iter->second;
+
+
+		if (stopOrder->direction == DIRECTION_LONG && stopOrder->price <= long_cross_price)
+			bLong_cross = true;
+		if (stopOrder->direction == DIRECTION_SHORT && stopOrder->price >= short_cross_price)
+			bShort_cross = true;
+		if (bLong_cross == false && bShort_cross == false)
+		{
+			//不满足条件的跳过
+			iter++;
+			continue;
+		}
+		std::shared_ptr<Event_Order> ptr_order = std::make_shared<Event_Order>();
+		ptr_order->symbol = stopOrder->symbol;
+		ptr_order->exchange = stopOrder->exchange;
+		ptr_order->direction = stopOrder->direction;
+		ptr_order->offset = stopOrder->offset;
+		ptr_order->orderID = std::to_string(m_limit_order_count++);
+		ptr_order->price = stopOrder->price;
+		ptr_order->totalVolume = stopOrder->totalVolume;
+
+		ptr_order->status = STATUS_ALLTRADED;
+		ptr_order->tradedVolume = stopOrder->totalVolume;
+		ptr_order->totalVolume = stopOrder->totalVolume;
+		ptr_order->gatewayname = stopOrder->gatewayname;
+		ptr_order->orderTime = m_datetime.toString().toStdString();
+
+		m_limit_orders[ptr_order->orderID] = ptr_order;
+
+
+
+		//stopOrder->tradedVolume = stopOrder->totalVolume;
+		//stopOrder->status = STATUS_ALLTRADED;
+		//m_strategy->onOrder(stopOrder);
+
+		m_tradeCount++;
+		if (bLong_cross)
+		{
+			trade_price = std::max(stopOrder->price, long_best_price);
+			pos_change = stopOrder->tradedVolume;
+		}
+		else
+		{
+			trade_price = std::min(stopOrder->price, short_best_price);
+			pos_change = -stopOrder->tradedVolume;
+		}
+		std::shared_ptr<Event_Trade> ptr_trade = std::make_shared<Event_Trade>();
+		ptr_trade->symbol = stopOrder->symbol;
+		ptr_trade->exchange = stopOrder->exchange;
+		ptr_trade->orderID = stopOrder->orderID;
+		ptr_trade->tradeID = std::to_string(m_tradeCount);
+		ptr_trade->direction = stopOrder->direction;
+		ptr_trade->offset = stopOrder->offset;
+		ptr_trade->volume = stopOrder->tradedVolume;
+		ptr_trade->gatewayname = stopOrder->gatewayname;
+		ptr_trade->tradeTime = m_datetime.toString().toStdString();
+
+		m_tradeMap[ptr_trade->tradeID] = ptr_trade;
+
+		stopOrder->status = STATUS_TRIGGED;
+
+		m_strategy->onStopOrder(stopOrder);
+		m_strategy->onOrder(ptr_order);
+
+		m_strategy->setPos(m_strategy->getpos() + pos_change);
+		m_strategy->onTrade(ptr_trade);
+
+		//满足条件的处理完了删除这个节点
+		m_active_stop_orders.erase(iter++);
+	}
 
 }
 
-
-void BacktesterEngine::cancelOrder(std::string orderID, std::string gatewayname)
+void BacktesterEngine::cancel_stop_order(std::string orderID, std::string gatewayname)
 {
-	if (m_WorkingOrdermap.find(orderID) != m_WorkingOrdermap.end())
+	if (m_active_stop_orders.find(orderID) != m_active_stop_orders.end())
 	{
-		std::shared_ptr<Event_Order>order = m_WorkingOrdermap[orderID];
-		if (order != nullptr)
+		std::shared_ptr<Event_StopOrder>ptr_order = m_active_stop_orders[orderID];
+		if (ptr_order != nullptr)
 		{
 			//报单有效
-			if (!(order->status == STATUS_ALLTRADED || order->status == STATUS_CANCELLED))
+			if (!(ptr_order->status == STATUS_ALLTRADED || ptr_order->status == STATUS_CANCELLED))
 			{
 				//可撤单状态
-				m_Ordermap[orderID]->status = STATUS_CANCELLED;
-				m_WorkingOrdermap.erase(orderID);
+				m_stop_orders[orderID]->status = STATUS_CANCELLED;
+				m_active_stop_orders.erase(orderID);
+			}
+		}
+	}
+
+}
+
+void BacktesterEngine::cancel_limit_order(std::string orderID, std::string gatewayname)
+{
+	if (m_active_limit_orders.find(orderID) != m_active_limit_orders.end())
+	{
+		std::shared_ptr<Event_Order>ptr_order = m_active_limit_orders[orderID];
+		if (ptr_order != nullptr)
+		{
+			//报单有效
+			if (!(ptr_order->status == STATUS_ALLTRADED || ptr_order->status == STATUS_CANCELLED))
+			{
+				//可撤单状态
+				m_limit_orders[orderID]->status = STATUS_CANCELLED;
+				m_active_limit_orders.erase(orderID);
 			}
 		}
 	}
 }
+
+void BacktesterEngine::cancelOrder(std::string orderID, std::string gatewayname)
+{
+	cancel_stop_order(orderID, gatewayname);
+	cancel_limit_order(orderID, gatewayname);
+}
+void BacktesterEngine::cancelAllOrder()
+{
+	std::map<std::string, std::shared_ptr<Event_Order>>::iterator iter;
+	for(iter= m_active_limit_orders.begin();iter!= m_active_limit_orders.end();)
+	{
+		std::shared_ptr<Event_Order>ptr_order =iter->second;
+		if (ptr_order != nullptr)
+		{
+			//报单有效
+			if (!(ptr_order->status == STATUS_ALLTRADED || ptr_order->status == STATUS_CANCELLED))
+			{
+				//可撤单状态
+				m_limit_orders[ptr_order->orderID]->status = STATUS_CANCELLED;
+				m_active_limit_orders.erase(iter++);
+			}
+		}
+		else
+			iter++;
+	}
+	std::map<std::string, std::shared_ptr<Event_StopOrder>>::iterator iteror;
+	for (iteror = m_active_stop_orders.begin(); iteror != m_active_stop_orders.end();)
+	{
+		std::shared_ptr<Event_StopOrder>ptr_order = iteror->second;
+		if (ptr_order != nullptr)
+		{
+			//报单有效
+			if (!(ptr_order->status == STATUS_ALLTRADED || ptr_order->status == STATUS_CANCELLED))
+			{
+				//可撤单状态
+				m_stop_orders[ptr_order->orderID]->status = STATUS_CANCELLED;
+				m_active_stop_orders.erase(iteror++);
+			}
+		}
+		else
+			iteror++;
+	}
+}
+
 
 void BacktesterEngine::PutEvent(std::shared_ptr<Event>e)
 {

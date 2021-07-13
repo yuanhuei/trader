@@ -32,9 +32,16 @@
 #define EXCHANGE_INE "INE"    //上海国际能源交易中心
 
 #define STATUS_ALLTRADED "orderalltraded"
+#define STATUS_PARTTRADED "orderparttraded"
+#define STATUS_NOTRADED "ordernottraded"
+
 #define STATUS_CANCELLED "ordercanceld"
 #define STATUS_WAITING "orderwaiting"
+#define STATUS_SUBMITTING "ordersubmitting"
 #define STATUS_TRIGGED "ordertrigged"
+#define STATUS_REGECTED "orderrejected"
+
+
 
 typedef enum
 {

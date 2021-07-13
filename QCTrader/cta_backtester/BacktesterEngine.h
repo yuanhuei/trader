@@ -6,6 +6,7 @@
 #include<set>
 #include"qcstructs.h"
 #include<QDateTime>
+#include <QCTrader/cta_strategy/StrategyTemplate.h>
 
 class StrategyTemplate;
 class EventEngine;
@@ -82,11 +83,13 @@ public:
 
 	TickData m_tick;
 	BarData m_bar;
-	//self.datetime = None
+	QDateTime m_datetime;
 
 	Interval m_iInterval=MINUTE;
 	int m_days = 0;
 	//self.callback = None
+
+	std::string m_backtestmode = BAR_MODE;								//bar模式还是tick模式
 
 	int m_stop_order_count = 0;
 	//stop_orders = {}
@@ -103,6 +106,8 @@ public:
 	std::map<std::string, std::shared_ptr<Event_Order>>m_active_limit_orders;		//工作中的单   
 
 	//int m_trade_count = 0;
+	int  m_tradeCount = 0;							//成交次数
+
 	std::map<std::string, std::shared_ptr<Event_Trade>>m_tradeMap;//成交单					
 	//std::map<std::string, Result>m_result;											
 
@@ -119,9 +124,12 @@ public:
 	//提供给Strategytemplate调用的接口
 	std::vector<std::string> sendOrder(bool bStopOrder,std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy);
 	void cancelOrder(std::string orderID, std::string gatewayname);
+	void cancel_stop_order(std::string orderID, std::string gatewayname);
+	void cancel_limit_order(std::string orderID, std::string gatewayname);
+	void cancelAllOrder();
 
-	void cross_limit_order();
-	void cross_stop_order();
+	void cross_limit_order(const BarData& data);
+	void cross_stop_order(const BarData& data);
 	std::vector<std::string> send_limit_order(std::string symbol, std::string strDirection, std::string strOffset, 
 		double price, double volume, StrategyTemplate* Strategy);
 	std::vector<std::string> send_stop_order(std::string symbol, std::string strDirection, std::string strOffset, 
@@ -143,8 +151,6 @@ public:
 	void update_daily_close(float price);
 
 
-	void CrossStopOrder(const BarData& data);
-	void CrossLimitOrder(const BarData& data);
 
 	void StartBacktesting(
 		std::string strStrategyName,
@@ -164,7 +170,5 @@ public:
 
 	//回测的变量
 	//int m_limitorderCount=1;						//人工ORDERID
-	int  m_tradeCount=0;							//成交次数
-	std::string m_backtestmode;								//bar模式还是tick模式
 };
 
