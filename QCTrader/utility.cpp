@@ -13,48 +13,145 @@
 #include"CTAAPI.h"
 #include"event_engine/eventengine.h"
 
-QString str2qstr_new(std::string str)
-{
-	return QString::fromLocal8Bit(str.c_str());
-}
-std::string time_t2str(time_t datetime)
-{
-    auto tt = datetime;
-    struct tm* ptm = localtime(&tt);
-    char date[60] = { 0 };
-    sprintf(date, "%d-%02d-%02d      %02d:%02d:%02d",
-        (int)ptm->tm_year + 1900, (int)ptm->tm_mon + 1, (int)ptm->tm_mday,
-        (int)ptm->tm_hour, (int)ptm->tm_min, (int)ptm->tm_sec);
-    return std::string(date);
-}
-void savetraderecord(std::string strategyname, std::shared_ptr<Event_Trade>etrade,EventEngine* eventEngine)
-{
-    //交易记录
-    if (_access("./traderecord", 0) != -1)
+    QString str2qstr_new(std::string str)
     {
-        std::fstream f;
-        f.open("./traderecord/" + strategyname + ".csv", std::ios::app | std::ios::out);
-        if (!f.is_open())
-        {
-            //如果打不开文件
-            std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
-            e->msg = "无法保存交易记录";
-            e->gatewayname = "CTP";
-            eventEngine->Put(e);
-            return;
-        }
-        std::string symbol = etrade->symbol;
-        std::string direction = etrade->direction;
-        std::string offset = etrade->offset;
-        std::string tradetime = etrade->tradeTime;
-        std::string volume = Utils::doubletostring(etrade->volume);
-        std::string price = Utils::doubletostring(etrade->price);
-
-        f << strategyname << "," << tradetime << "," << symbol << "," << direction << "," << offset << "," << price << "," << volume << "\n";
-
-        f.close();
+        return QString::fromLocal8Bit(str.c_str());
     }
-}
+
+    std::string Global_FUC::time_t2str(time_t datetime)
+    {
+        auto tt = datetime;
+        struct tm* ptm = localtime(&tt);
+        char date[60] = { 0 };
+        sprintf(date, "%d-%02d-%02d      %02d:%02d:%02d",
+            (int)ptm->tm_year + 1900, (int)ptm->tm_mon + 1, (int)ptm->tm_mday,
+            (int)ptm->tm_hour, (int)ptm->tm_min, (int)ptm->tm_sec);
+        return std::string(date);
+    }
+
+
+    void Global_FUC::savetraderecord(std::string strategyname, std::shared_ptr<Event_Trade>etrade, EventEngine* eventEngine)
+    {
+        //交易记录
+        if (_access("./traderecord", 0) != -1)
+        {
+            std::fstream f;
+            f.open("./traderecord/" + strategyname + ".csv", std::ios::app | std::ios::out);
+            if (!f.is_open())
+            {
+                //如果打不开文件
+                std::shared_ptr<Event_Log>e = std::make_shared<Event_Log>();
+                e->msg = "无法保存交易记录";
+                e->gatewayname = "CTP";
+                eventEngine->Put(e);
+                return;
+            }
+            std::string symbol = etrade->symbol;
+            std::string direction = etrade->direction;
+            std::string offset = etrade->offset;
+            std::string tradetime = etrade->tradeTime;
+            std::string volume = Utils::doubletostring(etrade->volume);
+            std::string price = Utils::doubletostring(etrade->price);
+
+            f << strategyname << "," << tradetime << "," << symbol << "," << direction << "," << offset << "," << price << "," << volume << "\n";
+
+            f.close();
+        }
+    }
+
+    std::map<std::string, std::map<std::string, float>> Global_FUC::ReadStrategyConfFileJson(std::string fileName, CTAAPI* ctaEngine)
+    {
+        Json::Reader reader;
+        Json::Value root;
+        std::map<std::string, std::map<std::string, float>> strategyConfigInfo_map;
+        std::string StrategyName, ClassName;
+
+        //从文件中读取，保证当前文件有demo.json文件  
+        std::ifstream in(fileName, std::ios::binary);
+
+        if (!in.is_open())
+        {
+            ctaEngine->writeCtaLog("打开策略配置文件失败");
+            return strategyConfigInfo_map;
+        }
+
+        if (reader.parse(in, root))
+        {
+            ctaEngine->writeCtaLog("打开策略配置文件成功");
+            for (int i = 0; i < root.size(); i++)
+            {
+                //读取策略名称和合约名称
+
+                StrategyName = root[i]["strategy_name"].asString();
+                // std::string vt_symbol = root[i]["vt_symbol"].asString();
+                ClassName = root[i]["class_name"].asString();
+                if (StrategyName.length() < 1 || ClassName.length() < 1)
+                {
+                    ctaEngine->writeCtaLog("配置文件策略信息不全");
+                    return strategyConfigInfo_map;
+                }
+
+                //读取策略配置信息 
+                std::map<std::string, float> settingMap;
+                Json::Value::Members members;
+                members = root[i]["setting"].getMemberNames();
+                //std::vector<std::string> settingKeys= root["setting"].getMemberNames();
+                for (Json::Value::Members::iterator iterMember = members.begin(); iterMember != members.end(); iterMember++)   // 遍历每个key
+                {
+                    std::string strKey = *iterMember;
+                    float fValue = root[i]["setting"][strKey.c_str()].asFloat();
+                    /*
+                    if (root[i]["setting"][strKey.c_str()].isString())
+                    {
+                        fValue = root[i]["setting"][strKey.c_str()].asString();
+                    }
+                    else
+                        fValue = root[i]["setting"][strKey.c_str()].asFloat();
+                    */
+                    //if(fValue.ist)
+                    settingMap.insert({ strKey,  fValue });
+
+                }
+                //插入到策略配置map中
+                strategyConfigInfo_map[StrategyName + "_" + ClassName] = settingMap;
+            }
+        }
+        else
+        {
+            ctaEngine->writeCtaLog("解析策略配置文件失败");
+        }
+
+        in.close();
+        ctaEngine->writeCtaLog("策略配置加载完成");
+        return  strategyConfigInfo_map;
+    }
+
+    void Global_FUC::WriteStrategyDataJson(std::map<std::string, std::string>dataMap, std::string fileName)
+    {
+
+
+        Json::Value root;
+
+        //根节点属性
+        std::map<std::string, std::string>::iterator iter;
+        for (iter = dataMap.begin(); iter != dataMap.end(); iter++)
+        {
+            std::string varName = iter->first;
+            std::string varValue = iter->second;
+            root[varName] = Json::Value(varValue);
+        }
+
+        Json::StyledWriter sw;
+
+        //输出到文件
+        std::ofstream os;
+        std::string file = "./Strategy/cta_strategy_data_" + fileName + ".json";
+        os.open(file);
+        os << sw.write(root);
+        os.close();
+
+    }
+
 ArrayManager::ArrayManager(int iSize)
 {
     m_iSize = iSize;
@@ -402,96 +499,3 @@ void BarGenerator::updateBar(BarData* barData)
     
 }
 
-std::map<std::string, std::map<std::string, float>> ReadStrategyConfFileJson(std::string fileName,CTAAPI* ctaEngine)
-{
-    Json::Reader reader;
-    Json::Value root;
-    std::map<std::string, std::map<std::string, float>> strategyConfigInfo_map;
-    std::string StrategyName, ClassName;
-
-    //从文件中读取，保证当前文件有demo.json文件  
-    std::ifstream in(fileName, std::ios::binary);
-
-    if (!in.is_open())
-    {
-        ctaEngine->writeCtaLog("打开策略配置文件失败");
-        return strategyConfigInfo_map;
-    }
-
-    if (reader.parse(in, root))
-    {
-        ctaEngine->writeCtaLog("打开策略配置文件成功");
-        for (int i = 0; i < root.size(); i++)
-        {
-            //读取策略名称和合约名称
-
-            StrategyName = root[i]["strategy_name"].asString();
-           // std::string vt_symbol = root[i]["vt_symbol"].asString();
-            ClassName = root[i]["class_name"].asString();
-            if (StrategyName.length() < 1  || ClassName.length() < 1)
-            {
-                ctaEngine->writeCtaLog("配置文件策略信息不全");
-                return strategyConfigInfo_map;
-            }
-
-            //读取策略配置信息 
-            std::map<std::string, float> settingMap;
-            Json::Value::Members members;
-            members = root[i]["setting"].getMemberNames();
-            //std::vector<std::string> settingKeys= root["setting"].getMemberNames();
-            for (Json::Value::Members::iterator iterMember = members.begin(); iterMember != members.end(); iterMember++)   // 遍历每个key
-            {
-                std::string strKey = *iterMember;
-                float fValue = root[i]["setting"][strKey.c_str()].asFloat();
-                /*
-                if (root[i]["setting"][strKey.c_str()].isString())
-                {
-                    fValue = root[i]["setting"][strKey.c_str()].asString();
-                }
-                else
-                    fValue = root[i]["setting"][strKey.c_str()].asFloat();
-                */
-                //if(fValue.ist)
-                settingMap.insert({ strKey,  fValue });
-
-            }
-            //插入到策略配置map中
-            strategyConfigInfo_map[StrategyName  + "_" + ClassName] = settingMap;
-        }
-    }
-    else
-    {
-        ctaEngine->writeCtaLog("解析策略配置文件失败");
-    }
-
-    in.close();
-    ctaEngine->writeCtaLog("策略配置加载完成");
-    return  strategyConfigInfo_map;
-}
-
-void WriteStrategyDataJson(std::map<std::string, std::string>dataMap, std::string fileName)
-{
-
-
-    Json::Value root;
-
-    //根节点属性
-    std::map<std::string, std::string>::iterator iter;
-    for (iter = dataMap.begin(); iter != dataMap.end(); iter++)
-    {
-        std::string varName = iter->first;
-        std::string varValue = iter->second;
-        root[varName] = Json::Value(varValue);
-    }
-
-    Json::StyledWriter sw;
-
-    //输出到文件
-    std::ofstream os;
-    std::string file = "./Strategy/cta_strategy_data_" + fileName + ".json";
-    os.open(file);
-    os << sw.write(root);
-    os.close();
-
-
-}

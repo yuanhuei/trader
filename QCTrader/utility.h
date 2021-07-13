@@ -10,12 +10,14 @@ class BollChannelStrategy;
 class CTAAPI;
 class EventEngine;
 
-QString str2qstr_new(std::string str);
-std::map<std::string, std::map<std::string, float>> ReadStrategyConfFileJson(std::string fileName, CTAAPI* ctaEngine);
-void WriteStrategyDataJson(std::map<std::string, std::string>dataMap, std::string fileName);
-void savetraderecord(std::string strategyname, std::shared_ptr<Event_Trade>etrade, EventEngine* eventEngine);
-std::string time_t2str(time_t datetime);
-
+    QString str2qstr_new(std::string str);
+    namespace Global_FUC 
+    {
+        std::map<std::string, std::map<std::string, float>> ReadStrategyConfFileJson(std::string fileName, CTAAPI* ctaEngine);
+        void WriteStrategyDataJson(std::map<std::string, std::string>dataMap, std::string fileName);
+        void savetraderecord(std::string strategyname, std::shared_ptr<Event_Trade>etrade, EventEngine* eventEngine);
+        std::string time_t2str(time_t datetime);
+    }
 
 //typedef void(StrategyTemplate::*ON_FUNC)(BarData);
 typedef std::function<void(BarData)> ON_Functional;
