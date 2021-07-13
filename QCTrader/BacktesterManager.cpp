@@ -105,7 +105,7 @@ void BacktesterManager::InitUI()
 
 void BacktesterManager::UpdateLogTable(LogData data)
 {
-	ui.textEdit->insertPlainText(QString::fromStdString(data.logTime + "    " + data.msg + "\n"));
+	ui.textEdit->insertPlainText(str2qstr_new(data.logTime + "    " + data.msg + "\n"));
 
 }
 void BacktesterManager::RegisterEvent()

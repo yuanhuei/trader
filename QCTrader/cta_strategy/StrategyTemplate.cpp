@@ -24,7 +24,7 @@ StrategyTemplate::StrategyTemplate(CTAAPI*ctaEngine,std::string strategyName, st
 	m_strategydata = new StrategyData();
 	m_strategydata->insertvar("inited", Utils::booltostring(inited));
 	m_strategydata->insertvar("trading", Utils::booltostring(trading));
-	m_strategydata->insertvar("pos", Utils::booltostring(trading));
+	m_strategydata->insertvar("pos", "0");
 
 	m_algorithm = new algorithmOrder(unitLimit, TradingMode, this);
 	m_MongoCxx = new MongoCxx(g_pool);

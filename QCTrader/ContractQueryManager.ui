@@ -69,11 +69,6 @@
          </column>
          <column>
           <property name="text">
-           <string>最小委托量</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
            <string>交易接口</string>
           </property>
          </column>

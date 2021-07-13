@@ -47,9 +47,11 @@ void BollChannelStrategy::updateSetting()
 		fixed_size = std::stoi(iter->second);
 	//运行变量只有一个，就是仓位
 	settingMap = m_strategydata->getallvar();
-	if ((iter = settingMap.find("pos")) != settingMap.end())
-		m_Pos = std::stoi(iter->second);
-
+	if(settingMap.size()>0)
+	{
+		if ((iter = settingMap.find("pos")) != settingMap.end())
+			m_Pos = std::stoi(iter->second);
+	}
 }
 
 void BollChannelStrategy::onTick(TickData Tick)

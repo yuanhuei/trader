@@ -512,6 +512,7 @@
      <string>帮助</string>
     </property>
     <addaction name="action"/>
+    <addaction name="action_2"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -549,6 +550,11 @@
   <action name="action">
    <property name="text">
     <string>关于</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>查询合约</string>
    </property>
   </action>
  </widget>
@@ -651,6 +657,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>action_2</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_contractQueryclicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>635</x>
+     <y>289</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>menu_ctp_connect()</slot>
@@ -659,5 +681,6 @@
   <slot>SendOrder_clicked()</slot>
   <slot>menu_CTAStrategy()</slot>
   <slot>menu_CTABacktest()</slot>
+  <slot>menu_contractQueryclicked()</slot>
  </slots>
 </ui>
