@@ -115,7 +115,7 @@ void StrategyTemplate::onInit()
 	}
 
 	*/
-	inited = true;
+	//inited = true;
 	//putEvent();
 }
 //¿ªÊ¼ 

@@ -276,12 +276,16 @@ std::map<std::string, double> ArrayManager::boll(int iWindow,int iDev)
     {
         inReal[i] = openprice_array[i];
     }
+    outBegIdx = new int();
+    outNBElement = new int();
 
     TA_BBANDS(startIdx, endIdx, inReal, optInTimePeriod, optInNbDevDn, 
         optInNbDevDn, optInMAType, outBegIdx, outNBElement, outRealUpperBand, outRealMiddleBand, outRealLowerBand);
     mapBoll["boll_up"] = outRealUpperBand[m_iSize - iWindow];
     mapBoll["boll_middle"] = outRealMiddleBand[m_iSize - iWindow];
     mapBoll["boll_down"] = outRealLowerBand[m_iSize - iWindow];
+    delete outBegIdx;
+    delete outNBElement;
     return mapBoll;
 
 }
@@ -297,7 +301,8 @@ double ArrayManager::cci(int iWindow)
     int* outBegIdx;
     int* outNBElement;
     double        outReal[100];
-
+    outBegIdx = new int();
+    outNBElement = new int();
     for (int i = 0; i < m_iSize; i++)
     {
         inHigh[i] = highprice_array[i];
@@ -306,7 +311,8 @@ double ArrayManager::cci(int iWindow)
     }
 
     TA_CCI(startIdx, endIdx, inHigh, inLow, inClose, optInTimePeriod, outBegIdx, outNBElement, outReal);
-
+    delete outBegIdx;
+    delete outNBElement;
     return outReal[m_iSize - iWindow];
 }
 
@@ -321,7 +327,8 @@ double ArrayManager::atr(int iWindow)
     int* outBegIdx;
     int* outNBElement;
     double        outReal[100];
-
+    outBegIdx = new int();
+    outNBElement = new int();
     for (int i = 0; i < m_iSize; i++)
     {
         inHigh[i] = highprice_array[i];
@@ -330,7 +337,8 @@ double ArrayManager::atr(int iWindow)
     }
 
     TA_ATR(startIdx, endIdx, inHigh, inLow, inClose, optInTimePeriod, outBegIdx, outNBElement, outReal);
-
+    delete outBegIdx;
+    delete outNBElement;
     return outReal[m_iSize - iWindow];
 }
 

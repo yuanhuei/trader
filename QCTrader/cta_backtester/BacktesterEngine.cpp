@@ -225,7 +225,7 @@ void BacktesterEngine::calculate_result()
 	}
 
 	// Calculate daily result by iteration.初始化价格，仓位
-	int	pre_close = 0;
+	int	pre_close = -1;
 	int start_pos = 0;
 	//计算每日的利润和损失
 	for(std::map<QDate, std::shared_ptr<DailyTradingResult>>::iterator iter= m_daily_resultMap.begin();iter!= m_daily_resultMap.end();iter++)
@@ -721,6 +721,8 @@ void BacktesterEngine::cross_limit_order(const BarData& data)
 		ptr_trade->volume = limitOrder->tradedVolume;
 		ptr_trade->gatewayname = limitOrder->gatewayname;
 		ptr_trade->tradeTime = m_datetime.toString().toStdString();
+
+		m_tradeMap[ptr_trade->tradeID] = ptr_trade;
 
 		m_strategy->setPos(m_strategy->getpos() + pos_change);
 		m_strategy->onTrade(ptr_trade);

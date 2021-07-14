@@ -22,8 +22,9 @@ BacktesterManager::BacktesterManager(QWidget *parent)
 	
 	m_backtesterEngine->writeCtaLog("初始化CTA回测引擎");
 
-	qRegisterMetaType<LogData>("LogData");//注册到元系统中 UpdatePriceTableData
-	connect(this, SIGNAL(UpdateLogSignal()), this, SLOT(UpdateTesterResult()));
+	RegisterEvent();
+	//qRegisterMetaType<LogData>("LogData");//注册到元系统中 UpdatePriceTableData
+	connect(this, SIGNAL(UpdateTesterResultSignal()), this, SLOT(UpdateTesterResult()));
 	InitUI();
 
 }
@@ -120,6 +121,7 @@ void BacktesterManager::ProcecssTesterFisnishedEvent(std::shared_ptr<Event>e)
 void BacktesterManager::UpdateTesterResult()
 {
 	//输出回测统计信息
+	ui.tableWidget->insertColumn(1);
 	ui.tableWidget->setItem(0, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["start_date"])));
 	ui.tableWidget->setItem(1, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["end_date"])));
 	ui.tableWidget->setItem(2, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["total_days"])));

@@ -71,7 +71,7 @@ void BollChannelStrategy::on_5min_bar(BarData data)
 	m_ArrayManager->update_bar(data);
 	if (m_ArrayManager->m_iInit != true)
 		return;
-	
+	inited = true;
 	std::map<std::string, double>mapBoll;
 	mapBoll= m_ArrayManager->boll(boll_window, boll_dev);
 	boll_up = mapBoll["boll_up"];
