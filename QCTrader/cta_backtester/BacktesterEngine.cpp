@@ -141,10 +141,10 @@ void BacktesterEngine::runBacktesting()
 //推送数据
 	 
 	 //std::vector<BarData>datalist = loadBar(m_symbol, initDays);
-	 bool bTrading = false;
+	// bool bTrading = false;
 	 for (int i=0;i< vector_history_data.size();i++)
 	 {
-		 if (bTrading)
+		 if (m_strategy->trading)
 		 {
 			 m_barDate = vector_history_data[i].date;//赋值当前推送bar的时间给m_barDate方便传递参数
 			 m_datetime = QDateTime::fromString(QString::fromStdString(vector_history_data[i].date + " " + vector_history_data[i].time),"yy/nn/dd hh:mm:ss");
@@ -160,12 +160,18 @@ void BacktesterEngine::runBacktesting()
 			 {
 				 m_strategy->trading = true;//初始化完成后开始执行策略
 				 writeCtaLog("策略初始化完成，开始回测策略");
-				 bTrading = true;
+				 //bTrading = true;
 			 }
+			 m_strategy->onBar(vector_history_data[i]);//调用策略的onBar函数推送bar数据
+			 update_daily_close(vector_history_data[i].close);//更新m_daily_results map的收盘价，为后面计算做准备
+
 		 }
 	 }
-	 if (m_strategy->inited==false)
+	 if (m_strategy->inited == false)
+	 {
 		 writeCtaLog("策略初始化无法完成，不能回测");
+		 return;
+	 }
 	 
 
 //计算统计结果
@@ -357,7 +363,7 @@ std::vector<BarData> BacktesterEngine::loadBarbyDateTime(std::string symbol, QDa
 	// 从客户端池中获取一个客户端
 	mongoc_client_t* client = mongoc_client_pool_pop(g_pool);																		//取一个mongo连接
 
-	collection = mongoc_client_get_collection(client, DATABASE_NAME, symbol.c_str());
+	collection = mongoc_client_get_collection(client, DATABASE_NAME, BARCOLLECTION_NAME);
 
 	cursor = mongoc_collection_find(collection, MONGOC_QUERY_NONE, 0, 0, 0, &parent, NULL, NULL);
 
@@ -378,18 +384,37 @@ std::vector<BarData> BacktesterEngine::loadBarbyDateTime(std::string symbol, QDa
 		BarData bardata;
 		bardata.symbol = json["symbol"].string_value();
 		bardata.exchange = json["exchange"].string_value();
-		bardata.open = json["open"].number_value();
-		bardata.high = json["high"].number_value();
-		bardata.low = json["low"].number_value();
-		bardata.close = json["close"].number_value();
+		bardata.open = json["open_price"].number_value();
+		bardata.high = json["high_price"].number_value();
+		bardata.low = json["low_price"].number_value();
+		bardata.close = json["close_price"].number_value();
 		bardata.volume = json["volume"].number_value();
 
 		json11::Json::object datetime = json["datetime"].object_items();
 		bardata.unixdatetime = datetime["$date"].number_value() / 1000;
+		//std::string strdatetime = json["datetime"].;
+		time_t t;  //秒时间  
+		tm* local; //本地时间   
+		//tm* gmt;   //格林威治时间  
+		char buf[128] = { 0 };
 
-		bardata.date = json["date"].string_value();
-		bardata.time = json["time"].string_value();
+		t = bardata.unixdatetime-8*60*60; //或者time(&t);//获取目前秒时间  
+		local = localtime(&t); //转为本地时间  
+		strftime(buf, 64, "%Y-%m-%d %H:%M:%S", local);
+		//std::cout << buf << std::endl;
+		QString qString = QString::fromStdString(buf);
+		QStringList strList = qString.split(" ");
+		//bardata.date = qString.section(" ", 0, 0).toStdString();
+		//bardata.time = qString.section(" ", 1, 1).toStdString();
+		bardata.date = strList[0].toStdString();
+		bardata.time = strList[1].toStdString();
 
+
+		//QDateTime qDateTime = QDateTime::fromString(qString, "yyyy-MM-dd hh:mm:ss");
+
+		//bardata.date = qDateTime.date().toString().toStdString();// json["date"].string_value();
+		//bardata.time = qDateTime.time().toString().toStdString();// json["time"].string_value();
+		/*
 		bardata.openPrice = json["openPrice"].number_value();//今日开
 		bardata.highPrice = json["highPrice"].number_value();//今日高
 		bardata.lowPrice = json["lowPrice"].number_value();//今日低
@@ -397,8 +422,8 @@ std::vector<BarData> BacktesterEngine::loadBarbyDateTime(std::string symbol, QDa
 
 		bardata.upperLimit = json["upperLimit"].number_value();//涨停
 		bardata.lowerLimit = json["lowerLimit"].number_value();//跌停
-
-		bardata.openInterest = json["openInterest"].number_value();//持仓
+		*/
+		bardata.openInterest = json["open_interest"].number_value();//持仓
 
 		datavector.push_back(bardata);
 
@@ -442,17 +467,17 @@ std::vector<TickData> BacktesterEngine::loadTickbyDateTime(std::string symbol, Q
 	bson_init(&parent);
 	//查询bson
 	BSON_APPEND_UTF8(&parent, "symbol", symbol.c_str());
-	BSON_APPEND_DOCUMENT_BEGIN(&parent, "datetime", &child);
-	BSON_APPEND_TIME_T(&child, "$gt", start);
-	BSON_APPEND_TIME_T(&child, "$lt", end);
+	//BSON_APPEND_DOCUMENT_BEGIN(&parent, "datetime", &child);
+	//BSON_APPEND_TIME_T(&child, "$gt", start);
+	//BSON_APPEND_TIME_T(&child, "$lt", end);
 
-	bson_append_document_end(&parent, &child);
+	//bson_append_document_end(&parent, &child);
 
 
 	char* str = bson_as_json(&parent, NULL);
 	//	printf("\n%s\n", str);
 
-	collection = mongoc_client_get_collection(client, DATABASE_NAME, symbol.c_str());
+	collection = mongoc_client_get_collection(client, DATABASE_NAME, TICKCOLLECTION_NAME);
 
 	cursor = mongoc_collection_find(collection, MONGOC_QUERY_NONE, 0, 0, 0, &parent, NULL, NULL);
 

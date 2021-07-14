@@ -62,7 +62,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_2"/>
+          <widget class="QLineEdit" name="lineEdit_2">
+           <property name="text">
+            <string>al2109</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -76,7 +80,23 @@
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="comboBox_2"/>
+          <widget class="QComboBox" name="comboBox_2">
+           <item>
+            <property name="text">
+             <string>分钟</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>小时</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>天</string>
+            </property>
+           </item>
+          </widget>
          </item>
         </layout>
        </item>
@@ -90,7 +110,18 @@
           </widget>
          </item>
          <item>
-          <widget class="QDateEdit" name="dateEdit"/>
+          <widget class="QDateEdit" name="dateEdit">
+           <property name="dateTime">
+            <datetime>
+             <hour>0</hour>
+             <minute>0</minute>
+             <second>0</second>
+             <year>2010</year>
+             <month>1</month>
+             <day>4</day>
+            </datetime>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -104,7 +135,18 @@
           </widget>
          </item>
          <item>
-          <widget class="QDateEdit" name="dateEdit_2"/>
+          <widget class="QDateEdit" name="dateEdit_2">
+           <property name="dateTime">
+            <datetime>
+             <hour>0</hour>
+             <minute>0</minute>
+             <second>0</second>
+             <year>2010</year>
+             <month>1</month>
+             <day>10</day>
+            </datetime>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -118,7 +160,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_10"/>
+          <widget class="QLineEdit" name="lineEdit_10">
+           <property name="text">
+            <string>2.5e-05</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -132,7 +178,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_9"/>
+          <widget class="QLineEdit" name="lineEdit_9">
+           <property name="text">
+            <string>0.5</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -146,7 +196,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_12"/>
+          <widget class="QLineEdit" name="lineEdit_12">
+           <property name="text">
+            <string>10</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -160,7 +214,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_13"/>
+          <widget class="QLineEdit" name="lineEdit_13">
+           <property name="text">
+            <string>0.5</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -174,7 +232,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_14"/>
+          <widget class="QLineEdit" name="lineEdit_14">
+           <property name="text">
+            <string>100000</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>

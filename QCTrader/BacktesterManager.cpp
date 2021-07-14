@@ -20,7 +20,7 @@ BacktesterManager::BacktesterManager(QWidget *parent)
 	m_mainwindow = (MainWindow*)parent;
 	m_backtesterEngine = m_mainwindow->m_backtesterEngine;
 	
-	m_backtesterEngine->writeCtaLog((str2qstr_new("初始化CTA回测引擎")).toStdString());
+	m_backtesterEngine->writeCtaLog("初始化CTA回测引擎");
 
 	qRegisterMetaType<LogData>("LogData");//注册到元系统中 UpdatePriceTableData
 	connect(this, SIGNAL(UpdateLogSignal()), this, SLOT(UpdateTesterResult()));
@@ -101,12 +101,13 @@ void BacktesterManager::InitUI()
 	ui.lineEdit_12->setValidator(validator);
 	ui.lineEdit_13->setValidator(validator);
 	ui.lineEdit_14->setValidator(validator);
+
 }
 
 void BacktesterManager::UpdateLogTable(LogData data)
 {
 	ui.textEdit->insertPlainText(str2qstr_new(data.logTime + "    " + data.msg + "\n"));
-
+	//str2qstr_new
 }
 void BacktesterManager::RegisterEvent()
 {
@@ -205,22 +206,22 @@ void BacktesterManager::startBacktest_clicked()
 	{
 		if (iter->first.find(strStrategyName) != iter->first.npos)
 		{
-			strStategyClassName = QString::fromStdString(iter->first).section("_", 1, 1);
+			strStategyClassName = QString::fromStdString(iter->first).section("_",2, 2);
 			settingMap = iter->second;
 		}
 	}
 
 
-	Interval iInterval = Interval(ui.comboBox_2->currentIndex());
+	Interval iInterval = MINUTE;// Interval(ui.comboBox_2->currentIndex());
 	QDate starDate, endDate;
 	starDate=ui.dateEdit->dateTime().date();
 	endDate = ui.dateEdit_2->dateTime().date();
 
 	float rate = ui.lineEdit_10->text().toFloat();//费率
-	float slippage = ui.lineEdit_10->text().toFloat();//交易滑点
-	float contractsize = ui.lineEdit_10->text().toFloat();//合约乘数
-	float pricetick = ui.lineEdit_10->text().toFloat();//价格跳动
-	float capital = ui.lineEdit_10->text().toFloat();//资金
+	float slippage = ui.lineEdit_9->text().toFloat();//交易滑点
+	float contractsize = ui.lineEdit_12->text().toFloat();//合约乘数
+	float pricetick = ui.lineEdit_13->text().toFloat();//价格跳动
+	float capital = ui.lineEdit_14->text().toFloat();//资金
 
 	m_backtesterEngine->StartBacktesting(strStrategyName, strStategyClassName.toStdString(), strSymbol, iInterval,
 		starDate, endDate, rate, slippage, contractsize, pricetick, capital, settingMap);
