@@ -147,7 +147,7 @@ void BacktesterEngine::runBacktesting()
 		 if (m_strategy->trading)
 		 {
 			 m_barDate = vector_history_data[i].date;//赋值当前推送bar的时间给m_barDate方便传递参数
-			 m_datetime = QDateTime::fromString(QString::fromStdString(vector_history_data[i].date + " " + vector_history_data[i].time),"yy/nn/dd hh:mm:ss");
+			 m_datetime = QDateTime::fromString(QString::fromStdString(vector_history_data[i].date + " " + vector_history_data[i].time),"yyyy-MM-dd hh:mm:ss");
 			 cross_limit_order(vector_history_data[i]);//检查价格是否触发之前的order
 			 cross_stop_order(vector_history_data[i]);//检查价格是否触发之前的order
 
@@ -162,6 +162,9 @@ void BacktesterEngine::runBacktesting()
 				 writeCtaLog("策略初始化完成，开始回测策略");
 				 //bTrading = true;
 			 }
+			 m_barDate = vector_history_data[i].date;//赋值当前推送bar的时间给m_barDate方便传递参数
+			 m_datetime = QDateTime::fromString(QString::fromStdString(vector_history_data[i].date + " " + vector_history_data[i].time), "yyyy-MM-dd hh:mm:ss");
+
 			 m_strategy->onBar(vector_history_data[i]);//调用策略的onBar函数推送bar数据
 			 update_daily_close(vector_history_data[i].close);//更新m_daily_results map的收盘价，为后面计算做准备
 
@@ -191,8 +194,8 @@ void BacktesterEngine::runBacktesting()
 void BacktesterEngine::update_daily_close(float price)
 {
 	QDate date;
-	date.fromString(QString::fromStdString(m_barDate), "yyyy/mm/dd");//把字符串时间转换成QDate类型
-	std::map<QDate, std::shared_ptr<DailyTradingResult> >::iterator iter = m_daily_resultMap.find(date);
+	date=QDate::fromString(QString::fromStdString(m_barDate), "yyyy-MM-dd");//把字符串时间转换成QDate类型
+	std::map <QDate , std::shared_ptr<DailyTradingResult> > ::iterator iter = m_daily_resultMap.find(date);
 	if (iter!= m_daily_resultMap.end())//已经有这天的数据
 	{
 		//更新closeprice
@@ -219,7 +222,7 @@ void BacktesterEngine::calculate_result()
 	{
 		std::string tradetime = iter->second->tradeTime;
 		QDate date;
-		date=QDateTime::fromString(QString::fromStdString(tradetime), "yyyy/mm/dd hh:mm::ss").date();
+		date=QDateTime::fromString(QString::fromStdString(tradetime), "yyyy-MM-dd").date();
 		
 		m_daily_resultMap[date]->add_trade(*iter->second);
 	}
@@ -616,6 +619,7 @@ std::vector<std::string> BacktesterEngine::send_limit_order(std::string symbol, 
 	ptr_order->price = price;
 	ptr_order->totalVolume = volume;
 	ptr_order->status = STATUS_SUBMITTING;
+	ptr_order->orderTime = m_barDate;
 	//ptr_stop_order-> = pStrategy->m_strategyName;
 
 	//m_limit_order_count++;
@@ -645,6 +649,7 @@ std::vector<std::string> BacktesterEngine::send_stop_order(std::string symbol, s
 	ptr_stop_order->offset = strOffset;
 	ptr_stop_order->price = price;
 	ptr_stop_order->totalVolume = volume;
+	ptr_stop_order->orderTime = m_barDate;
 
 	std::string orderID = std::to_string(m_limit_order_count);
 	ptr_stop_order->orderID = orderID;
@@ -720,7 +725,9 @@ void BacktesterEngine::cross_limit_order(const BarData& data)
 		ptr_trade->offset = limitOrder->offset;
 		ptr_trade->volume = limitOrder->tradedVolume;
 		ptr_trade->gatewayname = limitOrder->gatewayname;
-		ptr_trade->tradeTime = m_datetime.toString().toStdString();
+		ptr_trade->tradeTime = m_barDate;// m_datetime.toString().toStdString();
+		ptr_trade->price = limitOrder->price;
+	
 
 		m_tradeMap[ptr_trade->tradeID] = ptr_trade;
 
@@ -802,7 +809,8 @@ void BacktesterEngine::cross_stop_order(const BarData& data)
 		ptr_trade->offset = stopOrder->offset;
 		ptr_trade->volume = stopOrder->tradedVolume;
 		ptr_trade->gatewayname = stopOrder->gatewayname;
-		ptr_trade->tradeTime = m_datetime.toString().toStdString();
+		ptr_trade->tradeTime = m_barDate;// m_datetime.toString().toStdString();
+		ptr_trade->price = stopOrder->price;
 
 		m_tradeMap[ptr_trade->tradeID] = ptr_trade;
 

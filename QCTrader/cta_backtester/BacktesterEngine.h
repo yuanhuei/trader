@@ -116,7 +116,7 @@ public:
 
 
 
-	std::map<QDate, std::shared_ptr<DailyTradingResult>> m_daily_resultMap;
+	std::map <QDate , std::shared_ptr<DailyTradingResult >> m_daily_resultMap;
 	std::map < std::string, std::string> m_result_statistics;
 
 	void calculate_result();

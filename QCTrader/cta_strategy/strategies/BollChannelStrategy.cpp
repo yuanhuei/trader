@@ -8,9 +8,9 @@ BollChannelStrategy::BollChannelStrategy(CTAAPI* ctaEngine, std::string strategy
 	Interval iInterval = MINUTE;
 	ON_Functional on_func1, on_fun2;
 	on_func1 = std::bind(&BollChannelStrategy::onBar, this, std::placeholders::_1);
-	on_fun2 = std::bind(&BollChannelStrategy::on_5min_bar, this, std::placeholders::_1);
+	on_fun2 = std::bind(&BollChannelStrategy::on_30min_bar, this, std::placeholders::_1);
 
-	m_BarGenerate = new BarGenerator(on_func1, 5, on_fun2, iInterval);
+	m_BarGenerate = new BarGenerator(on_func1, 30, on_fun2, iInterval);
 	m_ArrayManager = new ArrayManager();
 
 
@@ -64,7 +64,7 @@ void BollChannelStrategy::onBar(BarData data)
 	m_BarGenerate->updateBar(&data);
 
 }
-void BollChannelStrategy::on_5min_bar(BarData data)
+void BollChannelStrategy::on_30min_bar(BarData data)
 {
 	cancelallorder();
 
