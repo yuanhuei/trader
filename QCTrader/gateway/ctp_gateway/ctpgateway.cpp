@@ -50,9 +50,14 @@ std::string CTPGateway:: GetExchangeName(std::string strSymbol)
 }
 int CTPGateway:: GetSymbolSize(std::string strSymbol)
 {
+	
 	int iSize = 0;
-	if (m_TDSPI->m_symbolSizeMap.find(strSymbol) != m_TDSPI->m_symbolSizeMap.end())
-		return m_TDSPI->m_symbolSizeMap[strSymbol];
+	if(m_TDSPI->m_symbolSizeMap.size()>0)
+	{ 
+		if (m_TDSPI->m_symbolSizeMap.find(strSymbol) != m_TDSPI->m_symbolSizeMap.end())
+			iSize= m_TDSPI->m_symbolSizeMap[strSymbol];
+
+	}
 	return iSize;
 }
 

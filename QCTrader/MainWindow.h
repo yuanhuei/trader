@@ -14,6 +14,7 @@ class CtaEngine;
 class CTAStrategyManager;
 class BacktesterManager;
 class BacktesterEngine;
+class ContractQueryManager;
 
 #pragma pack(1)
 struct UpdatePriceTableData
@@ -178,7 +179,7 @@ private slots:
 	void menu_exit();
 	void menu_CTAStrategy();
 	void menu_CTABacktest();
-	void menu_ContractQueryclicked();
+	void menu_contractQueryclicked();
 
 	void symbol_ReturnPressed();
 	void SendOrder_clicked();
@@ -201,6 +202,8 @@ public:
 	CTAStrategyManager* m_ctaStrategyDailog=NULL;
 	BacktesterEngine* m_backtesterEngine = NULL;
 	BacktesterManager* m_ctaBacktesterManager=NULL;
+	ContractQueryManager* m_ContractQueryManager= NULL;
+
 
 
     //model

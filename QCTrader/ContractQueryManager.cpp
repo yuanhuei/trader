@@ -6,6 +6,11 @@
 ContractQueryManager::ContractQueryManager(QWidget *parent)
 	: QWidget(parent)
 {
+	setWindowFlags(Qt::CustomizeWindowHint |
+		Qt::WindowMinimizeButtonHint |
+		Qt::WindowMaximizeButtonHint);
+	setWindowFlags(Qt::Window);
+
 	ui.setupUi(this);
 	m_mainwindow = (MainWindow*)parent;
 }
@@ -28,18 +33,17 @@ void ContractQueryManager::Query_clicked()
 		for (iter = allContractMap.begin(); iter != allContractMap.end(); iter++)
 		{
 			ptr_contract =iter->second;
-			
+			ui.tableWidget->insertRow(iRowCount);
 			ui.tableWidget->setItem(iRowCount, 0, new QTableWidgetItem(str2qstr_new(ptr_contract->symbol)));
 			ui.tableWidget->setItem(iRowCount, 1, new QTableWidgetItem(str2qstr_new(ptr_contract->exchange)));
 			ui.tableWidget->setItem(iRowCount, 2, new QTableWidgetItem(str2qstr_new(ptr_contract->name)));
 			ui.tableWidget->setItem(iRowCount, 3, new QTableWidgetItem(str2qstr_new(ptr_contract->productClass)));
-			int iSize = m_mainwindow->m_gatewaymanager->GetSymbolSize(symbol.toStdString(), ptr_contract->gatewayname);
+			int iSize = m_mainwindow->m_gatewaymanager->GetSymbolSize(ptr_contract->symbol, ptr_contract->gatewayname);
 			ui.tableWidget->setItem(iRowCount, 4, new QTableWidgetItem(str2qstr_new(std::to_string(iSize))));
 			ui.tableWidget->setItem(iRowCount, 5, new QTableWidgetItem(str2qstr_new(std::to_string(ptr_contract->priceTick))));
 			ui.tableWidget->setItem(iRowCount, 6, new QTableWidgetItem(str2qstr_new(ptr_contract->gatewayname)));
 			iRowCount++;
 		}
-
 
 	}
 	else
@@ -48,6 +52,7 @@ void ContractQueryManager::Query_clicked()
 		if (ptr_contract != nullptr)
 		{
 			ui.tableWidget->clearContents();
+			ui.tableWidget->insertRow(0);
 			ui.tableWidget->setItem(0, 0, new QTableWidgetItem(str2qstr_new(ptr_contract->symbol)));
 			ui.tableWidget->setItem(0, 1, new QTableWidgetItem(str2qstr_new(ptr_contract->exchange)));
 			ui.tableWidget->setItem(0, 2, new QTableWidgetItem(str2qstr_new(ptr_contract->name)));

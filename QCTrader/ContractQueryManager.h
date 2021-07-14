@@ -11,7 +11,7 @@ public:
 	ContractQueryManager(QWidget *parent = Q_NULLPTR);
 	~ContractQueryManager();
 private slots:
-	void ContractQueryManager::Query_clicked();
+	void Query_clicked();
 
 
 private:

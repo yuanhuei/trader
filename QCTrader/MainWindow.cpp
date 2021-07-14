@@ -702,11 +702,11 @@ void MainWindow::write_log(std::string msg, std::string gateway_name)
 }
 
 
-void MainWindow::menu_ContractQueryclicked()
+void MainWindow::menu_contractQueryclicked()
 {
-
-	ContractQueryManager e = new ContractQueryManager(this);
-	e.show();
+	if (m_ContractQueryManager == nullptr)
+		m_ContractQueryManager = new ContractQueryManager(this);
+	m_ContractQueryManager->show();
 
 
 }

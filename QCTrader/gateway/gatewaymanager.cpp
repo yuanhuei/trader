@@ -43,7 +43,10 @@ std::string Gatewaymanager::GetExchangeName(std::string strSymbol, std::string s
 int  Gatewaymanager::GetSymbolSize(std::string strSymbol, std::string strGatewayname)
 {
 	std::unique_lock<std::mutex>lck(gatewaymtx);
-	return m_gatewaymap[strGatewayname]->GetSymbolSize(strSymbol);//连接指定的接口
+	std::shared_ptr<QCGateway> ptr_gateway;
+	ptr_gateway = m_gatewaymap[strGatewayname];
+	int iSize = ptr_gateway->GetSymbolSize(strSymbol);
+	return iSize;//连接指定的接口
 }
 
 
