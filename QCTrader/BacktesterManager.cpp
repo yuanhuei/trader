@@ -40,32 +40,33 @@ void BacktesterManager::InitUI()
 	ui.widget->addGraph();
 	ui.widget->xAxis->setLabel("x");
 	ui.widget->yAxis->setLabel("y");
-	ui.widget->xAxis->setRange(0, 10);
-	ui.widget->yAxis->setRange(0, 1000000);
+
+	//ui.widget->xAxis->setRange(0, 10);
+	//ui.widget->yAxis->setRange(0, 1000000);
 	ui.widget->replot();
 	ui.widget->show();
 
 	ui.widget_2->addGraph();
 	ui.widget_2->xAxis->setLabel("x");
 	ui.widget_2->yAxis->setLabel("y");
-	ui.widget_2->xAxis->setRange(0, 10);
-	ui.widget_2->yAxis->setRange(-100000, 0);
+	//ui.widget_2->xAxis->setRange(0, 10);
+	//ui.widget_2->yAxis->setRange(-100000, 0);
 	ui.widget_2->replot();
 	ui.widget_2->show();
 
 	ui.widget_3->addGraph();
 	ui.widget_3->xAxis->setLabel("x");
 	ui.widget_3->yAxis->setLabel("y");
-	ui.widget_3->xAxis->setRange(0, 10);
-	ui.widget_3->yAxis->setRange(-500, 100000);
+	//ui.widget_3->xAxis->setRange(0, 10);
+	//ui.widget_3->yAxis->setRange(-500, 100000);
 	ui.widget_3->replot();
 	ui.widget_3->show();
 
 	ui.widget_4->addGraph();
 	ui.widget_4->xAxis->setLabel("x");
 	ui.widget_4->yAxis->setLabel("y");
-	ui.widget_4->xAxis->setRange(0, 1000);
-	ui.widget_4->yAxis->setRange(-500, 10000);
+	//ui.widget_4->xAxis->setRange(0, 1000);
+	//ui.widget_4->yAxis->setRange(-500, 10000);
 	ui.widget_4->replot();
 	ui.widget_4->show();
 
@@ -130,12 +131,12 @@ void BacktesterManager::UpdateTesterResult()
 	ui.tableWidget->setItem(3, iColumnCount, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["profit_days"])));
 	ui.tableWidget->setItem(4, iColumnCount, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["loss_days"])));
 	ui.tableWidget->setItem(5, 0, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["start_balance"])));
-	ui.tableWidget->setItem(5, 0, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["end_balance"])));
-	ui.tableWidget->setItem(6, 0, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["max_drawdown"])));
-	ui.tableWidget->setItem(7, 0, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["max_ddpercent"])));
-	ui.tableWidget->setItem(8, 0, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["total_net_pnl"])));
+	ui.tableWidget->setItem(6, 0, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["end_balance"])));
+	ui.tableWidget->setItem(7, 0, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["max_drawdown"])));
+	ui.tableWidget->setItem(8, 0, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["max_ddpercent"])));
+	ui.tableWidget->setItem(9, 0, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["total_net_pnl"])));
 	//ui.tableWidget->setItem(9, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["daily_net_pnl"])));
-	ui.tableWidget->setItem(9, 0, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["total_commission"])));
+	ui.tableWidget->setItem(10, 0, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["total_commission"])));
 	//ui.tableWidget->setItem(11, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["daily_commission"])));
 
 	ui.tableWidget->setItem(10, 0, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["total_slippage"])));
@@ -174,14 +175,24 @@ void BacktesterManager::UpdateTesterResult()
 		
 	}
 	ui.widget->graph(0)->setData(x, balance_y);
+	//ui.widget->graph(0)->rescaleKeyAxis(true);
+	//ui.widget->graph(0)->rescaleValueAxis(true);
+	ui.widget->graph(0)->rescaleAxes(true);
 	ui.widget->replot();
 	ui.widget->show();
+
 	ui.widget_2->graph(0)->setData(x, drawdown_y);
+	ui.widget_2->graph(0)->rescaleAxes(true);
+	//ui.widget->graph(0)->rescaleValueAxis(true);
+	//ui.widget->graph(0)->rescaleAxes(true);
 	ui.widget_2->replot();
 	ui.widget_2->show();
+
 	ui.widget_3->graph(0)->setData(x, pnl_y);
+	ui.widget_3->graph(0)->rescaleAxes(true);
 	ui.widget_3->replot();
 	ui.widget_3->show();
+
 	//ui.widget_4->graph(0)->setData(x, pnl_distribution_y);
 	ui.widget_4->replot();
 	ui.widget_4->show();
