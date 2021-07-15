@@ -338,7 +338,7 @@
              </row>
              <row>
               <property name="text">
-               <string>新建行</string>
+               <string>最后交易日</string>
               </property>
              </row>
              <row>
@@ -384,11 +384,6 @@
              <row>
               <property name="text">
                <string>百分比最大回撤</string>
-              </property>
-             </row>
-             <row>
-              <property name="text">
-               <string>新建行</string>
               </property>
              </row>
              <row>

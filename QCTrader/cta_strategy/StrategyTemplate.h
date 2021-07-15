@@ -117,7 +117,7 @@ public:
 	//总报单开平函数公用
 	std::vector<std::string> sendOrder(bool bStopOrder, std::string strDirection, std::string strOffset, double price, double volume);
 	//撤所有单，停止策略时使用
-	void cancelallorder();
+	void cancelAllOrder();
 	//撤单函数
 	void cancelOrder(std::string orderID, std::string gatewayname);
 

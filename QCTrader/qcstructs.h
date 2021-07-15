@@ -290,6 +290,7 @@ public:
 
 	std::string date;
 	std::string time;
+	std::string datetime;
 	long long unixdatetime;	//时间戳在提取mongodb数据时候会除以1000
 
 	double openPrice = 0;//今日开

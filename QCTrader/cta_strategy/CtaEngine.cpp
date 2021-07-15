@@ -535,7 +535,7 @@ void CtaEngine::stopStrategy(std::string name)
 		{
 			temp->onStop();
 			//³·µ¥
-			temp->cancelallorder();
+			temp->cancelAllOrder();
 		}
 	}
 	else
@@ -921,13 +921,13 @@ std::vector<std::string>CtaEngine::sendOrder(bool bStopOrder, std::string symbol
 		req.exchange = m_gatewaymanager->GetExchangeName(symbol, "CTP");// getContract(symbol)->exchange;
 		req.price = price;
 		req.volume = volume;
-
+		/*
 		if (m_riskmanager->checkRisk(req) == false)
 		{
 			std::vector<std::string>result;
 			return result;
 		}
-		/*
+		
 		if (Strategy->getparam("currency") != "Null" && Strategy->getparam("productClass") != "Null")
 		{
 			req.currency = Strategy->getparam("currency");

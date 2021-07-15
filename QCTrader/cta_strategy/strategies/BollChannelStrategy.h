@@ -25,7 +25,7 @@ public:
     //BAR
     void onBar(BarData Bar);
 
-    void on_30min_bar(BarData data);
+    void on_5min_bar(BarData data);
 
     //报单回调
     virtual void onOrder(std::shared_ptr<Event_Order>e);

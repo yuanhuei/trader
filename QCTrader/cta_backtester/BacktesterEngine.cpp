@@ -147,7 +147,7 @@ void BacktesterEngine::runBacktesting()
 		 if (m_strategy->trading)
 		 {
 			 m_barDate = vector_history_data[i].date;//赋值当前推送bar的时间给m_barDate方便传递参数
-			 m_datetime = QDateTime::fromString(QString::fromStdString(vector_history_data[i].date + " " + vector_history_data[i].time),"yyyy-MM-dd hh:mm:ss");
+			 m_datetime = QDateTime::fromString(QString::fromStdString(vector_history_data[i].datetime),"yyyy-MM-dd hh:mm:ss");
 			 cross_limit_order(vector_history_data[i]);//检查价格是否触发之前的order
 			 cross_stop_order(vector_history_data[i]);//检查价格是否触发之前的order
 
@@ -241,8 +241,8 @@ void BacktesterEngine::calculate_result()
 
 void BacktesterEngine::calculate_statistics(bool bOutput )
 {
-	m_result_statistics["start_date"] = m_startDay.toString().toStdString();
-	m_result_statistics["end_date"] = m_endDay.toString().toStdString();
+	m_result_statistics["start_date"] = m_startDay.toString("yyyy-MM-dd").toStdString();
+	m_result_statistics["end_date"] = m_endDay.toString("yyyy-MM-dd").toStdString();
 	m_result_statistics["total_days"] = int(m_daily_resultMap.size());
 
 	int iProfit_days = 0;
@@ -279,32 +279,33 @@ void BacktesterEngine::calculate_statistics(bool bOutput )
 		daily_return = iter.second->m_return + daily_return;
 	}
 	double lastBalance = preBalance;
-	m_result_statistics["profit_days"] = iProfit_days;
+	m_result_statistics["profit_days"] = std::to_string(iProfit_days);
 
-	m_result_statistics["loss_days"] = iLoss_days;
-	m_result_statistics["end_balance"] = lastBalance;
+	m_result_statistics["loss_days"] = std::to_string(iLoss_days);
+	m_result_statistics["start_balance"] = std::to_string(m_capital);
+	m_result_statistics["end_balance"] = std::to_string(lastBalance);
 
 
-	m_result_statistics["max_drawdown"] = max_drawdown;
-	m_result_statistics["max_ddpercent"] = max_ddpercent;
+	m_result_statistics["max_drawdown"] = std::to_string(max_drawdown);
+	m_result_statistics["max_ddpercent"] = std::to_string(max_ddpercent);
 		//m_result_statistics["max_drawdown_end"] =
 
-	m_result_statistics["total_net_pnl"] = preBalance - m_capital;
-	m_result_statistics["daily_net_pnl"] = (preBalance - m_capital)/m_daily_resultMap.size();
+	m_result_statistics["total_net_pnl"] = std::to_string(preBalance - m_capital);
+	m_result_statistics["daily_net_pnl"] = std::to_string((preBalance - m_capital)/m_daily_resultMap.size());
 
-	m_result_statistics["total_commission"] = total_commission;
-	m_result_statistics["daily_commission"] = total_commission/ m_daily_resultMap.size();
+	m_result_statistics["total_commission"] = std::to_string(total_commission);
+	m_result_statistics["daily_commission"] = std::to_string(total_commission/ m_daily_resultMap.size());
 
-	m_result_statistics["total_slippage"] = total_slippage;
-	m_result_statistics["total_turnover"] = total_turnover;
+	m_result_statistics["total_slippage"] = std::to_string(total_slippage);
+	m_result_statistics["total_turnover"] = std::to_string(total_turnover);
 
 
-	m_result_statistics["total_trade_count"] = total_trade_count;
-	m_result_statistics["daily_trade_count"] = total_trade_count/ m_daily_resultMap.size();
-	m_result_statistics["total_return"] = (lastBalance - m_capital) / m_capital;
+	m_result_statistics["total_trade_count"] = std::to_string(total_trade_count);
+	m_result_statistics["daily_trade_count"] = std::to_string(total_trade_count/ m_daily_resultMap.size());
+	m_result_statistics["total_return"] = std::to_string((lastBalance - m_capital) / m_capital);
 
-	m_result_statistics["annual_return"] = (lastBalance - m_capital)*240 / m_capital;
-	m_result_statistics["daily_return"] =daily_return/ m_daily_resultMap.size();
+	m_result_statistics["annual_return"] = std::to_string((lastBalance - m_capital)*240 / m_capital);
+	m_result_statistics["daily_return"] = std::to_string(daily_return/ m_daily_resultMap.size());
 		//m_result_statistics["return_std"] =
 
 		//m_result_statistics["sharpe_ratio"] =
@@ -409,6 +410,7 @@ std::vector<BarData> BacktesterEngine::loadBarbyDateTime(std::string symbol, QDa
 		QStringList strList = qString.split(" ");
 		//bardata.date = qString.section(" ", 0, 0).toStdString();
 		//bardata.time = qString.section(" ", 1, 1).toStdString();
+		bardata.datetime = qString.toStdString();
 		bardata.date = strList[0].toStdString();
 		bardata.time = strList[1].toStdString();
 
@@ -618,6 +620,7 @@ std::vector<std::string> BacktesterEngine::send_limit_order(std::string symbol, 
 	ptr_order->offset = strOffset;
 	ptr_order->price = price;
 	ptr_order->totalVolume = volume;
+	ptr_order->tradedVolume = volume;
 	ptr_order->status = STATUS_SUBMITTING;
 	ptr_order->orderTime = m_barDate;
 	//ptr_stop_order-> = pStrategy->m_strategyName;
@@ -649,6 +652,7 @@ std::vector<std::string> BacktesterEngine::send_stop_order(std::string symbol, s
 	ptr_stop_order->offset = strOffset;
 	ptr_stop_order->price = price;
 	ptr_stop_order->totalVolume = volume;
+	ptr_stop_order->tradedVolume = volume;
 	ptr_stop_order->orderTime = m_barDate;
 
 	std::string orderID = std::to_string(m_limit_order_count);
@@ -671,7 +675,7 @@ std::vector<std::string> BacktesterEngine::send_stop_order(std::string symbol, s
 void BacktesterEngine::cross_limit_order(const BarData& data)
 {
 	double long_cross_price, short_cross_price, long_best_price, short_best_price,trade_price,pos_change;
-	bool bLong_cross, bShort_cross;
+	bool bLong_cross=false, bShort_cross=false;
 
 	if (m_backtestmode == BAR_MODE)
 	{
@@ -741,7 +745,7 @@ void BacktesterEngine::cross_limit_order(const BarData& data)
 void BacktesterEngine::cross_stop_order(const BarData& data)
 {
 	double long_cross_price, short_cross_price, long_best_price, short_best_price, trade_price, pos_change;
-	bool bLong_cross, bShort_cross;
+	bool bLong_cross=false, bShort_cross=false;
 
 	if (m_backtestmode == BAR_MODE)
 	{
@@ -771,7 +775,8 @@ void BacktesterEngine::cross_stop_order(const BarData& data)
 		ptr_order->exchange = stopOrder->exchange;
 		ptr_order->direction = stopOrder->direction;
 		ptr_order->offset = stopOrder->offset;
-		ptr_order->orderID = std::to_string(m_limit_order_count++);
+		m_limit_order_count++;
+		ptr_order->orderID = std::to_string(m_limit_order_count);
 		ptr_order->price = stopOrder->price;
 		ptr_order->totalVolume = stopOrder->totalVolume;
 
@@ -879,12 +884,12 @@ void BacktesterEngine::cancelAllOrder()
 		if (ptr_order != nullptr)
 		{
 			//报单有效
-			if (!(ptr_order->status == STATUS_ALLTRADED || ptr_order->status == STATUS_CANCELLED))
-			{
+			//if (!(ptr_order->status == STATUS_ALLTRADED || ptr_order->status == STATUS_CANCELLED))
+			//{
 				//可撤单状态
 				m_limit_orders[ptr_order->orderID]->status = STATUS_CANCELLED;
 				m_active_limit_orders.erase(iter++);
-			}
+			//}
 		}
 		else
 			iter++;
@@ -896,12 +901,12 @@ void BacktesterEngine::cancelAllOrder()
 		if (ptr_order != nullptr)
 		{
 			//报单有效
-			if (!(ptr_order->status == STATUS_ALLTRADED || ptr_order->status == STATUS_CANCELLED))
-			{
+			//if (!(ptr_order->status == STATUS_ALLTRADED || ptr_order->status == STATUS_CANCELLED))
+			//{
 				//可撤单状态
 				m_stop_orders[ptr_order->orderID]->status = STATUS_CANCELLED;
 				m_active_stop_orders.erase(iteror++);
-			}
+			//}
 		}
 		else
 			iteror++;

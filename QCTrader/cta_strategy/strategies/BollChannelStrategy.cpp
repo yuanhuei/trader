@@ -8,12 +8,12 @@ BollChannelStrategy::BollChannelStrategy(CTAAPI* ctaEngine, std::string strategy
 	Interval iInterval = MINUTE;
 	ON_Functional on_func1, on_fun2;
 	on_func1 = std::bind(&BollChannelStrategy::onBar, this, std::placeholders::_1);
-	on_fun2 = std::bind(&BollChannelStrategy::on_30min_bar, this, std::placeholders::_1);
+	on_fun2 = std::bind(&BollChannelStrategy::on_5min_bar, this, std::placeholders::_1);
 
-	m_BarGenerate = new BarGenerator(on_func1, 30, on_fun2, iInterval);
+	m_BarGenerate = new BarGenerator(on_func1, 5, on_fun2, iInterval);
 	m_ArrayManager = new ArrayManager();
 
-
+	//m_Pos = 0;
 }
 
 BollChannelStrategy::~BollChannelStrategy()
@@ -64,14 +64,15 @@ void BollChannelStrategy::onBar(BarData data)
 	m_BarGenerate->updateBar(&data);
 
 }
-void BollChannelStrategy::on_30min_bar(BarData data)
+void BollChannelStrategy::on_5min_bar(BarData data)
 {
-	cancelallorder();
 
 	m_ArrayManager->update_bar(data);
 	if (m_ArrayManager->m_iInit != true)
 		return;
-	inited = true;
+	inited = true;//需要在这里给inited赋值
+	cancelAllOrder();
+
 	std::map<std::string, double>mapBoll;
 	mapBoll= m_ArrayManager->boll(boll_window, boll_dev);
 	boll_up = mapBoll["boll_up"];
@@ -86,9 +87,9 @@ void BollChannelStrategy::on_30min_bar(BarData data)
 		intra_trade_low = data.low;
 
 		if (cci_value > 0)
-			buy(boll_up, fixed_size);
+			buy(boll_up, fixed_size,true);
 		else if (cci_value < 0)
-			sellshort(boll_down, fixed_size);
+			sellshort(boll_down, fixed_size, true);
 	}
 	else if (m_Pos > 0)
 	{
@@ -96,7 +97,7 @@ void BollChannelStrategy::on_30min_bar(BarData data)
 		intra_trade_low = data.low;
 
 		long_stop = intra_trade_high - atr_value * sl_multiplier;
-		sell(long_stop, std::abs(m_Pos));
+		sell(long_stop, std::abs(m_Pos), true);
 
 
 	}
@@ -105,7 +106,7 @@ void BollChannelStrategy::on_30min_bar(BarData data)
 		intra_trade_high = data.high;
 		intra_trade_low = std::min(intra_trade_low, float(data.low));
 		short_stop = intra_trade_low + atr_value * sl_multiplier;
-		sellshort(short_stop,std::abs(m_Pos));
+		buycover(short_stop,std::abs(m_Pos), true);
 	}
 
 				
@@ -118,11 +119,7 @@ void BollChannelStrategy::onOrder(std::shared_ptr<Event_Order>e)
 {
 	m_ctaEngine->writeCtaLog("委托单提交成功");
 }
-//成交回调
-void BollChannelStrategy::onTrade(std::shared_ptr<Event_Trade>e)
-{
-	m_ctaEngine->writeCtaLog("订单成交");
-}
+
 
 void BollChannelStrategy::onInit()
 {
@@ -133,7 +130,7 @@ void BollChannelStrategy::onInit()
 	{
 		onBar(*it);
 	}
-	inited = true;
+	//inited = true; 通过on_30min_bar中判断if (m_ArrayManager->m_iInit != true)后给inited赋值true，这里如果输入的bar数量不够没有完成初始化，不应该赋值
 }
 
 void BollChannelStrategy::onStart()
@@ -143,4 +140,20 @@ void BollChannelStrategy::onStart()
 void BollChannelStrategy::onStop()
 {
 	StrategyTemplate::onStop();
+}
+
+void BollChannelStrategy::onTrade(std::shared_ptr<Event_Trade>e)
+{
+	/*
+	if (e->direction == DIRECTION_LONG && e->offset == OFFSET_OPEN)
+		m_Pos = e->volume;
+	else if (e->direction == DIRECTION_LONG && e->offset == OFFSET_CLOSE)
+		m_Pos = m_Pos- e->volume;
+	else if (e->direction == DIRECTION_SHORT && e->offset == OFFSET_OPEN)
+		m_Pos = -e->volume;
+	else if (e->direction == DIRECTION_SHORT && e->offset == OFFSET_CLOSE)
+		m_Pos= m_Pos + e->volume;
+		*/
+	m_ctaEngine->writeCtaLog("订单成交");
+
 }

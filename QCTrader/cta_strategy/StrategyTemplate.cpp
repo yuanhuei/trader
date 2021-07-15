@@ -222,14 +222,17 @@ std::vector<std::string> StrategyTemplate::sendOrder(bool bStopOrder, std::strin
 }
 
 //撤掉这个策略所有单
-void StrategyTemplate::cancelallorder()
+void StrategyTemplate::cancelAllOrder()
 {
+	/*
 	m_orderlistmtx.lock();
 	for (std::vector<std::string>::iterator iter = m_orderlist.begin(); iter != m_orderlist.end(); iter++)
 	{
 		cancelOrder(*iter, gatewayname);
 	}
 	m_orderlistmtx.unlock();
+	*/
+	m_ctaEngine->cancelAllOrder();
 }
 
 //撤交易所的单

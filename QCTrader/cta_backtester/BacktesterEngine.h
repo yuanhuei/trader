@@ -41,12 +41,12 @@ public:
 	double	m_total_pnl = 0;
 	double		m_net_pnl = 0;
 
-	double	m_balance;//资金
-	double m_highlevel;//资金最大值
+	double	m_balance=0;//资金
+	double m_highlevel=0;//资金最大值
 		
-	double  m_return;//每日回报
-	double 	m_drawdown;//每日回测
-	double  m_ddpercent;//回测百分比
+	double  m_return=0;//每日回报
+	double 	m_drawdown=0;//每日回测
+	double  m_ddpercent=0;//回测百分比
 };
 
 
@@ -73,7 +73,7 @@ public:
 	float	m_slippage = 0;
 	float	m_size = 1;
 	float m_pricetick = 0;
-	float m_capital = 1000000;
+	float m_capital = 100000;
 	float risk_free= 0.02;
 	//mode = BacktestingMode.BAR;
 	//self.inverse = False
