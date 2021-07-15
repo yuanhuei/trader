@@ -45,8 +45,8 @@ public:
 	double m_highlevel=0;//资金最大值
 		
 	double  m_return=0;//每日回报
-	double 	m_drawdown=0;//每日回测
-	double  m_ddpercent=0;//回测百分比
+	double 	m_drawdown=0;//每日相对之前最高点的回撤
+	double  m_ddpercent=0;//回撤百分比
 };
 
 

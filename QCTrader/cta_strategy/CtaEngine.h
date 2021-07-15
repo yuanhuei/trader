@@ -66,6 +66,7 @@ public:
 	std::vector<std::string>sendOrder(bool bStopOrder,std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy);
 
 	void cancelOrder(std::string orderID, std::string gatewayname);
+	void cancelAllOrder();
 	void writeCtaLog(std::string msg);
 
 	void PutEvent(std::shared_ptr<Event>e);

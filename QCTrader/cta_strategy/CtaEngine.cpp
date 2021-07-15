@@ -610,6 +610,12 @@ void CtaEngine::stopallStrategy()
 	m_orderStrategymtx.unlock();
 }
 
+void CtaEngine::cancelAllOrder()
+{
+
+
+}
+
 /******************´¦Àíº¯Êý***************************/
 void CtaEngine::procecssTickEvent(std::shared_ptr<Event>e)
 {

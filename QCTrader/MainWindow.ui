@@ -511,8 +511,8 @@
     <property name="title">
      <string>帮助</string>
     </property>
-    <addaction name="action"/>
     <addaction name="action_2"/>
+    <addaction name="action"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>

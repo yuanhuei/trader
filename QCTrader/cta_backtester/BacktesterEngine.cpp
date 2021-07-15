@@ -243,7 +243,7 @@ void BacktesterEngine::calculate_statistics(bool bOutput )
 {
 	m_result_statistics["start_date"] = m_startDay.toString("yyyy-MM-dd").toStdString();
 	m_result_statistics["end_date"] = m_endDay.toString("yyyy-MM-dd").toStdString();
-	m_result_statistics["total_days"] = int(m_daily_resultMap.size());
+	m_result_statistics["total_days"] = std::to_string(m_daily_resultMap.size());
 
 	int iProfit_days = 0;
 	int iLoss_days = 0;
@@ -254,7 +254,7 @@ void BacktesterEngine::calculate_statistics(bool bOutput )
 	double	total_slippage = 0;
 	double	total_turnover = 0;
 	double total_trade_count = 0;
-	double daily_return = 0;
+	double daily_return = 0, total_return=0;
 	for (auto &iter: m_daily_resultMap)
 	{
 		if (iter.second->m_net_pnl > 0)
@@ -262,13 +262,13 @@ void BacktesterEngine::calculate_statistics(bool bOutput )
 		else if (iter.second->m_net_pnl < 0)
 			iLoss_days++;
 		iter.second->m_balance += iter.second->m_net_pnl+ preBalance;
-		iter.second->m_highlevel = std::max(preBalance, iter.second->m_balance);
-		iter.second->m_return = iter.second->m_net_pnl / preBalance;
-		iter.second->m_drawdown = iter.second->m_balance - iter.second->m_highlevel;
-		iter.second->m_ddpercent = iter.second->m_drawdown / iter.second->m_highlevel;
+		iter.second->m_highlevel = std::max(preBalance, iter.second->m_balance);//之前的最高净值
+		iter.second->m_return = iter.second->m_net_pnl / preBalance;//当天的收益率
+		iter.second->m_drawdown = iter.second->m_balance - iter.second->m_highlevel;//当天相对最高点的的回测
+		iter.second->m_ddpercent = iter.second->m_drawdown / iter.second->m_highlevel;//当天相对于最高的百分比回测
 		preBalance = iter.second->m_balance;
 
-		max_drawdown = std::min(iter.second->m_drawdown, max_drawdown);
+		max_drawdown = std::min(iter.second->m_drawdown, max_drawdown);//是负数，所以用min
 		max_ddpercent = std::min(iter.second->m_ddpercent, max_ddpercent);
 
 		total_commission = iter.second->m_commission + total_commission;
@@ -276,9 +276,10 @@ void BacktesterEngine::calculate_statistics(bool bOutput )
 		total_turnover = iter.second->m_turnover + total_turnover;
 		total_trade_count = iter.second->m_trades.size() + total_trade_count;
 
-		daily_return = iter.second->m_return + daily_return;
+		total_return = iter.second->m_return + total_return;
 	}
-	double lastBalance = preBalance;
+	int totalDays = m_daily_resultMap.size();
+	double lastBalance = preBalance;//这里的preBalance从上面for循环里面看，是最后一个banlance，
 	m_result_statistics["profit_days"] = std::to_string(iProfit_days);
 
 	m_result_statistics["loss_days"] = std::to_string(iLoss_days);
@@ -291,21 +292,22 @@ void BacktesterEngine::calculate_statistics(bool bOutput )
 		//m_result_statistics["max_drawdown_end"] =
 
 	m_result_statistics["total_net_pnl"] = std::to_string(preBalance - m_capital);
-	m_result_statistics["daily_net_pnl"] = std::to_string((preBalance - m_capital)/m_daily_resultMap.size());
+	m_result_statistics["daily_net_pnl"] = std::to_string((preBalance - m_capital)/ totalDays);
 
 	m_result_statistics["total_commission"] = std::to_string(total_commission);
-	m_result_statistics["daily_commission"] = std::to_string(total_commission/ m_daily_resultMap.size());
+	m_result_statistics["daily_commission"] = std::to_string(total_commission/ totalDays);
 
 	m_result_statistics["total_slippage"] = std::to_string(total_slippage);
 	m_result_statistics["total_turnover"] = std::to_string(total_turnover);
-
+	m_result_statistics["daily_slippage"] = std::to_string(total_slippage/ totalDays);
+	m_result_statistics["daily_turnover"] = std::to_string(total_turnover/ totalDays);
 
 	m_result_statistics["total_trade_count"] = std::to_string(total_trade_count);
-	m_result_statistics["daily_trade_count"] = std::to_string(total_trade_count/ m_daily_resultMap.size());
-	m_result_statistics["total_return"] = std::to_string((lastBalance - m_capital) / m_capital);
+	m_result_statistics["daily_trade_count"] = std::to_string(total_trade_count/ totalDays);
 
-	m_result_statistics["annual_return"] = std::to_string((lastBalance - m_capital)*240 / m_capital);
-	m_result_statistics["daily_return"] = std::to_string(daily_return/ m_daily_resultMap.size());
+	m_result_statistics["total_return"] = std::to_string((lastBalance - m_capital) / m_capital);
+	m_result_statistics["annual_return"] = std::to_string((lastBalance - m_capital) * 240 / totalDays * m_capital);
+	m_result_statistics["daily_return"] = std::to_string(total_return/ totalDays);
 		//m_result_statistics["return_std"] =
 
 		//m_result_statistics["sharpe_ratio"] =
