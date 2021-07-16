@@ -2,12 +2,12 @@
 #include"CtaEngine.h"
 #include<cstdlib>
 #include<string>
-#include"CTAAPI.h"
+#include"BaseEngine.h"
 #include"utility.h"
 extern mongoc_uri_t* g_uri;
 extern mongoc_client_pool_t* g_pool;
 
-StrategyTemplate::StrategyTemplate(CTAAPI*ctaEngine,std::string strategyName, std::string symbol)
+StrategyTemplate::StrategyTemplate(BaseEngine*ctaEngine,std::string strategyName, std::string symbol)
 {
 	m_ctaEngine = ctaEngine;
 	gatewayname = "CTP";

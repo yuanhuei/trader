@@ -18,7 +18,7 @@
 class algorithmOrder;
 class MongoCxx;
 class CtaEngine;
-class CTAAPI;
+class BaseEngine;
 
 
 class StrategyData
@@ -42,7 +42,7 @@ private:
 class StrategyTemplate
 {
 public:
-	StrategyTemplate(CTAAPI* ctaEngine,std::string strategyName,std::string symbol);
+	StrategyTemplate(BaseEngine* ctaEngine,std::string strategyName,std::string symbol);
 	virtual ~StrategyTemplate();
 	/******************************策略参数和变量*********************************************/
 	//基本参数
@@ -148,7 +148,7 @@ public:
 	MongoCxx *m_MongoCxx;
 
 	//CTA管理器
-	CTAAPI* m_ctaEngine;
+	BaseEngine* m_ctaEngine;
 
 	//Bar推送                                   tick级可以不用 ， 如果是bar的就要用
 	std::mutex m_hourminutemtx;					//可以在继承的策略直接用这些变量，省着声明了 

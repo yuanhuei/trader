@@ -7,7 +7,7 @@ class BollChannelStrategy :
     public StrategyTemplate
 {
 public:
-    BollChannelStrategy(CTAAPI* ctaEngine, std::string strategyName, std::string symbol);
+    BollChannelStrategy(BaseEngine* ctaEngine, std::string strategyName, std::string symbol);
     ~BollChannelStrategy();
 
     void updateSetting();

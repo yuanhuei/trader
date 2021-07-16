@@ -180,7 +180,7 @@
     <ClInclude Include="cta_backtester\BacktesterEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\CTAAPI.h">
+    <ClInclude Include="..\include\BaseEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Debug\uic\ui_ContractQueryManager.h">

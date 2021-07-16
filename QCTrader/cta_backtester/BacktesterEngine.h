@@ -1,5 +1,5 @@
 #pragma once
-#include "CTAAPI.h"
+#include "BaseEngine.h"
 #include<string>
 #include<map>
 #include<vector>
@@ -51,7 +51,7 @@ public:
 
 
 class BacktesterEngine :
-    public CTAAPI
+    public BaseEngine
 {
 public:
 	BacktesterEngine(EventEngine* eventengine);

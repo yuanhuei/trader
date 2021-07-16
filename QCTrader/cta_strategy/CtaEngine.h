@@ -18,7 +18,7 @@
 #include"../include/libmongoc-1.0/mongoc.h"
 #include"../include/libbson-1.0/bson.h"
 //#include "stdafx.h"
-#include<CTAAPI.h>
+#include<BaseEngine.h>
 //#include "second.h"
 #define CTAORDER_BUY "ctaorderbuy"
 #define CTAORDER_SELL "ctaordersell"
@@ -54,7 +54,7 @@ public:
 	double shortydposition = 0;
 };
 
-class CtaEngine :public CTAAPI
+class CtaEngine :public BaseEngine
 {
 public:
 	//CTAπ‹¿Ì∆˜

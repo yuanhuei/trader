@@ -10,7 +10,7 @@
 
 #include <iostream>  
 #include <fstream>  
-#include"CTAAPI.h"
+#include"BaseEngine.h"
 #include"event_engine/eventengine.h"
 
     QString str2qstr_new(std::string str)
@@ -59,7 +59,7 @@
         }
     }
 
-    std::map<std::string, std::map<std::string, float>> Global_FUC::ReadStrategyConfFileJson(std::string fileName, CTAAPI* ctaEngine)
+    std::map<std::string, std::map<std::string, float>> Global_FUC::ReadStrategyConfFileJson(std::string fileName, BaseEngine* ctaEngine)
     {
         Json::Reader reader;
         Json::Value root;

@@ -1,0 +1,130 @@
+行情：代码 交易所 名称 最新价 成交量 开盘价 最高价 最低价 买一价 买一量 卖一价 卖一量 时间 接口
+
+委托：委托号 来源 代码 交易所 类型 方向 开平 价格 总数量 已成交 状态 时间 接口
+
+成交：成交号 委托号 代码 交易所 方向 开平  价格 数量 时间 接口 
+
+资金：账户 余额 冻结 可用 接口
+
+持仓：代码 交易所 方向 数量 昨仓 冻结 均价 盈亏 接口
+
+日志：时间 信息 接口
+
+ctpmanager.cpp
+void CTAmanager::registerEvent()
+{
+	m_eventengine->RegEvent(EVENT_TICK, std::bind(&CTAmanager::procecssTickEvent, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_ORDER, std::bind(&CTAmanager::processOrderEvent, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_TRADE, std::bind(&CTAmanager::processTradeEvent, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_POSITION, std::bind(&CTAmanager::processPositionEvent, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_TIMER, std::bind(&CTAmanager::autoConnect, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_LOG, std::bind(&CTAmanager::showLog, this, std::placeholders::_1));
+}
+
+ctpgateway.cpp
+	m_eventengine->RegEvent(EVENT_TIMER, std::bind(&CTPGateway::query, this));//注册到事件驱动引擎，循环查询
+}
+gatewaymanager.cpp
+	m_eventengine->RegEvent(EVENT_CONTRACT, std::bind(&Gatewaymanager::getallContract, this, std::placeholders::_1));
+
+jstradergui.cpp
+	void JSTraderGUI::RegEvent()
+{
+	m_eventengine->RegEvent(EVENT_LOG, std::bind(&JSTraderGUI::OnLog, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_ACCOUNT, std::bind(&JSTraderGUI::onAccount, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_POSITION, std::bind(&JSTraderGUI::onPosition, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_LOADSTRATEGY, std::bind(&JSTraderGUI::onStrategyLoaded, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_UPDATESTRATEGY, std::bind(&JSTraderGUI::onStrategyUpdate, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_UPDATEPORTFOLIO, std::bind(&JSTraderGUI::onPortfolioUpdate, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_TICK, std::bind(&JSTraderGUI::onPriceTableUpdate, this, std::placeholders::_1));
+}
+portfolio.cpp
+	m_eventengine->RegEvent(EVENT_TICK, std::bind(&Portfolio::updateportfolio, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_TIMER, std::bind(&Portfolio::recordNetValue, this, std::placeholders::_1));
+riskmanager.cpp
+	void riskmanager::registerEvent()
+{
+	eventengine_ptr->RegEvent(EVENT_TRADE, std::bind(&riskmanager::updateTrade, this, std::placeholders::_1));
+	eventengine_ptr->RegEvent(EVENT_ORDER, std::bind(&riskmanager::updateOrder, this, std::placeholders::_1));
+	eventengine_ptr->RegEvent(EVENT_TIMER, std::bind(&riskmanager::updateTimer, this, std::placeholders::_1));
+}
+
+
+connect
+
+QGroupBox *JSTraderGUI::createLogGroup()
+{
+	QGroupBox *groupBox = new QGroupBox(str2qstr("日志"));
+	QTextBrowser *Logbrowser = new QTextBrowser;
+	QGridLayout *grid = new QGridLayout;
+	grid->addWidget(Logbrowser);
+	groupBox->setLayout(grid);
+	connect(this, SIGNAL(WriteLog(QString)), Logbrowser, SLOT(append(QString)));
+	return groupBox;
+}
+
+
+QGroupBox *JSTraderGUI::createControlGroup()
+{
+	QGroupBox *groupBox = new QGroupBox(str2qstr("控制"));
+	QPushButton *load = new QPushButton(str2qstr("加载策略"));
+	QPushButton *init = new QPushButton(str2qstr("初始化"));
+	QPushButton *start = new QPushButton(str2qstr("启动策略"));
+	QPushButton *stop = new QPushButton(str2qstr("停止策略"));
+
+	connect(load, SIGNAL(clicked()), this, SLOT(OnPressLoadStrategy()));
+	connect(init, SIGNAL(clicked()), this, SLOT(OnPressInitStrategy()));
+	connect(start, SIGNAL(clicked()), this, SLOT(OnPressStartStrategy()));
+	connect(stop, SIGNAL(clicked()), this, SLOT(OnPressStopStrategy()));
+
+	QHBoxLayout *Hbox = new QHBoxLayout;
+	Hbox->addWidget(load);
+	Hbox->addWidget(init);
+	Hbox->addWidget(start);
+	Hbox->addWidget(stop);
+	Hbox->addStretch();
+	groupBox->setLayout(Hbox);
+	return groupBox;
+}
+
+
+
+
+QGroupBox *JSTraderGUI::createRiskControl()
+
+	QPushButton *buttonClearOrderFlowCount = new QPushButton(str2qstr("清空流控计数"));
+	QPushButton *buttonclearTradeCount = new QPushButton(str2qstr("清空总成交计数"));
+	QPushButton *buttonSaveSetting = new QPushButton(str2qstr("保存设置"));
+
+
+	connect(buttonSwitchEngineStatus, SIGNAL(clicked()), this, SLOT(switchEngineStatus()), Qt::QueuedConnection);
+	connect(buttonClearOrderFlowCount, SIGNAL(clicked()), this, SLOT(onPressbuttonClearOrderFlowCount()), Qt::QueuedConnection);
+	connect(buttonclearTradeCount, SIGNAL(clicked()), this, SLOT(onPressbuttonclearTradeCount()), Qt::QueuedConnection);
+	connect(buttonSaveSetting, SIGNAL(clicked()), this, SLOT(onPressbuttonSaveSetting()), Qt::QueuedConnection);
+
+
+
+
+QGroupBox *JSTraderGUI::createPortfolio_1()
+{
+	QGroupBox *groupBox = new QGroupBox(str2qstr("组合"));
+	QHBoxLayout *Hbox = new QHBoxLayout;
+	QLabel *label_portfolio_winning = new QLabel(str2qstr("组合盈利"));
+	QLabel *label_portfolio_test = new QLabel(str2qstr("╮(╯▽╰)╭"));
+	Hbox->addWidget(label_portfolio_winning);
+	Hbox->addWidget(label_portfolio_test);
+	groupBox->setLayout(Hbox);
+	connect(this, SIGNAL(UpdatePortfolioWinning(QString)), label_portfolio_winning, SLOT(setText(QString)));
+	return groupBox;
+}
+void JSTraderGUI::CreateStrategyBox(LoadStrategyData data)//再GUI线程创建
+
+			connect(spinboxdelegate, SIGNAL(changepos(std::string, std::string, double)), this, SLOT(Onchanedpos(std::string, std::string, double)), Qt::QueuedConnection);
+			connect(spinboxdelegate, SIGNAL(setupdatetrue()), var_tableview, SLOT(setmodelupdatetrue()));
+		}
+void JSTraderGUI::LoadUI()
+	connect(this, SIGNAL(LoadStrategySignal(LoadStrategyData)), this, SLOT(CreateStrategyBox(LoadStrategyData)), Qt::QueuedConnection);
+	connect(this, SIGNAL(UpdateStrategySignal(UpdateStrategyData)), this, SLOT(UpdateStrategyBox(UpdateStrategyData)), Qt::QueuedConnection);
+	connect(this, SIGNAL(UpdatePositionSignal(PositionData)), this, SLOT(UpdatePositionBox(PositionData)), Qt::QueuedConnection);
+	connect(this, SIGNAL(UpdateAccountSignal(AccountData)), this, SLOT(UpdateAccountBox(AccountData)), Qt::QueuedConnection);
+	connect(this, SIGNAL(UpdatePortfolioSignal(PortfolioData)), this, SLOT(UpdatePortfolioBox(PortfolioData)), Qt::QueuedConnection);
