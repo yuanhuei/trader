@@ -22,7 +22,7 @@ public:
 	void calculate_pnl(float pre_close, float start_pos, int size, float rate, float slippage);
 
 
-	QDate date = date;
+	QDate m_date;
 	double m_close_price;//今天收盘价
 	double	m_pre_close = 0;//前一天的收盘价
 

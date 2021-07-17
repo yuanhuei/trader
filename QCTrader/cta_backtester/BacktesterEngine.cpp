@@ -20,7 +20,7 @@ extern mongoc_client_pool_t* g_pool;
 DailyTradingResult::DailyTradingResult(QDate date, double price)
 {
 	m_close_price = price;
-	date = date;
+	m_date = date;
 }
 DailyTradingResult::~DailyTradingResult()
 {

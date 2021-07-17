@@ -40,6 +40,8 @@ void BacktesterManager::InitUI()
 	ui.widget->addGraph();
 	ui.widget->xAxis->setLabel("x");
 	ui.widget->yAxis->setLabel("y");
+	ui.widget->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+
 
 	//ui.widget->xAxis->setRange(0, 10);
 	//ui.widget->yAxis->setRange(0, 1000000);
@@ -50,9 +52,11 @@ void BacktesterManager::InitUI()
 	ui.widget_2->xAxis->setLabel("x");
 	ui.widget_2->yAxis->setLabel("y");
 	//ui.widget_2->xAxis->setRange(0, 10);
-	ui.widget_2->yAxis->setRange(-100000, 0);
+	//ui.widget_2->yAxis->setRange(-1000, 0);
 	ui.widget_2->replot();
 	ui.widget_2->show();
+
+	///////////每日盈亏为柱状图
 
 	ui.widget_3->addGraph();
 	ui.widget_3->xAxis->setLabel("x");
@@ -97,7 +101,7 @@ void BacktesterManager::InitUI()
 
 
 	//设置只能输入数字
-	QValidator* validator = new QIntValidator(0, 9999, this);
+	QValidator* validator = new QIntValidator(0, 999999, this);
 	ui.lineEdit_9->setValidator(validator);
 	ui.lineEdit_10->setValidator(validator);
 	ui.lineEdit_12->setValidator(validator);
@@ -190,21 +194,47 @@ void BacktesterManager::UpdateTesterResult()
 
 	ui.widget_2->graph(0)->setData(x, drawdown_y);
 	ui.widget_2->graph(0)->rescaleAxes(true);
+	int gi = 1;
+	QColor color(20 + 200 / 4.0 * gi, 70 * (1.6 - gi / 4.0), 150, 150);
+	ui.widget_2->graph(0)->setLineStyle(QCPGraph::lsLine);
+	ui.widget_2->graph(0)->setPen(QPen(color.lighter(200)));
+	ui.widget_2->graph(0)->setBrush(QBrush(color));
 	//ui.widget->graph(0)->rescaleValueAxis(true);
 	//ui.widget->graph(0)->rescaleAxes(true);
 	ui.widget_2->replot();
 	ui.widget_2->show();
 
+	//////////////////////////////////////柱状图
+	QCPAxis* keyAxis = ui.widget_3->xAxis;
+	QCPAxis* valueAxis = ui.widget_3->yAxis;
+	if(fossil==nullptr)
+		fossil = new QCPBars(keyAxis, valueAxis);  // 使用xAxisui.widget_3key轴，yAxis作为value轴
+
+	fossil->setAntialiased(false); // 为了更好的边框效果，关闭抗齿锯
+	//fossil->setName("Fossil fuels"); // 设置柱状图的名字，可在图例中显示
+	fossil->setPen(QPen(QColor(0, 168, 140).lighter(130))); // 设置柱状图的边框颜色
+	fossil->setBrush(QColor(0, 168, 140));  // 设置柱状图的画刷颜色
+	//fossil->keyAxis()->setRange(0,30);
+	//fossil->valueAxis()->rescale(true);
+
+	//keyAxis->setRange(0, 8);               // 设置范围
+	//keyAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
+
+	//valueAxis->setRange(0, 12.1);
+	//valueAxis->setPadding(35);             // 轴的内边距，
+	//valueAxis->setLabel("Power Consumption in\nKilowatts per Capita (2007)");
+	//valueAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
+	//QVector<double> fossilData;
+	//fossilData << 0.86 * 10.5 << 0.83 * 5.5 << 0.84 * 5.5 << 0.52 * 5.8 << 0.89 * 5.2 << 0.90 * 4.2 << 0.67 * 11.2;
+	fossil->setData(x, pnl_y);
+	//ui.widget_3->
 	ui.widget_3->graph(0)->setData(x, pnl_y);
 	ui.widget_3->graph(0)->rescaleAxes(true);
-	int gi = 1;
-	QColor color(20 + 200 / 4.0 * gi, 70 * (1.6 - gi / 4.0), 150, 150);
-	ui.widget_3->graph(0)->setLineStyle(QCPGraph::lsLine);
-	ui.widget_3->graph(0)->setPen(QPen(color.lighter(200)));
-	ui.widget_3->graph(0)->setBrush(QBrush(color));
-	//ui.widget_3->legend->setVisible(true);
-	//ui.widget_3->legend->setBrush(QColor(255, 255, 255, 150));
-
+	//gi = 1;
+//	QColor color_3(20 + 200 / 4.0 * gi, 70 * (1.6 - gi / 4.0), 150, 150);
+	//ui.widget_3->graph(0)->setLineStyle(QCPGraph::lsLine);
+	//ui.widget_3->graph(0)->setPen(QPen(color_3.lighter(200)));
+	//ui.widget_3->graph(0)->setBrush(QBrush(color_3));
 	ui.widget_3->replot();
 	ui.widget_3->show();
 
@@ -269,6 +299,9 @@ void BacktesterManager::startBacktest_clicked()
 	ui.widget_2->graph(0)->data().data()->clear();
 	ui.widget_2->replot();
 	ui.widget_2->show();
+
+	if (fossil != nullptr)
+		fossil->data().data()->clear();
 	ui.widget_3->graph(0)->data().data()->clear();
 	ui.widget_3->replot();
 	ui.widget_3->show();

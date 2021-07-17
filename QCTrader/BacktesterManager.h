@@ -22,6 +22,7 @@ public:
 
 	BacktesterEngine* m_backtesterEngine;
 	std::map<std::string, std::map<std::string, float>>  m_ctaStrategyMap;
+	QCPBars* fossil=nullptr;
 
 	MainWindow* m_mainwindow;
 
