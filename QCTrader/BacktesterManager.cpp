@@ -41,6 +41,10 @@ void BacktesterManager::InitUI()
 	ui.widget->xAxis->setLabel("x");
 	ui.widget->yAxis->setLabel("y");
 	ui.widget->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+	ui.widget_2->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+	ui.widget_3->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+	ui.widget_4->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+
 
 
 	//ui.widget->xAxis->setRange(0, 10);
@@ -206,8 +210,7 @@ void BacktesterManager::UpdateTesterResult()
 
 	ui.widget_2->graph(0)->setData(x, drawdown_y);
 	ui.widget_2->graph(0)->rescaleAxes(true);
-	int gi = 1;
-	QColor color(20 + 200 / 4.0 * gi, 70 * (1.6 - gi / 4.0), 150, 150);
+	QColor color(0, 0, 255);
 	ui.widget_2->graph(0)->setLineStyle(QCPGraph::lsLine);
 	ui.widget_2->graph(0)->setPen(QPen(color.lighter(200)));
 	ui.widget_2->graph(0)->setBrush(QBrush(color));
@@ -232,16 +235,16 @@ void BacktesterManager::UpdateTesterResult()
 
 	fossil->setAntialiased(false); // ÎªÁË¸üºÃµÄ±ß¿òÐ§¹û£¬¹Ø±Õ¿¹³Ý¾â
 	//fossil->setName("Fossil fuels"); // ÉèÖÃÖù×´Í¼µÄÃû×Ö£¬¿ÉÔÚÍ¼ÀýÖÐÏÔÊ¾
-	fossil->setPen(QPen(QColor(0, 168, 140).lighter(130))); // ÉèÖÃÖù×´Í¼µÄ±ß¿òÑÕÉ«
-	fossil->setBrush(QColor(0, 168, 140));  // ÉèÖÃÖù×´Í¼µÄ»­Ë¢ÑÕÉ«
+	fossil->setPen(QPen(QColor(255, 0, 0).lighter(130))); // ÉèÖÃÖù×´Í¼µÄ±ß¿òÑÕÉ«
+	fossil->setBrush(QColor(255, 0, 0));  // ÉèÖÃÖù×´Í¼µÄ»­Ë¢ÑÕÉ«
 	fossil->setData(x1, pnl_y1);
 	fossil->setWidth(1);
 	fossil->setBarsGroup(group1);
 
 	if (fossil2 == nullptr)
 		fossil2 = new QCPBars(keyAxis, valueAxis);  // Ê¹ÓÃxAxisui.widget_3keyÖá£¬yAxis×÷ÎªvalueÖá
-	fossil2->setPen(QPen(QColor(255, 154, 0).lighter(130))); // ÉèÖÃÖù×´Í¼µÄ±ß¿òÑÕÉ«
-	fossil2->setBrush(QColor(255, 154, 0));  // ÉèÖÃÖù×´Í¼µÄ»­Ë¢ÑÕÉ«
+	fossil2->setPen(QPen(QColor(255, 255, 0).lighter(130))); // ÉèÖÃÖù×´Í¼µÄ±ß¿òÑÕÉ«
+	fossil2->setBrush(QColor(255, 255, 0));  // ÉèÖÃÖù×´Í¼µÄ»­Ë¢ÑÕÉ«
 	fossil2->setData(x2, pnl_y2);
 	fossil2->setWidth(1);
 	fossil2->setBarsGroup(group1);
