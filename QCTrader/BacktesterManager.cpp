@@ -58,7 +58,7 @@ void BacktesterManager::InitUI()
 
 	///////////每日盈亏为柱状图
 
-	ui.widget_3->addGraph();
+	//ui.widget_3->addGraph();
 	ui.widget_3->xAxis->setLabel("x");
 	ui.widget_3->yAxis->setLabel("y");
 	//ui.widget_3->xAxis->setRange(0, 10);
@@ -169,22 +169,34 @@ void BacktesterManager::UpdateTesterResult()
 	// 每日盈亏
 	// 盈亏分布
 	int nDay = m_backtesterEngine->m_daily_resultMap.size()+1;//开始的x[0]置为0，所以总天数加1
-	QVector<double> x(nDay), balance_y(nDay),drawdown_y(nDay),pnl_y(nDay),pnl_distribution_y(nDay);
+	QVector<double> x(nDay), balance_y(nDay),drawdown_y(nDay),pnl_y(nDay),pnl_y1,pnl_y2,x1,x2,pnl_distribution_y(nDay);
 	int n = 0;
 	x[n] = 0;
 	balance_y[0] = m_backtesterEngine->m_capital;
 	drawdown_y[0] = 0;
 	pnl_y[0] = 0;
-	for (auto &iter: m_backtesterEngine->m_daily_resultMap)
+	for (auto& iter : m_backtesterEngine->m_daily_resultMap)
 	{
 		n++;
 		balance_y[n] = iter.second->m_balance;
 		drawdown_y[n] = iter.second->m_drawdown;
 		pnl_y[n] = iter.second->m_net_pnl;
+		x[n] = n;
 
-		x[n] = n ;
-		
+		if (pnl_y[n] >= 0)
+		{
+			pnl_y1.push_back(pnl_y[n]);
+			x1.push_back(x[n]);
+		}
+		else
+		{
+			pnl_y2.push_back(pnl_y[n]);
+			x2.push_back(x[n]);
+		}
+
 	}
+
+
 	ui.widget->graph(0)->setData(x, balance_y);
 	//ui.widget->graph(0)->rescaleKeyAxis(true);
 	//ui.widget->graph(0)->rescaleValueAxis(true);
@@ -205,6 +217,14 @@ void BacktesterManager::UpdateTesterResult()
 	ui.widget_2->show();
 
 	//////////////////////////////////////柱状图
+
+	QCPBarsGroup* group1 = new QCPBarsGroup(ui.widget_3);
+	group1->setSpacing(1);
+	//QCPBars* bars = new QCPBars(customPlot->xAxis, customPlot->yAxis);
+	//bars->setData(datax1, datay1);
+	//bars->setBrush(QColor(0, 0, 255, 50));
+	//bars->setPen(QColor(0, 0, 255));
+
 	QCPAxis* keyAxis = ui.widget_3->xAxis;
 	QCPAxis* valueAxis = ui.widget_3->yAxis;
 	if(fossil==nullptr)
@@ -214,10 +234,23 @@ void BacktesterManager::UpdateTesterResult()
 	//fossil->setName("Fossil fuels"); // 设置柱状图的名字，可在图例中显示
 	fossil->setPen(QPen(QColor(0, 168, 140).lighter(130))); // 设置柱状图的边框颜色
 	fossil->setBrush(QColor(0, 168, 140));  // 设置柱状图的画刷颜色
-	//fossil->keyAxis()->setRange(0,30);
-	//fossil->valueAxis()->rescale(true);
+	fossil->setData(x1, pnl_y1);
+	fossil->setWidth(1);
+	fossil->setBarsGroup(group1);
 
-	//keyAxis->setRange(0, 8);               // 设置范围
+	if (fossil2 == nullptr)
+		fossil2 = new QCPBars(keyAxis, valueAxis);  // 使用xAxisui.widget_3key轴，yAxis作为value轴
+	fossil2->setPen(QPen(QColor(255, 154, 0).lighter(130))); // 设置柱状图的边框颜色
+	fossil2->setBrush(QColor(255, 154, 0));  // 设置柱状图的画刷颜色
+	fossil2->setData(x2, pnl_y2);
+	fossil2->setWidth(1);
+	fossil2->setBarsGroup(group1);
+
+
+	keyAxis->rescale(true);// setRange(0, 8);               // 设置范围
+	valueAxis->rescale(true);
+
+
 	//keyAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
 
 	//valueAxis->setRange(0, 12.1);
@@ -226,15 +259,15 @@ void BacktesterManager::UpdateTesterResult()
 	//valueAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
 	//QVector<double> fossilData;
 	//fossilData << 0.86 * 10.5 << 0.83 * 5.5 << 0.84 * 5.5 << 0.52 * 5.8 << 0.89 * 5.2 << 0.90 * 4.2 << 0.67 * 11.2;
-	fossil->setData(x, pnl_y);
 	//ui.widget_3->
-	ui.widget_3->graph(0)->setData(x, pnl_y);
-	ui.widget_3->graph(0)->rescaleAxes(true);
+	//ui.widget_3->graph(0)->setData(x, pnl_y);
+	//ui.widget_3->graph(0)->rescaleAxes(true);
 	//gi = 1;
 //	QColor color_3(20 + 200 / 4.0 * gi, 70 * (1.6 - gi / 4.0), 150, 150);
 	//ui.widget_3->graph(0)->setLineStyle(QCPGraph::lsLine);
 	//ui.widget_3->graph(0)->setPen(QPen(color_3.lighter(200)));
 	//ui.widget_3->graph(0)->setBrush(QBrush(color_3));
+
 	ui.widget_3->replot();
 	ui.widget_3->show();
 
@@ -302,7 +335,10 @@ void BacktesterManager::startBacktest_clicked()
 
 	if (fossil != nullptr)
 		fossil->data().data()->clear();
-	ui.widget_3->graph(0)->data().data()->clear();
+	if (fossil2 != nullptr)
+		fossil2->data().data()->clear();
+
+	//ui.widget_3->graph(0)->data().data()->clear();
 	ui.widget_3->replot();
 	ui.widget_3->show();
 	ui.widget_4->graph(0)->data().data()->clear();

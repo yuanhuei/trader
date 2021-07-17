@@ -4,7 +4,7 @@
 #include<qdatetime.h>
 #include<talib.h>
 #include<ta_defs.h>
-
+#include<math.h>
 #include <json/json.h>
 #include<qstring.h>
 
@@ -29,6 +29,10 @@
         return std::string(date);
     }
 
+    int  Global_FUC::round_double(double number)
+    {
+        return (number > 0.0) ? (number + 0.5) : (number - 0.5);
+    }
 
     void Global_FUC::savetraderecord(std::string strategyname, std::shared_ptr<Event_Trade>etrade, EventEngine* eventEngine)
     {

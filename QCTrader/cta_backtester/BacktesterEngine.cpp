@@ -312,7 +312,8 @@ void BacktesterEngine::calculate_statistics(bool bOutput )
 
 
 	m_result_statistics["max_drawdown"] = std::to_string(max_drawdown);
-	m_result_statistics["max_ddpercent"] = std::to_string(max_ddpercent);
+	std::string strMax_ddpercent = std::to_string(max_ddpercent * 100) + "%";
+	m_result_statistics["max_ddpercent"] = strMax_ddpercent;
 		//m_result_statistics["max_drawdown_end"] =
 
 	m_result_statistics["total_net_pnl"] = std::to_string(preBalance - m_capital);
@@ -329,9 +330,17 @@ void BacktesterEngine::calculate_statistics(bool bOutput )
 	m_result_statistics["total_trade_count"] = std::to_string(total_trade_count);
 	m_result_statistics["daily_trade_count"] = std::to_string(total_trade_count/ totalDays);
 
-	m_result_statistics["total_return"] = std::to_string((lastBalance - m_capital) / m_capital);
-	m_result_statistics["annual_return"] = std::to_string((lastBalance - m_capital) * 240 / totalDays * m_capital);
-	m_result_statistics["daily_return"] = std::to_string(total_return/ totalDays);
+
+	total_return = (lastBalance - m_capital) / m_capital;
+	double annual_return = (lastBalance - m_capital)*240 /( m_capital* totalDays);
+	daily_return = total_return / totalDays;
+	std::string strTotal_return = std::to_string(total_return*100)+"%";
+	std::string strAnnual_return = std::to_string(annual_return *100)+"%";
+	std::string strDaily_return = std::to_string(daily_return *100)+"%";
+
+	m_result_statistics["total_return"] = strTotal_return;
+	m_result_statistics["annual_return"] = strAnnual_return;
+	m_result_statistics["daily_return"] = strDaily_return;
 		//m_result_statistics["return_std"] =
 
 		//m_result_statistics["sharpe_ratio"] =
