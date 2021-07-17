@@ -197,6 +197,14 @@ void BacktesterManager::UpdateTesterResult()
 
 	ui.widget_3->graph(0)->setData(x, pnl_y);
 	ui.widget_3->graph(0)->rescaleAxes(true);
+	int gi = 1;
+	QColor color(20 + 200 / 4.0 * gi, 70 * (1.6 - gi / 4.0), 150, 150);
+	ui.widget_3->graph(0)->setLineStyle(QCPGraph::lsLine);
+	ui.widget_3->graph(0)->setPen(QPen(color.lighter(200)));
+	ui.widget_3->graph(0)->setBrush(QBrush(color));
+	//ui.widget_3->legend->setVisible(true);
+	//ui.widget_3->legend->setBrush(QColor(255, 255, 255, 150));
+
 	ui.widget_3->replot();
 	ui.widget_3->show();
 
@@ -232,7 +240,7 @@ void BacktesterManager::startBacktest_clicked()
 	{
 		if (iter->first.find(strStrategyName) != iter->first.npos)
 		{
-			strStategyClassName = QString::fromStdString(iter->first).section("_",2, 2);
+			strStategyClassName = QString::fromStdString(iter->first).section("_", 2, 2);
 			settingMap = iter->second;
 		}
 	}
@@ -240,15 +248,34 @@ void BacktesterManager::startBacktest_clicked()
 
 	Interval iInterval = MINUTE;// Interval(ui.comboBox_2->currentIndex());
 	QDate starDate, endDate;
-	starDate=ui.dateEdit->dateTime().date();
+	starDate = ui.dateEdit->dateTime().date();
 	endDate = ui.dateEdit_2->dateTime().date();
 
 	float rate = ui.lineEdit_10->text().toFloat();//费率
 	float slippage = ui.lineEdit_9->text().toFloat();//交易滑点
+
 	float contractsize = ui.lineEdit_12->text().toFloat();//合约乘数
 	float pricetick = ui.lineEdit_13->text().toFloat();//价格跳动
 	float capital = ui.lineEdit_14->text().toFloat();//资金
 
+	//再次测试的时候清空数据
+	m_backtesterEngine->ResetData();//重置数据
+	ui.tableWidget->clearContents();
+	ui.textEdit->clear();
+
+	ui.widget->graph(0)->data().data()->clear();
+	ui.widget->replot();
+	ui.widget->show();
+	ui.widget_2->graph(0)->data().data()->clear();
+	ui.widget_2->replot();
+	ui.widget_2->show();
+	ui.widget_3->graph(0)->data().data()->clear();
+	ui.widget_3->replot();
+	ui.widget_3->show();
+	ui.widget_4->graph(0)->data().data()->clear();
+	ui.widget_4->replot();
+	ui.widget_4->show();
+	/////////////////////
 	m_backtesterEngine->StartBacktesting(strStrategyName, strStategyClassName.toStdString(), strSymbol, iInterval,
 		starDate, endDate, rate, slippage, contractsize, pricetick, capital, settingMap);
 	//子线程在执行回测的时候，回测界面需要清除上次的遗留数据，几个按钮也需要disable

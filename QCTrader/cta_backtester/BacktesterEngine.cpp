@@ -19,6 +19,8 @@ extern mongoc_client_pool_t* g_pool;
 
 DailyTradingResult::DailyTradingResult(QDate date, double price)
 {
+	m_close_price = price;
+	date = date;
 }
 DailyTradingResult::~DailyTradingResult()
 {
@@ -27,39 +29,43 @@ DailyTradingResult::~DailyTradingResult()
 void DailyTradingResult::add_trade(Event_Trade trade)
 {
 
-	m_trades.push_back(trade);
+	m_Dailytrades.push_back(trade);
 }
 
 void DailyTradingResult::calculate_pnl (float pre_close,float start_pos,int size,float rate,float slippage)
 {
-	if (pre_close != -1)//输入为-1表示不知道之前的收盘价
-		m_pre_close = pre_close;
-	else
-		m_pre_close = 1;
-
 	m_start_pos = start_pos;
-	m_end_pos = start_pos;
+	m_end_pos = m_start_pos;
 
-	m_holding_pnl = m_start_pos * (m_close_price - m_pre_close) * size;
+	if (pre_close != -1)//输入为-1表示m_daily_resultMap的第一天，不知道之前的收盘价，仓位也为0，所以为0
+	{
+		m_pre_close = pre_close;
+		m_holding_pnl = m_start_pos * (m_close_price - m_pre_close) * size;
+	}
+	else
+		m_holding_pnl = 0;
+
+
+	
 
 	//Trading pnl is the pnl from new trade during the day
-	m_trade_count = m_trades.size();
+	m_trade_count = m_Dailytrades.size();
 	for (int i = 0; i < m_trade_count; i++)
 	{
 		int pos_change;
-		if (m_trades[i].direction == DIRECTION_LONG)
-			pos_change = m_trades[i].volume;
+		if (m_Dailytrades[i].direction == DIRECTION_LONG)
+			pos_change = m_Dailytrades[i].volume;
 		else
-			pos_change = -m_trades[i].volume;
+			pos_change = -m_Dailytrades[i].volume;
+
+		m_trading_pnl += pos_change * (m_close_price - m_Dailytrades[i].price) * size;
+
+		m_turnover += m_Dailytrades[i].volume * size * m_Dailytrades[i].price;
+		m_slippage += m_Dailytrades[i].volume * size * slippage;
+		m_commission += m_turnover * rate;
 
 		m_end_pos += pos_change;
 
-		m_turnover = m_trades[i].volume * size * m_trades[i].price;
-		m_trading_pnl += pos_change * (m_close_price - m_trades[i].price) * size;
-		m_slippage += m_trades[i].volume * size * slippage;
-
-		m_turnover += m_turnover;
-		m_commission += m_turnover * rate;
 	}
 
 	// Net pnl takes account of commissionand slippage cost
@@ -80,6 +86,22 @@ BacktesterEngine::~BacktesterEngine()
 
 }
 
+void BacktesterEngine:: ResetData()
+{
+	m_stop_order_count = 0;
+	m_limit_order_count = 0;
+	m_tradeCount = 0;
+
+	m_stop_orders.clear();
+	m_active_stop_orders.clear();
+	m_limit_orders.clear();
+	m_active_limit_orders.clear();
+	m_tradeMap.clear();
+	vector_history_data.clear();
+	m_daily_resultMap.clear();
+	m_result_statistics.clear();
+
+}
 
 
 void BacktesterEngine::StartBacktesting(
@@ -118,6 +140,7 @@ void BacktesterEngine::StartBacktesting(
 	if(m_thread.joinable())
 		m_thread.detach();
 }
+
 void BacktesterEngine::runBacktesting()
 {
 //生成策略实例
@@ -146,13 +169,13 @@ void BacktesterEngine::runBacktesting()
 	 {
 		 if (m_strategy->trading)
 		 {
-			 m_barDate = vector_history_data[i].date;//赋值当前推送bar的时间给m_barDate方便传递参数
-			 m_datetime = QDateTime::fromString(QString::fromStdString(vector_history_data[i].datetime),"yyyy-MM-dd hh:mm:ss");
+			 //m_barDate = vector_history_data[i].date;//赋值当前推送bar的时间给m_barDate方便传递参数
+			 //m_datetime = QDateTime::fromString(QString::fromStdString(vector_history_data[i].datetime),"yyyy-MM-dd hh:mm:ss");
 			 cross_limit_order(vector_history_data[i]);//检查价格是否触发之前的order
 			 cross_stop_order(vector_history_data[i]);//检查价格是否触发之前的order
 
-			 m_strategy->onBar(vector_history_data[i]);//调用策略的onBar函数推送bar数据
-			 update_daily_close(vector_history_data[i].close);//更新m_daily_results map的收盘价，为后面计算做准备
+			 //m_strategy->onBar(vector_history_data[i]);//调用策略的onBar函数推送bar数据
+			 //update_daily_close(vector_history_data[i].close);//更新m_daily_results map的收盘价，为后面计算做准备
 		 }
 		 else
 		 {
@@ -162,13 +185,14 @@ void BacktesterEngine::runBacktesting()
 				 writeCtaLog("策略初始化完成，开始回测策略");
 				 //bTrading = true;
 			 }
-			 m_barDate = vector_history_data[i].date;//赋值当前推送bar的时间给m_barDate方便传递参数
-			 m_datetime = QDateTime::fromString(QString::fromStdString(vector_history_data[i].date + " " + vector_history_data[i].time), "yyyy-MM-dd hh:mm:ss");
-
-			 m_strategy->onBar(vector_history_data[i]);//调用策略的onBar函数推送bar数据
-			 update_daily_close(vector_history_data[i].close);//更新m_daily_results map的收盘价，为后面计算做准备
 
 		 }
+		 m_barDate = vector_history_data[i].date;//赋值当前推送bar的时间给m_barDate方便传递参数
+		 m_datetime = QDateTime::fromString(QString::fromStdString(vector_history_data[i].date + " " + vector_history_data[i].time), "yyyy-MM-dd hh:mm:ss");
+
+		 m_strategy->onBar(vector_history_data[i]);//调用策略的onBar函数推送bar数据
+		 update_daily_close(vector_history_data[i].close);//更新m_daily_results map的收盘价，为后面计算做准备
+
 	 }
 	 if (m_strategy->inited == false)
 	 {
@@ -274,7 +298,7 @@ void BacktesterEngine::calculate_statistics(bool bOutput )
 		total_commission = iter.second->m_commission + total_commission;
 		total_slippage = iter.second->m_slippage + total_slippage;
 		total_turnover = iter.second->m_turnover + total_turnover;
-		total_trade_count = iter.second->m_trades.size() + total_trade_count;
+		total_trade_count = iter.second->m_Dailytrades.size() + total_trade_count;
 
 		total_return = iter.second->m_return + total_return;
 	}

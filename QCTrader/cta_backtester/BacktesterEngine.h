@@ -26,7 +26,7 @@ public:
 	double m_close_price;//今天收盘价
 	double	m_pre_close = 0;//前一天的收盘价
 
-	 std::vector<Event_Trade> m_trades;
+	 std::vector<Event_Trade> m_Dailytrades;
 	int m_trade_count = 0;
 
 	int m_start_pos = 0;
@@ -36,8 +36,8 @@ public:
 	double m_commission = 0;//手续费
 	double m_slippage = 0;//滑点
 
-	double	m_trading_pnl = 0;
-	double	m_holding_pnl = 0;
+	double	m_trading_pnl = 0;//这天新开仓到收盘的PNL
+	double	m_holding_pnl = 0;//这天开始的仓位到收盘所获得的PNL
 	double	m_total_pnl = 0;
 	double		m_net_pnl = 0;
 
@@ -119,6 +119,7 @@ public:
 	std::map <QDate , std::shared_ptr<DailyTradingResult >> m_daily_resultMap;
 	std::map < std::string, std::string> m_result_statistics;
 
+	void ResetData();
 	void calculate_result();
 	void calculate_statistics(bool bOutput = false);
 
