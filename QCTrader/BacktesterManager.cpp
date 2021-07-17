@@ -168,10 +168,7 @@ void BacktesterManager::UpdateTesterResult()
 	//ui.tableWidget->setItem(24, 1, new QTableWidgetItem(str2qstr_new(m_backtesterEngine->m_result_statistics["return_drawdown_ratio"])));
 
 	//画图
-	//账户净值
-	//净值回撤
-	// 每日盈亏
-	// 盈亏分布
+
 	int nDay = m_backtesterEngine->m_daily_resultMap.size()+1;//开始的x[0]置为0，所以总天数加1
 	QVector<double> x(nDay), balance_y(nDay),drawdown_y(nDay),pnl_y(nDay),pnl_y1,pnl_y2,x1,x2,pnl_distribution_y(nDay);
 	int n = 0;
@@ -199,6 +196,7 @@ void BacktesterManager::UpdateTesterResult()
 		}
 
 	}
+	//账户净值
 
 
 	ui.widget->graph(0)->setData(x, balance_y);
@@ -207,6 +205,7 @@ void BacktesterManager::UpdateTesterResult()
 	ui.widget->graph(0)->rescaleAxes(true);
 	ui.widget->replot();
 	ui.widget->show();
+	//净值回撤
 
 	ui.widget_2->graph(0)->setData(x, drawdown_y);
 	ui.widget_2->graph(0)->rescaleAxes(true);
@@ -219,61 +218,39 @@ void BacktesterManager::UpdateTesterResult()
 	ui.widget_2->replot();
 	ui.widget_2->show();
 
-	//////////////////////////////////////柱状图
+	// 每日盈亏
+//////////////////////////////////////柱状图
 
 	QCPBarsGroup* group1 = new QCPBarsGroup(ui.widget_3);
 	group1->setSpacing(1);
-	//QCPBars* bars = new QCPBars(customPlot->xAxis, customPlot->yAxis);
-	//bars->setData(datax1, datay1);
-	//bars->setBrush(QColor(0, 0, 255, 50));
-	//bars->setPen(QColor(0, 0, 255));
 
 	QCPAxis* keyAxis = ui.widget_3->xAxis;
 	QCPAxis* valueAxis = ui.widget_3->yAxis;
-	if(fossil==nullptr)
-		fossil = new QCPBars(keyAxis, valueAxis);  // 使用xAxisui.widget_3key轴，yAxis作为value轴
+	if(m_barOverXAxis ==nullptr)
+		m_barOverXAxis = new QCPBars(keyAxis, valueAxis);  // 使用xAxisui.widget_3key轴，yAxis作为value轴
 
-	fossil->setAntialiased(false); // 为了更好的边框效果，关闭抗齿锯
+	m_barOverXAxis->setAntialiased(false); // 为了更好的边框效果，关闭抗齿锯
 	//fossil->setName("Fossil fuels"); // 设置柱状图的名字，可在图例中显示
-	fossil->setPen(QPen(QColor(255, 0, 0).lighter(130))); // 设置柱状图的边框颜色
-	fossil->setBrush(QColor(255, 0, 0));  // 设置柱状图的画刷颜色
-	fossil->setData(x1, pnl_y1);
-	fossil->setWidth(1);
-	fossil->setBarsGroup(group1);
+	m_barOverXAxis->setPen(QPen(QColor(255, 0, 0).lighter(130))); // 设置柱状图的边框颜色
+	m_barOverXAxis->setBrush(QColor(255, 0, 0));  // 设置柱状图的画刷颜色
+	m_barOverXAxis->setData(x1, pnl_y1);
+	m_barOverXAxis->setWidth(1);
+	m_barOverXAxis->setBarsGroup(group1);
 
-	if (fossil2 == nullptr)
-		fossil2 = new QCPBars(keyAxis, valueAxis);  // 使用xAxisui.widget_3key轴，yAxis作为value轴
-	fossil2->setPen(QPen(QColor(255, 255, 0).lighter(130))); // 设置柱状图的边框颜色
-	fossil2->setBrush(QColor(255, 255, 0));  // 设置柱状图的画刷颜色
-	fossil2->setData(x2, pnl_y2);
-	fossil2->setWidth(1);
-	fossil2->setBarsGroup(group1);
+	if (m_barUnderXAxis == nullptr)
+		m_barUnderXAxis = new QCPBars(keyAxis, valueAxis);  // 使用xAxisui.widget_3key轴，yAxis作为value轴
+	m_barUnderXAxis->setPen(QPen(QColor(255, 255, 0).lighter(130))); // 设置柱状图的边框颜色
+	m_barUnderXAxis->setBrush(QColor(255, 255, 0));  // 设置柱状图的画刷颜色
+	m_barUnderXAxis->setData(x2, pnl_y2);
+	m_barUnderXAxis->setWidth(1);
+	m_barUnderXAxis->setBarsGroup(group1);
 
-
-	keyAxis->rescale(true);// setRange(0, 8);               // 设置范围
+	keyAxis->rescale(true);
 	valueAxis->rescale(true);
-
-
-	//keyAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
-
-	//valueAxis->setRange(0, 12.1);
-	//valueAxis->setPadding(35);             // 轴的内边距，
-	//valueAxis->setLabel("Power Consumption in\nKilowatts per Capita (2007)");
-	//valueAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
-	//QVector<double> fossilData;
-	//fossilData << 0.86 * 10.5 << 0.83 * 5.5 << 0.84 * 5.5 << 0.52 * 5.8 << 0.89 * 5.2 << 0.90 * 4.2 << 0.67 * 11.2;
-	//ui.widget_3->
-	//ui.widget_3->graph(0)->setData(x, pnl_y);
-	//ui.widget_3->graph(0)->rescaleAxes(true);
-	//gi = 1;
-//	QColor color_3(20 + 200 / 4.0 * gi, 70 * (1.6 - gi / 4.0), 150, 150);
-	//ui.widget_3->graph(0)->setLineStyle(QCPGraph::lsLine);
-	//ui.widget_3->graph(0)->setPen(QPen(color_3.lighter(200)));
-	//ui.widget_3->graph(0)->setBrush(QBrush(color_3));
 
 	ui.widget_3->replot();
 	ui.widget_3->show();
-
+	// 盈亏分布
 	//ui.widget_4->graph(0)->setData(x, pnl_distribution_y);
 	ui.widget_4->replot();
 	ui.widget_4->show();
@@ -336,10 +313,10 @@ void BacktesterManager::startBacktest_clicked()
 	ui.widget_2->replot();
 	ui.widget_2->show();
 
-	if (fossil != nullptr)
-		fossil->data().data()->clear();
-	if (fossil2 != nullptr)
-		fossil2->data().data()->clear();
+	if (m_barOverXAxis != nullptr)
+		m_barOverXAxis->data().data()->clear();
+	if (m_barUnderXAxis != nullptr)
+		m_barUnderXAxis->data().data()->clear();
 
 	//ui.widget_3->graph(0)->data().data()->clear();
 	ui.widget_3->replot();

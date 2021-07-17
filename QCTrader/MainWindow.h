@@ -199,10 +199,10 @@ public:
 	riskmanager* m_riskmanager;//风险管理器
 
 	CtaEngine* m_ctaEngine;//cta管理器
-	CTAStrategyManager* m_ctaStrategyDailog=NULL;
-	BacktesterEngine* m_backtesterEngine = NULL;
-	BacktesterManager* m_ctaBacktesterManager=NULL;
-	ContractQueryManager* m_ContractQueryManager= NULL;
+	CTAStrategyManager* m_ctaStrategyDailog=nullptr;
+	BacktesterEngine* m_backtesterEngine = nullptr;
+	BacktesterManager* m_ctaBacktesterManager= nullptr;
+	ContractQueryManager* m_ContractQueryManager= nullptr;
 
 
 

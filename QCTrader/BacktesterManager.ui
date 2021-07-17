@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>BacktesterManager</string>
+   <string>CTA回测</string>
   </property>
   <widget class="QFrame" name="frame">
    <property name="geometry">
