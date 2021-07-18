@@ -25,12 +25,48 @@ CTAStrategyManager::CTAStrategyManager(QWidget* parent)
 	m_ctaEngine = m_mainwindow->m_ctaEngine;
 	InitUI();
 
+	connect(this, SIGNAL(UpdateStopOrderTableSignal()), this, SLOT(UpdateStopOrderTable()));
+	m_mainwindow->m_eventengine->RegEvent(EVENT_STOP_ORDER, std::bind(&CTAStrategyManager::ProcecssStopOrderEvent, this, std::placeholders::_1));
+
+
 }
 
 CTAStrategyManager::~CTAStrategyManager()
 {
 }
+void CTAStrategyManager::ProcecssStopOrderEvent(std::shared_ptr<Event>e)
+{
+	emit UpdateStopOrderTableSignal();
 
+}
+
+void CTAStrategyManager::UpdateStopOrderTable()
+{
+	m_StopOrderTableModel->clear();
+	m_ctaEngine->m_stop_order_mtx.lock();
+	std::map<std::string, std::shared_ptr<Event_StopOrder>>::iterator iter= m_ctaEngine->m_stop_order_map.begin();
+	int i = 0;
+	for (iter; iter != m_ctaEngine->m_stop_order_map.end(); iter++)
+	{
+		std::shared_ptr<Event_StopOrder>ptr_StopOrder = iter->second;
+
+		m_StopOrderTableModel->setItem(i, 0, new QStandardItem(str2qstr_new(ptr_StopOrder->orderID)));
+		m_StopOrderTableModel->setItem(i, 1, new QStandardItem(""));
+		m_StopOrderTableModel->setItem(i, 2, new QStandardItem(str2qstr_new(ptr_StopOrder->symbol + "." + ptr_StopOrder->exchange)));
+		m_StopOrderTableModel->setItem(i, 3, new QStandardItem(str2qstr_new(ptr_StopOrder->direction)));
+		m_StopOrderTableModel->setItem(i, 4, new QStandardItem(str2qstr_new(ptr_StopOrder->offset)));
+		m_StopOrderTableModel->setItem(i, 5, new QStandardItem(QString::number(ptr_StopOrder->price)));
+		m_StopOrderTableModel->setItem(i, 6, new QStandardItem(QString::number(ptr_StopOrder->totalVolume)));
+		m_StopOrderTableModel->setItem(i, 7, new QStandardItem(str2qstr_new((ptr_StopOrder->status))));
+		m_StopOrderTableModel->setItem(i, 8, new QStandardItem(""));
+		m_StopOrderTableModel->setItem(i, 9, new QStandardItem(str2qstr_new(ptr_StopOrder->strategyName)));
+		i++;
+
+	}
+	m_ctaEngine->m_stop_order_mtx.lock();
+	return;
+
+}
 
 void CTAStrategyManager::InitUI()
 {
@@ -72,6 +108,18 @@ void CTAStrategyManager::InitUI()
 
 	}
 	ui.pushButton->setDisabled(true);//暂时不用
+
+	m_StopOrderTableModel =new QStandardItemModel;
+	QStringList StopOrderTableHeader;
+	StopOrderTableHeader << str2qstr_new("停止委托号") << str2qstr_new("限价委托号") << str2qstr_new("本地代码") << str2qstr_new("方向") << str2qstr_new("开平") << str2qstr_new("价格") << str2qstr_new("数量") << str2qstr_new("状态") << str2qstr_new("锁仓") << str2qstr_new("策略名");
+	m_StopOrderTableModel->setHorizontalHeaderLabels(StopOrderTableHeader);
+	ui.tableView_2->setModel(m_StopOrderTableModel);
+	ui.tableView_2->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+	//ui.tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	ui.tableView_2->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	ui.tableView_2->setSelectionBehavior(QAbstractItemView::SelectRows);  //单击选择一行  
+	ui.tableView_2->setSelectionMode(QAbstractItemView::SingleSelection); //设置只能选择一行，不能多行选中  
+	ui.tableView_2->setAlternatingRowColors(true);
 
 }
 void CTAStrategyManager::addStrategy_clicked()

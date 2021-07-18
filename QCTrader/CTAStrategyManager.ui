@@ -188,58 +188,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QTableWidget" name="tableWidget_2">
-          <column>
-           <property name="text">
-            <string>停止委托号</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>限价委托号</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>本地代码</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>方向</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>开平</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>价格</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>数量</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>状态</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>锁仓</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>策略名</string>
-           </property>
-          </column>
-         </widget>
+         <widget class="QTableView" name="tableView_2"/>
          <widget class="QTableWidget" name="tableWidget_3">
           <column>
            <property name="text">

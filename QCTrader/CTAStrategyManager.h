@@ -17,6 +17,8 @@ public:
 	//void pushLogToCTAStrategyWindow(std::string msg);
 	void UpdateLogTable(LogData data);
 	//void pushLogData(std::string msg);
+	void ProcecssStopOrderEvent(std::shared_ptr<Event>e);
+
 
 private:
 	Ui::CTAStrategyManager ui;
@@ -24,6 +26,7 @@ private:
 	//std::map<std::string, std::map<std::string, float>>* m_strategyConfigInfo_map;
 
 	QStandardItemModel* m_StrategyConf;
+	QStandardItemModel* m_StopOrderTableModel;
 	CtaEngine* m_ctaEngine;
 private slots:
 	void addStrategy_clicked();
@@ -34,6 +37,8 @@ private slots:
 	void stopAllStrategy_clicked();
 	void clearLog();
 	void StrategyTable_clicked();
-
+	void UpdateStopOrderTable();
+signals:
+	void UpdateStopOrderTableSignal();
 
 };

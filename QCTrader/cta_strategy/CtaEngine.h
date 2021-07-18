@@ -118,9 +118,10 @@ private:
 	std::map<std::string, std::vector<StrategyTemplate*>>m_tickstrategymap;	std::mutex m_tickstrategymtx;
 	//key 策略名+合约名, value 为策略指针    用来把界面选中的策略名 对应的的策略对象启动
 	std::map<std::string, StrategyTemplate*>m_strategymap;			std::mutex m_strategymtx;
-
+public:
 	//orderid:: orderReq
 	std::map<std::string, std::shared_ptr<Event_StopOrder>> m_stop_order_map; std::mutex m_stop_order_mtx; 
+private:
 	int m_stop_order_count=1;
 	//因为stop order id的生成与其他orderid的生成是分开的，为了防止冲突，单独建立一个m_StoporderStrategymap保存
 	//stoporderid和策略的对应关系

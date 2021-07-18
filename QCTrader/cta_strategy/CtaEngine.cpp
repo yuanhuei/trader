@@ -613,10 +613,11 @@ void CtaEngine::stopallStrategy()
 void CtaEngine::cancelAllOrder(std::string strStragetyName)
 {
 	m_stragegyOrderMapmtx.lock();
-	if (m_stragegyOrderMap[strStragetyName].size() < 1)
-		return;
-	for (int i = 1; i < m_stragegyOrderMap[strStragetyName].size(); i++)
-		cancelOrder(m_stragegyOrderMap[strStragetyName][i]);
+	if (m_stragegyOrderMap[strStragetyName].size() >= 1)
+	{
+		for (int i = 1; i < m_stragegyOrderMap[strStragetyName].size(); i++)
+			cancelOrder(m_stragegyOrderMap[strStragetyName][i]);
+	}
 	m_stragegyOrderMapmtx.unlock();
 }
 
