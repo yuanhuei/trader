@@ -128,7 +128,7 @@ public:
 	void cancelOrder(std::string orderID, std::string gatewayname);
 	void cancel_stop_order(std::string orderID, std::string gatewayname);
 	void cancel_limit_order(std::string orderID, std::string gatewayname);
-	void cancelAllOrder();
+	void cancelAllOrder(std::string strStragetyName);
 
 	void cross_limit_order(const BarData& data);
 	void cross_stop_order(const BarData& data);

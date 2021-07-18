@@ -36,8 +36,7 @@ StrategyTemplate::~StrategyTemplate()
 	delete m_strategydata;
 	delete m_MongoCxx;
 }
-void StrategyTemplate::updateSetting()
-{}
+
 void StrategyTemplate::sync_data()
 {
 	std::string strFileName = m_strategyName + "_" + m_symbol;
@@ -232,7 +231,7 @@ void StrategyTemplate::cancelAllOrder()
 	}
 	m_orderlistmtx.unlock();
 	*/
-	m_ctaEngine->cancelAllOrder();
+	m_ctaEngine->cancelAllOrder(m_strategyName);
 }
 
 //撤交易所的单

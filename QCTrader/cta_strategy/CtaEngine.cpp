@@ -610,10 +610,14 @@ void CtaEngine::stopallStrategy()
 	m_orderStrategymtx.unlock();
 }
 
-void CtaEngine::cancelAllOrder()
+void CtaEngine::cancelAllOrder(std::string strStragetyName)
 {
-
-
+	m_stragegyOrderMapmtx.lock();
+	if (m_stragegyOrderMap[strStragetyName].size() < 1)
+		return;
+	for (int i = 1; i < m_stragegyOrderMap[strStragetyName].size(); i++)
+		cancelOrder(m_stragegyOrderMap[strStragetyName][i]);
+	m_stragegyOrderMapmtx.unlock();
 }
 
 /******************处理函数***************************/
@@ -686,12 +690,12 @@ void CtaEngine::processOrderEvent(std::shared_ptr<Event>e)
 void CtaEngine::processStopOrderEvent(std::shared_ptr<Event>e)
 {
 	std::shared_ptr<Event_StopOrder> eOrder = std::static_pointer_cast<Event_StopOrder>(e);
-	m_StoporderStrategymtx.lock();
-	if (m_StoporderStrategymap.find(eOrder->orderID) != m_StoporderStrategymap.end())
+	m_orderStrategymtx.lock();
+	if (m_orderStrategymap.find(eOrder->orderID) != m_orderStrategymap.end())
 	{
-		m_StoporderStrategymap[eOrder->orderID]->onStopOrder(eOrder);
+		m_orderStrategymap[eOrder->orderID]->onStopOrder(eOrder);
 	}
-	m_StoporderStrategymtx.unlock();
+	m_orderStrategymtx.unlock();
 }
 void CtaEngine::processTradeEvent(std::shared_ptr<Event>e)
 {
@@ -909,7 +913,7 @@ void CtaEngine::registerEvent()
 {
 	m_eventengine->RegEvent(EVENT_TICK, std::bind(&CtaEngine::procecssTickEvent, this, std::placeholders::_1));
 	m_eventengine->RegEvent(EVENT_ORDER, std::bind(&CtaEngine::processOrderEvent, this, std::placeholders::_1));
-	m_eventengine->RegEvent(EVENT_STOP_ORDER, std::bind(&CtaEngine::processOrderEvent, this, std::placeholders::_1));
+	m_eventengine->RegEvent(EVENT_STOP_ORDER, std::bind(&CtaEngine::processStopOrderEvent, this, std::placeholders::_1));
 
 	m_eventengine->RegEvent(EVENT_TRADE, std::bind(&CtaEngine::processTradeEvent, this, std::placeholders::_1));
 	m_eventengine->RegEvent(EVENT_POSITION, std::bind(&CtaEngine::processPositionEvent, this, std::placeholders::_1));
@@ -967,10 +971,46 @@ std::vector<std::string>CtaEngine::sendOrder(bool bStopOrder, std::string symbol
 		return v;
 	}
 }
-
-void CtaEngine::cancelOrder(std::string orderID, std::string gatewayname)
+void CtaEngine::cancel_local_stop_order(std::string orderID)
 {
-	std::shared_ptr<Event_Order>order = m_gatewaymanager->getorder(gatewayname, orderID);
+	std::shared_ptr<Event_StopOrder> ptr_stop_order;
+	m_stop_order_mtx.lock();
+	std::map<std::string, std::shared_ptr<Event_StopOrder>>::iterator iter= m_stop_order_map.find(orderID);
+	if (iter != m_stop_order_map.end())
+	{
+		ptr_stop_order = iter->second;
+		m_stop_order_map.erase(iter);
+	}
+	m_stop_order_mtx.unlock();
+	ptr_stop_order->status = STATUS_CANCELLED;
+
+
+	m_stragegyOrderMapmtx.lock();
+	std::vector<std::string>::iterator it = m_stragegyOrderMap[ptr_stop_order->strategyName].begin();
+	for (it; it!=m_stragegyOrderMap[ptr_stop_order->strategyName].end();)
+	{
+		if ((*it) == orderID)
+			it = m_stragegyOrderMap[ptr_stop_order->strategyName].erase(it);
+		else
+			iter++;
+
+	}
+	m_stragegyOrderMapmtx.unlock();	
+	
+	PutEvent(ptr_stop_order);
+
+}
+
+
+void CtaEngine::cancelOrder(std::string orderID, std::string gatewayName)
+{
+	if (orderID.find("stop_order_id") != orderID.npos)//是停止单
+	{
+		cancel_local_stop_order(orderID);
+		return;
+	}
+	//非停止单，直接提交给交易所
+	std::shared_ptr<Event_Order>order = m_gatewaymanager->getorder("CTP", orderID);
 	if (order != nullptr)
 	{
 		//报单有效
@@ -983,7 +1023,7 @@ void CtaEngine::cancelOrder(std::string orderID, std::string gatewayname)
 			req.frontID = order->frontID;
 			req.sessionID = order->sessionID;
 			req.orderID = order->orderID;
-			m_gatewaymanager->cancelOrder(req, order->gatewayname);
+			m_gatewaymanager->cancelOrder(req, "CTP");
 		}
 	}
 }
@@ -999,18 +1039,25 @@ std::vector<std::string>CtaEngine::sendStopOrder(std::string symbol, std::string
 	ptr_stop_order->totalVolume = volume;
 	ptr_stop_order->strategyName = pStrategy->m_strategyName;
 	m_stop_order_count++;
-	std::string orderID = "stop_order_id" + std::to_string(m_stop_order_count);
+	std::string orderID = "stop_order_id：" + std::to_string(m_stop_order_count);//加了stop_order_id：用来区分
 	//stop_order.orderID
 	m_stop_order_mtx.lock();
 	m_stop_order_map.insert(std::pair <std::string, std::shared_ptr<Event_StopOrder>> (orderID, ptr_stop_order));
 	m_stop_order_mtx.unlock();
 
+	m_orderStrategymtx.lock();
+	m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, pStrategy));
+	m_orderStrategymtx.unlock();
+	/*
 	m_StoporderStrategymtx.lock();
 	m_StoporderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, pStrategy));
 	m_StoporderStrategymtx.unlock();
+	*/
+	m_stragegyOrderMapmtx.lock();
+	m_stragegyOrderMap[pStrategy->m_strategyName].push_back(orderID);//不在m_stragegyOrderMap中保存
+	m_stragegyOrderMapmtx.unlock();
 
-	//m_stragegyOrderMap[pStrategy->m_strategyName].push_back(orderID);不在m_stragegyOrderMap中保存
-	//pStrategy->onStopOrder(ptr_stop_order);
+	//pStrategy->onStopOrder(ptr_stop_order); PutEvent后被调用了，这里不用调用
 	std::vector<std::string> orderidVector;
 	orderidVector.push_back(orderID);
 	

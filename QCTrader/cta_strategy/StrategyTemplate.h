@@ -70,7 +70,7 @@ public:
 	//停止
 	virtual void onStop();
 	//需要具体的策略函数实现，将配置文件中取得的值赋值给策略中具体的变量
-	virtual void updateSetting();
+	virtual void updateSetting()=0;
 
 
 	//给参数赋值
@@ -159,11 +159,7 @@ public:
 	//两个参数列表
 	StrategyData *m_strategydata;
 
-	/**********************************_(:з」∠)_回测用***********************************************/
-	//std::map<std::string, std::string>m_VarPlot;	std::map<std::string, std::string>m_indicatorPlot;			std::mutex m_VarPlotmtx;
-private:
 
-	/*******************************************************/
 	std::map<std::string, double>m_pos_map;				//持仓
 	std::mutex m_Pos_mapmtx;
 
@@ -172,136 +168,5 @@ private:
 	std::vector<std::string>m_orderlist;				//普通报单列表
 };
 
-class BarGreater
-{
-public:
-	bool operator ()(const BarData& bar1, const BarData& bar2)
-	{
-		return bar1.unixdatetime < bar2.unixdatetime;
-	}
-};
-
-class TickGreater
-{
-public:
-	bool operator ()(const TickData& tick1, const TickData& tick2)
-	{
-		return tick1.unixdatetime < tick2.unixdatetime;
-	}
-};
-
 #endif
 
-/*
-.h
-
-std::map<std::string,int> m_barMinute;
-std::map<std::string, int> m_barHour;
-std::map<std::string, BarData> m_barmap;
-
-
-
-
-
-
-
-
-
-.cpp
-
-if (m_barMinute.find(Tick.symbol) == m_barMinute.end())
-{
-m_barMinute.insert(std::pair<std::string, int>(Tick.symbol, 99));
-}
-if (m_barHour.find(Tick.symbol) == m_barHour.end())
-{
-m_barHour.insert(std::pair<std::string, int>(Tick.symbol, 99));
-}
-putEvent();
-
-int tickMinute = Tick.getminute();
-int tickHour = Tick.gethour();
-
-m_hourminutemtx.lock();
-
-if ((tickMinute != m_barMinute[Tick.symbol]) || (tickHour != m_barHour[Tick.symbol]))
-{
-if (m_barmap.find(Tick.symbol) != m_barmap.end())
-{//判断这个合约是否要存分钟bar
-onBar(m_barmap[Tick.symbol]);
-}
-BarData bar;
-
-bar.symbol = Tick.symbol;
-bar.exchange = Tick.exchange;
-bar.open = Tick.lastprice;
-bar.high = Tick.lastprice;
-bar.low = Tick.lastprice;
-bar.close = Tick.lastprice;
-
-bar.openPrice = Tick.openPrice;//今日开
-bar.highPrice = Tick.highPrice;//今日高
-bar.lowPrice = Tick.lowPrice;//今日低
-bar.preClosePrice = Tick.preClosePrice;//昨收
-
-bar.upperLimit = Tick.upperLimit;//涨停
-bar.lowerLimit = Tick.lowerLimit;//跌停
-
-bar.volume = Tick.volume;
-bar.openInterest = Tick.openInterest;
-
-bar.date = Tick.date;
-bar.time = Tick.time;
-bar.unixdatetime = Tick.unixdatetime;
-m_barmap[Tick.symbol] = bar;
-m_barMinute[Tick.symbol] = tickMinute;
-m_barHour[Tick.symbol] = tickHour;
-
-}
-else
-{
-m_barmap[Tick.symbol].high = std::max(m_barmap[Tick.symbol].high, Tick.lastprice);
-m_barmap[Tick.symbol].low = std::min(m_barmap[Tick.symbol].low, Tick.lastprice);
-m_barmap[Tick.symbol].close = Tick.lastprice;
-m_barmap[Tick.symbol].highPrice = Tick.highPrice;
-m_barmap[Tick.symbol].lowPrice = Tick.lowPrice;
-m_barmap[Tick.symbol].volume = Tick.volume;
-}
-m_hourminutemtx.unlock();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-*/

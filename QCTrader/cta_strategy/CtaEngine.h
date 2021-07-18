@@ -65,8 +65,10 @@ public:
 	//std::vector<std::string> sendOrder(std::string symbol, std::string orderType, double price, double volume, StrategyTemplate* Strategy);
 	std::vector<std::string>sendOrder(bool bStopOrder,std::string symbol, std::string strDirection, std::string strOffset, double price, double volume, StrategyTemplate* Strategy);
 
-	void cancelOrder(std::string orderID, std::string gatewayname);
-	void cancelAllOrder();
+	void cancelOrder(std::string orderID,std::string gatewayName="CTP");
+	void cancelAllOrder(std::string strStragetyName);
+	void cancel_local_stop_order(std::string orderID);
+
 	void writeCtaLog(std::string msg);
 
 	void PutEvent(std::shared_ptr<Event>e);
@@ -108,6 +110,7 @@ private:
 	std::map<std::string, StrategyTemplate*>m_orderStrategymap;		std::mutex m_orderStrategymtx;
 	//策略和策略下的订单的map,
 	std::map<std::string, std::vector<std::string>> m_stragegyOrderMap; std::mutex m_stragegyOrderMapmtx;
+
 	//key 合约名 value 持仓对象   用来缓存每一个合约的今仓昨仓是多少
 	std::map<std::string, PositionBuffer>m_symbolpositionbuffer;	std::mutex m_symbolpositionmtx;
 
@@ -116,11 +119,12 @@ private:
 	//key 策略名+合约名, value 为策略指针    用来把界面选中的策略名 对应的的策略对象启动
 	std::map<std::string, StrategyTemplate*>m_strategymap;			std::mutex m_strategymtx;
 
-	std::map<std::string, std::shared_ptr<Event_StopOrder>> m_stop_order_map; std::mutex m_stop_order_mtx; //orderid:: orderReq
+	//orderid:: orderReq
+	std::map<std::string, std::shared_ptr<Event_StopOrder>> m_stop_order_map; std::mutex m_stop_order_mtx; 
 	int m_stop_order_count=1;
 	//因为stop order id的生成与其他orderid的生成是分开的，为了防止冲突，单独建立一个m_StoporderStrategymap保存
 	//stoporderid和策略的对应关系
-	std::map<std::string, StrategyTemplate*>m_StoporderStrategymap;		std::mutex m_StoporderStrategymtx;
+	//std::map<std::string, StrategyTemplate*>m_StoporderStrategymap;		std::mutex m_StoporderStrategymtx;
 
 	void check_stop_order(TickData tickDate);
 	std::vector<std::string>sendStopOrder(std::string symbol, std::string strDirection,std::string strOffset, double price, double volume, StrategyTemplate* Strategy);

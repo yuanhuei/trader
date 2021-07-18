@@ -910,7 +910,7 @@ void BacktesterEngine::cancelOrder(std::string orderID, std::string gatewayname)
 	cancel_stop_order(orderID, gatewayname);
 	cancel_limit_order(orderID, gatewayname);
 }
-void BacktesterEngine::cancelAllOrder()
+void BacktesterEngine::cancelAllOrder(std::string strStragetyName)
 {
 	std::map<std::string, std::shared_ptr<Event_Order>>::iterator iter;
 	for(iter= m_active_limit_orders.begin();iter!= m_active_limit_orders.end();)
