@@ -75,7 +75,6 @@ public:
 	float m_pricetick = 0;
 	float m_capital = 100000;
 	float risk_free= 0.02;
-	//mode = BacktestingMode.BAR;
 	//self.inverse = False
 	std::string m_barDate;
 
@@ -87,39 +86,30 @@ public:
 
 	Interval m_iInterval=MINUTE;
 	int m_days = 0;
-	//self.callback = None
 	// 
 	//bar模式还是tick模式
 	std::string m_backtestmode = BAR_MODE;								
 
-	int m_stop_order_count = 0;
-	//stop_orders = {}
-	//active_stop_orders = {}
-
+	int m_stop_order_count = 0;//用于order ID生成
 	int m_limit_order_count = 0;
-	//self.limit_orders = {}
-	//self.active_limit_orders = {}
-
 	std::map<std::string, std::shared_ptr<Event_StopOrder>>m_stop_orders;				//所有的单，不会删除
 	std::map<std::string, std::shared_ptr<Event_StopOrder>>m_active_stop_orders;		   //工作中的单   
 
 	std::map<std::string, std::shared_ptr<Event_Order>>m_limit_orders;				//所有的单，不会删除
 	std::map<std::string, std::shared_ptr<Event_Order>>m_active_limit_orders;		//工作中的单   
 
-	//int m_trade_count = 0;
 	int  m_tradeCount = 0;							//成交次数
 
 	std::map<std::string, std::shared_ptr<Event_Trade>>m_tradeMap;//成交单					
-	//std::map<std::string, Result>m_result;											
 
-	std::vector<BarData> vector_history_data;
-
+	std::vector<BarData> vector_history_data; //加载的历史数据
 
 
-	std::map <QDate , std::shared_ptr<DailyTradingResult >> m_daily_resultMap;
-	std::map < std::string, std::string> m_result_statistics;
 
-	void ResetData();
+	std::map <QDate , std::shared_ptr<DailyTradingResult >> m_daily_resultMap; //根据成交单生成每日盈利结果
+	std::map < std::string, std::string> m_result_statistics; //最后输出的统计数据
+
+	void ResetData();//重新测试需要重制一下数据
 	void calculate_result();
 	void calculate_statistics(bool bOutput = false);
 
@@ -137,7 +127,7 @@ public:
 	std::vector<std::string> send_stop_order(std::string symbol, std::string strDirection, std::string strOffset, 
 		double price, double volume, StrategyTemplate* Strategy);
 
-	void PutEvent(std::shared_ptr<Event>e);
+	void PutEvent(std::shared_ptr<Event>e);//推送事件
 
 	std::vector<TickData> loadTickbyDateTime(std::string symbol, QDateTime startDay, QDateTime endDay);
 	std::vector<BarData> loadBarbyDateTime(std::string symbol, QDateTime startDay, QDateTime endDay);
@@ -145,7 +135,6 @@ public:
 	std::vector<BarData> loadBar(std::string symbol, int days);
 
 	EventEngine* m_eventengine;
-	//void InitUI();
 
 
 	//回测函数
@@ -170,7 +159,5 @@ public:
 	void runBacktesting();
 	void writeCtaLog(std::string msg);
 
-	//回测的变量
-	//int m_limitorderCount=1;						//人工ORDERID
 };
 

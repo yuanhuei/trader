@@ -66,56 +66,6 @@ void StrategyTemplate::onInit()
 	{
 		onBar(*it);
 	}
-	/*
-	std::vector<std::string>symbol_v = Utils::split(m_strategydata->getparam("symbol"), ",");
-	if (trademode == BAR_MODE)
-	{
-		std::vector<BarData>alldatalist;
-		for (std::vector<std::string>::iterator it = symbol_v.begin(); it != symbol_v.end(); it++)
-		{
-			std::vector<BarData>datalist = loadBar(*it, initDays);
-			for (std::vector<BarData>::iterator it = datalist.begin(); it != datalist.end(); it++)
-			{
-				alldatalist.push_back(*it);
-			}
-		}
-
-		std::sort(alldatalist.begin(), alldatalist.end(), BarGreater());
-
-		for (std::vector<BarData>::iterator it = alldatalist.begin(); it != alldatalist.end(); it++)
-		{
-			onBar(*it);
-		}
-	}
-	else if (trademode == TICK_MODE)
-	{
-		std::vector<TickData>alldatalist;
-		for (std::vector<std::string>::iterator it = symbol_v.begin(); it != symbol_v.end(); it++)
-		{
-			std::vector<TickData>datalist = loadTick(*it, initDays);
-			for (std::vector<TickData>::iterator it = datalist.begin(); it != datalist.end(); it++)
-			{
-				alldatalist.push_back(*it);
-			}
-		}
-
-		std::sort(alldatalist.begin(), alldatalist.end(), TickGreater());
-
-		for (std::vector<TickData>::iterator it = alldatalist.begin(); it != alldatalist.end(); it++)
-		{
-			onTick(*it);
-		}
-	}
-	//loadposfrommongo();  //读取持仓
-	std::map<std::string, double>map = getposmap();
-	for (std::map<std::string, double>::iterator iter = map.begin(); iter != map.end(); iter++)
-	{
-		m_algorithm->set_supposedPos(iter->first, iter->second);
-	}
-
-	*/
-	//inited = true;
-	//putEvent();
 }
 //开始 
 void StrategyTemplate::onStart()
@@ -372,19 +322,6 @@ std::map<std::string, double> StrategyTemplate::getposmap()
 	m_Pos_mapmtx.unlock();
 	return map;
 }
-/*
-std::map<std::string, std::string> StrategyTemplate::GetVarPlotMap()
-{
-	std::unique_lock<std::mutex>lck(m_VarPlotmtx);
-	return m_VarPlot;
-}
-
-std::map<std::string, std::string> StrategyTemplate::GetIndicatorMap()
-{
-	std::unique_lock<std::mutex>lck(m_VarPlotmtx);
-	return m_indicatorPlot;
-}
-*/
 void StrategyData::insertparam(std::string key, std::string value)
 {
 	m_mtx.lock();

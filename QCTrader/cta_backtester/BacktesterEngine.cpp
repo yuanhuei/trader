@@ -101,6 +101,8 @@ void BacktesterEngine:: ResetData()
 	m_daily_resultMap.clear();
 	m_result_statistics.clear();
 
+	return;
+
 }
 
 
@@ -375,7 +377,6 @@ std::vector<BarData> BacktesterEngine::loadBarbyDateTime(std::string symbol, QDa
 	}
 	const char* databasename = DATABASE_NAME;
 	const char* collectionsname = BARCOLLECTION_NAME;
-	//auto targetday = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) - (days * 24 * 3600);//获取当前的系统时间
 	auto start = startDay.toTime_t();
 	auto end = endDay.toTime_t();
 

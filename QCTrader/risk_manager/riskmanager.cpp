@@ -26,10 +26,10 @@ riskmanager::~riskmanager() {}
 
 void riskmanager::loadSetting()
 {
-	if (_access("./riskmanager", 0) != -1)
+	if (_access("./conf", 0) != -1)
 	{
 		std::fstream f;
-		f.open("./riskmanager/risk_config");
+		f.open("./conf/risk_config");
 		if (!f.is_open())
 		{
 			//如果打不开文件

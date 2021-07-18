@@ -51,12 +51,6 @@ CtaEngine::~CtaEngine()
 		}
 
 	}
-	/*
-	for (std::map<std::string, HINSTANCE>::iterator it = dllmap.begin(); it != dllmap.end(); it++)
-	{
-		Release result = (Release)GetProcAddress(it->second, "ReleaseStrategy");//析构策略
-		result();
-	}*/
 	delete m_portfolio;
 }
 //读取策略配置文件
@@ -372,45 +366,11 @@ void CtaEngine::loadStrategy()
 
 				}
 			}
-			/*
-			for (std::map<std::string, std::map<std::string, float>>::iterator it = m_strategyData_map.begin(); it != m_strategyData_map.end(); it++)
-			{
-				std::string str = it->first;
-				if (str == (strStrategyName + "_" + strSymbolName))//找到对应的策略合约
-				{
-					std::map<std::string, float>varMap = it->second;//变量map
-					for (std::map<std::string, float>::iterator it = varMap.begin(); it != varMap.end(); it++)
-					{
-						//遍历var
-						std::string value = std::to_string(it->second);
-						strategy_ptr->updateVar(it->first.c_str(), value.c_str());
-					}
-				}
-
-			}*/
 			//把读取到的配置和变量值通过strategeData更新到策略的变量上去
 			strategy_ptr->updateSetting();
 
-			//插入pos_map
-			//strategy_ptr->checkSymbol(strSymbolName.c_str());
-			/*
-			for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
-			{
-				strategy_ptr->checkSymbol((*iter).c_str());
-			}
-
-			if (strategy_ptr->getparam("name") == "Null")
-			{
-				this->writeCtaLog("策略中有一个没有给策略起名！", strategy_ptr->gatewayname);
-			}
-			else
-			{*/
-			//strategy_ptr->putEvent();
-			//strategy_ptr->putGUI();
 
 			m_tickstrategymtx.lock();
-			//for (std::vector<std::string>::iterator iter = symbol_v.begin(); iter != symbol_v.end(); iter++)
-			//{
 			//更新m_tickstrategymap
 			if (m_tickstrategymap.find(strSymbolName) == m_tickstrategymap.end())
 			{
@@ -846,26 +806,6 @@ void CtaEngine::processPositionEvent(std::shared_ptr<Event>e)
 	}
 	m_tickstrategymtx.unlock();
 }
-/*
-void CtaEngine::showLog(std::shared_ptr<Event>e)
-{
-	std::shared_ptr<Event_Log> elog = std::static_pointer_cast<Event_Log>(e);
-	if (elog->gatewayname == "CTP" && elog->msg == "行情服务器登录完成")
-	{
-		m_connectstatus = true;
-		m_tickstrategymtx.lock();
-		for (std::map<std::string, std::vector<StrategyTemplate*>>::iterator it = m_tickstrategymap.begin(); it != m_tickstrategymap.end(); it++)
-		{
-			std::shared_ptr<Event_Contract>contract = m_gatewaymanager->getContract(it->first);
-			SubscribeReq req;
-			req.symbol = contract->symbol;
-			req.exchange = contract->exchange;
-			m_gatewaymanager->subscribe(req, "CTP");
-		}
-		m_tickstrategymtx.unlock();
-	}
-}
-*/
 //设置了定时器，非交易时间断开连接，交易时间自动连接
 void CtaEngine::autoConnect(std::shared_ptr<Event>e)
 {
@@ -1049,11 +989,7 @@ std::vector<std::string>CtaEngine::sendStopOrder(std::string symbol, std::string
 	m_orderStrategymtx.lock();
 	m_orderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, pStrategy));
 	m_orderStrategymtx.unlock();
-	/*
-	m_StoporderStrategymtx.lock();
-	m_StoporderStrategymap.insert(std::pair<std::string, StrategyTemplate*>(orderID, pStrategy));
-	m_StoporderStrategymtx.unlock();
-	*/
+
 	m_stragegyOrderMapmtx.lock();
 	m_stragegyOrderMap[pStrategy->m_strategyName].push_back(orderID);//不在m_stragegyOrderMap中保存
 	m_stragegyOrderMapmtx.unlock();

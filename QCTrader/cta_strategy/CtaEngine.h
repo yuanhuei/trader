@@ -85,6 +85,7 @@ public:
 	void initallStrategy();															//初始化所有策略
 	void startallStrategy();															//启动所有策略
 	void stopallStrategy();															//停止所有策略
+	
 	void changesupposedpos(std::string name, std::string symbol, double pos);			//通过策略面板控制持仓
 
 	//交易留底
@@ -118,14 +119,11 @@ private:
 	std::map<std::string, std::vector<StrategyTemplate*>>m_tickstrategymap;	std::mutex m_tickstrategymtx;
 	//key 策略名+合约名, value 为策略指针    用来把界面选中的策略名 对应的的策略对象启动
 	std::map<std::string, StrategyTemplate*>m_strategymap;			std::mutex m_strategymtx;
-public:
+public://这个map数据需要在CTA策略界面上读取，所以public了
 	//orderid:: orderReq
 	std::map<std::string, std::shared_ptr<Event_StopOrder>> m_stop_order_map; std::mutex m_stop_order_mtx; 
 private:
-	int m_stop_order_count=1;
-	//因为stop order id的生成与其他orderid的生成是分开的，为了防止冲突，单独建立一个m_StoporderStrategymap保存
-	//stoporderid和策略的对应关系
-	//std::map<std::string, StrategyTemplate*>m_StoporderStrategymap;		std::mutex m_StoporderStrategymtx;
+	int m_stop_order_count=1;//为了生成ID
 
 	void check_stop_order(TickData tickDate);
 	std::vector<std::string>sendStopOrder(std::string symbol, std::string strDirection,std::string strOffset, double price, double volume, StrategyTemplate* Strategy);
@@ -145,14 +143,10 @@ private:
 	std::map<std::string, HINSTANCE>dllmap;//存放策略dll容器
 
 	//自动重连
-	//void showLog(std::shared_ptr<Event>e);
 	std::atomic_bool m_connectstatus;
 	void autoConnect(std::shared_ptr<Event>e);
 
-	//MONGOC 线程池
-	//mongoc_uri_t* m_uri;
 public:
-	//mongoc_client_pool_t* m_pool;
 
 	//portfolio
 	Portfolio* m_portfolio;
